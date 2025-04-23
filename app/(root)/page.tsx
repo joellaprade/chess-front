@@ -3,11 +3,11 @@ import Link from "next/link";
 export default function Page() {
   return (
     <>
-      <Link href={"/signup"}>
+      <Link className="w-full" href={"/signup"}>
         <button className="big-btn main-btn">Crear Cuenta</button>
       </Link>
 
-      <Link href={"/login"}>
+      <Link className="w-full" href={"/login"}>
         <button className="big-btn secondary-btn">Ingresar</button>
       </Link>
 

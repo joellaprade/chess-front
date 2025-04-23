@@ -28,6 +28,12 @@ const Navbar = () => {
     case "/friends":
       message = "Amigos";
       break;
+    case "/friends/invitations":
+      message = "Invitaciones";
+      break;
+    case "/friends/add":
+      message = "Agregar Amigo";
+      break;
     default:
       message = "Bienvenido";
       break;

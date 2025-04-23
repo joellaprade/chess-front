@@ -51,7 +51,7 @@ body {
   }
 
   .small-btn {
-    @apply p-1.5;
+    @apply p-2.5;
   }
 
   .main-btn {
@@ -68,6 +68,20 @@ body {
 
   .notification {
     @apply bg-dark-gray absolute top-0 left-0 z-1 flex w-full -translate-y-full justify-between px-9 py-8 transition-transform duration-300;
+  }
+
+  .toggle-switch {
+    @apply bg-dark-brown flex rounded-full p-3;
+  }
+  .toggle-switch h3 {
+    @apply cursor-pointer rounded-full px-5 py-2;
+  }
+  .toggle-switch .selected {
+    @apply bg-green;
+  }
+
+  .friend-list {
+    @apply flex w-full flex-col gap-6;
   }
 }
 

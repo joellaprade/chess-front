@@ -1,7 +1,7 @@
 export default function Page() {
   return (
     <>
-      <form action="">
+      <form className="w-full" action="">
         <input type="text" placeholder="Nombre de Usuario" />
         <input type="text" placeholder="Correo Electrónico" />
         <input type="text" placeholder="Contraseña" />

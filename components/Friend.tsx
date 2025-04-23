@@ -10,10 +10,11 @@ const Friend = () => {
       </div>
       <button className="small-btn bg-green">
         <Image
-          src={"/assets/small-pawn.png"}
+          src={"/assets/pawn-icon.png"}
           alt="small pawn"
           width={20}
           height={20}
+          className="object-contains"
         />
       </button>
     </div>

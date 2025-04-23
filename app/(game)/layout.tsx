@@ -1,5 +1,4 @@
 import Navbar from "@/components/Navbar";
-import Notification from "../../components/Notification";
 
 export default function RootLayout({
   children,
@@ -8,8 +7,7 @@ export default function RootLayout({
 }>) {
   return (
     <>
-      <Notification />
-      <Navbar />
+      <div className="bg-dark-brown h-25 w-full"></div>
       <div className="relative flex w-full flex-1 flex-col items-center justify-center gap-6 px-10">
         {children}
       </div>
