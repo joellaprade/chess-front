@@ -13,6 +13,7 @@ body {
   --color-dark-green: #739552;
   --color-green: #81b64c;
   --color-light: #ebecd0;
+  --color-yellow: #ffeb5f;
 }
 
 @layer base {
@@ -82,6 +83,38 @@ body {
 
   .friend-list {
     @apply flex w-full flex-col gap-6;
+  }
+}
+
+/* Game Components */
+@layer components {
+  /* hacer board con tamano dinamico */
+  .game {
+    @apply flex h-full flex-col;
+  }
+  .board {
+    @apply aspect-square w-full;
+  }
+  .row {
+    @apply flex;
+  }
+  .square {
+    @apply aspect-square flex-1;
+  }
+  .square.green {
+    @apply bg-dark-green;
+  }
+  .square.white {
+    @apply bg-light;
+  }
+  .square.yellow {
+    @apply bg-yellow;
+  }
+  .user {
+    @apply flex flex-1 items-center justify-between px-10;
+  }
+  .timer {
+    @apply flex gap-5 rounded bg-white p-2;
   }
 }
 

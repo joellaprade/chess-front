@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function Page() {
   return (
     <>
-      <Link className="w-full" href={"/play"}>
+      <Link className="w-full" href={"/game"}>
         <button className="big-btn main-btn">Jugar</button>
       </Link>
 

@@ -1,8 +1,8 @@
 "use client";
 
-import GameReqList from "@/components/GameReqList";
-import FriendReqList from "@/components/FriendReqList";
-import ToggleSwitch from "@/components/ToggleSwitch";
+import GameReqList from "@/components/home/GameReqList";
+import FriendReqList from "@/components/home/FriendReqList";
+import ToggleSwitch from "@/components/home/ToggleSwitch";
 import { useState } from "react";
 
 export default function Page() {
@@ -13,10 +13,10 @@ export default function Page() {
   };
 
   return (
-    <>
-      <ToggleSwitch className="absolute top-10" getChange={getChange} />
+    <div className="flex w-full flex-1 flex-col items-center gap-10 pt-10">
+      <ToggleSwitch getChange={getChange} />
       {selected == 0 && <GameReqList />}
       {selected == 1 && <FriendReqList />}
-    </>
+    </div>
   );
 }

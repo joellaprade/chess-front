@@ -9,7 +9,9 @@ export default function Page() {
         <Link className="link" href={"forgot-password"}>
           Olvidé mi Contraseña
         </Link>
-        <button className="big-btn main-btn mt-6">Ingresar</button>
+        <Link className="w-full" href={"/home"}>
+          <button className="big-btn main-btn mt-6">Ingresar</button>
+        </Link>
       </form>
     </>
   );

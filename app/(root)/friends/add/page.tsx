@@ -1,6 +1,6 @@
 "use client";
 
-import Friend from "@/components/Friend";
+import Friend from "@/components/home/Friend";
 
 export default function Page() {
   return (

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import ProfilePlaceholder from "./ProfilePlaceholder";
+import ProfilePlaceholder from "../home/ProfilePlaceholder";
 
 const Friend = () => {
   return (

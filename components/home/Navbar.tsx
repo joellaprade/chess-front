@@ -1,6 +1,6 @@
 "use client";
 
-import NavBg from "./ui/NavBg";
+import NavBg from "../ui/NavBg";
 import { ChevronLeft } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
