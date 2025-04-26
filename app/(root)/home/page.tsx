@@ -10,7 +10,10 @@ export default function Page() {
       <Link className="w-full" href={"/friends"}>
         <button className="big-btn secondary-btn">Amigos</button>
       </Link>
+
+      <Link className="w-full" href={"/settings"}>
+        <button className="big-btn secondary-btn">Ajustes</button>
+      </Link>
     </>
   );
 }
-6;

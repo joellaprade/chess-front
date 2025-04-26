@@ -1,5 +1,5 @@
-import Navbar from "@/components/home/Navbar";
-import Notification from "../../components/home/Notification";
+import Navbar from "@/reusable/components/home/Navbar";
+import Notification from "@/reusable/components/home/Notification";
 
 export default function RootLayout({
   children,
