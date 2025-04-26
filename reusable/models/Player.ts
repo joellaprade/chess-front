@@ -6,7 +6,7 @@ const playerSchema = new Schema({
   isOnline: { type: Boolean, default: false },
 });
 
-export const Player = models.User || model("Player", playerSchema);
+export const Player = models.Player || model("Player", playerSchema);
 export type Player = InferSchemaType<typeof playerSchema> & {
   _id: Types.ObjectId;
 };

@@ -1,10 +1,9 @@
 "use server";
-
-import db from "../lib/db";
+import { User } from "@/reusable/models/User";
 import bcrypt from "bcrypt";
-import { User } from "../models/User";
-import { Player } from "../models/Player";
+import db from "../lib/db";
 import { getFormValues } from "../lib/utils";
+import { Player } from "../models/Player";
 
 type formData = {
   name: string;
@@ -13,24 +12,22 @@ type formData = {
   password: string;
 };
 
-// export async function signUp(formData: FormData) {
-export async function signUp(body: any) {
+export async function signUp(formData: FormData): Promise<void> {
   try {
     await db();
-    console.log(body, body.name, typeof body.name);
-    // const { name, email, username, password } =
-    //   getFormValues<formData>(formData);
+    const { username, password, name, email } =
+      getFormValues<formData>(formData);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const { name } = body;
-
-    // const hashedPassword = await bcrypt.hash(password as string, 10);
-
-    const user = await User.create(body);
+    const user: User = await User.create({
+      name,
+      email,
+      username,
+      password: hashedPassword,
+    });
 
     const player: Player = await Player.create({ userId: user._id });
-
-    console.log(player);
-  } catch (e: any) {
-    console.error("Validation error:", JSON.stringify(e.errors, null, 2));
+  } catch (e) {
+    console.error(e);
   }
 }
