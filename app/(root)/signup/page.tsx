@@ -83,7 +83,7 @@ export default function Page() {
           onChange={(e) => {
             updateData(e.target.value, "confirmPassword");
           }}
-          type="text"
+          type="password"
           placeholder="Confirmar Contraseña"
         />
         <button
