@@ -1,5 +1,5 @@
-import Board from "@/components/game/Board";
-import User from "@/components/game/User";
+import Board from "@/reusable/components/game/Board";
+import User from "@/reusable/components/game/User";
 
 const Game = () => {
   const gameData: gameDataType = {

@@ -1,8 +1,8 @@
 "use client";
 
-import GameReqList from "@/components/home/GameReqList";
-import FriendReqList from "@/components/home/FriendReqList";
-import ToggleSwitch from "@/components/home/ToggleSwitch";
+import GameReqList from "@/reusable/components/home/GameReqList";
+import FriendReqList from "@/reusable/components/home/FriendReqList";
+import ToggleSwitch from "@/reusable/components/home/ToggleSwitch";
 import { useState } from "react";
 
 export default function Page() {

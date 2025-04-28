@@ -3,11 +3,14 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import login from "@/reusable/actions/login";
+import useFetchServerAction from "@/reusable/hooks/fetchAction";
 
 export default function Page() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isValid, setIsValid] = useState(false);
+
+  const { loading, error, fetchData } = useFetchServerAction(login);
 
   const checkIsValid = () => {
     if (!username || !password) {
@@ -18,13 +21,16 @@ export default function Page() {
     setIsValid(true);
   };
 
-  useEffect(() => {
-    checkIsValid();
-  }, [username, password]);
+  useEffect(checkIsValid, [username, password]);
 
   return (
     <>
-      <form className="w-full" action={login}>
+      <form
+        className="w-full"
+        action={(formData: FormData) => {
+          fetchData(formData);
+        }}
+      >
         <input
           value={username}
           onChange={(e) => setUsername(e.target.value)}
@@ -39,14 +45,15 @@ export default function Page() {
           placeholder="Contraseña"
           name="password"
         />
+        <span className="error">{error}</span>
         <Link className="link" href={"forgot-password"}>
           Olvidé mi Contraseña
         </Link>
         <button
-          type={`${isValid ? "submit" : "button"}`}
-          className={`big-btn main-btn mt-6 transition-opacity duration-300 ${isValid ? "" : "opacity-50"}`}
+          type={`${isValid && !loading ? "submit" : "button"}`}
+          className={`big-btn main-btn mt-6 transition-opacity duration-300 ${isValid && !loading ? "" : "opacity-50"}`}
         >
-          Ingresar
+          {loading ? "Enviando..." : "Ingresar"}
         </button>
       </form>
     </>

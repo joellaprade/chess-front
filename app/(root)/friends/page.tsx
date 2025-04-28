@@ -1,4 +1,4 @@
-import Friend from "@/components/home/Friend";
+import Friend from "@/reusable/components/home/Friend";
 import { Mail } from "lucide-react";
 import Link from "next/link";
 

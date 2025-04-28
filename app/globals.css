@@ -84,6 +84,11 @@ body {
   .friend-list {
     @apply flex w-full flex-col gap-6;
   }
+
+  .upload-field {
+    border-color: #ffffff60;
+    @apply bg-dark-brown w-full border-2 border-dashed py-5;
+  }
 }
 
 /* Game Components */
@@ -115,6 +120,12 @@ body {
   }
   .timer {
     @apply flex gap-5 rounded bg-white p-2;
+  }
+}
+
+@layer utilities {
+  .error {
+    @apply text-red-400;
   }
 }
 

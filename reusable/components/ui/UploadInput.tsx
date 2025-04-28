@@ -13,12 +13,13 @@ const UploadInput = ({ getFile, className }: props) => {
   return (
     <div className={`relative w-full ${className}`}>
       <input
+        name="upload-input"
         type="file"
         className="absolute h-full cursor-pointer opacity-0"
         id="file-upload"
         onChange={handleFileChange}
       />
-      <button className="big-btn main-btn">Subir Foto</button>
+      <button className="upload-field">Subir Foto</button>
     </div>
   );
 };

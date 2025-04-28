@@ -4,6 +4,8 @@ import bcrypt from "bcrypt";
 import db from "../lib/db";
 import { getFormValues } from "../lib/utils";
 import { Player } from "../models/Player";
+import { createSession } from "../lib/auth";
+import { redirect } from "next/navigation";
 
 type formData = {
   name: string;
@@ -13,21 +15,22 @@ type formData = {
 };
 
 export async function signUp(formData: FormData): Promise<void> {
-  try {
-    await db();
-    const { username, password, name, email } =
-      getFormValues<formData>(formData);
-    const hashedPassword = await bcrypt.hash(password, 10);
+  await db();
+  const { username, password, name, email } = getFormValues<formData>(formData);
+  const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user: User = await User.create({
-      name,
-      email,
-      username,
-      password: hashedPassword,
-    });
+  const user: User = await User.create({
+    name,
+    email,
+    username,
+    password: hashedPassword,
+  });
 
-    const player: Player = await Player.create({ userId: user._id });
-  } catch (e) {
-    console.error(e);
+  const player: Player = await Player.create({ userId: user._id });
+  if (player) {
+    await createSession(user);
+    redirect("/home");
+  } else {
+    throw new Error("Ocurrió un error al crear un nuevo usuario.");
   }
 }

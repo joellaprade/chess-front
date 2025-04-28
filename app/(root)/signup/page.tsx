@@ -1,9 +1,11 @@
 "use client";
 
 import { signUp } from "@/reusable/actions/signUp";
+import useFetchServerAction from "@/reusable/hooks/fetchAction";
 import { useEffect, useState } from "react";
 
 export default function Page() {
+  const [isValid, setIsValid] = useState(false);
   const [data, setData] = useState({
     name: "",
     email: "",
@@ -12,7 +14,7 @@ export default function Page() {
     confirmPassword: "",
   });
 
-  const [isValid, setIsValid] = useState(false);
+  const { loading, error, fetchData } = useFetchServerAction(signUp);
 
   const updateData = (data: any, field: string) => {
     setData((prevState) => ({ ...prevState, [field]: data }));
@@ -36,12 +38,21 @@ export default function Page() {
   };
 
   useEffect(() => {
+    console.log(loading);
+  });
+
+  useEffect(() => {
     validateData();
   }, [data]);
 
   return (
     <>
-      <form action={signUp} className="w-full">
+      <form
+        action={(formData: FormData) => {
+          fetchData(formData);
+        }}
+        className="w-full"
+      >
         <input
           value={data.name}
           onChange={(e) => {
@@ -86,11 +97,12 @@ export default function Page() {
           type="password"
           placeholder="Confirmar Contraseña"
         />
+        <span className="error">{error}</span>
         <button
-          type={`${isValid ? "submit" : "button"}`}
-          className={`big-btn main-btn mt-5 transition-opacity duration-300 ${isValid ? "" : "opacity-50"}`}
+          type={`${isValid && !loading ? "submit" : "button"}`}
+          className={`big-btn main-btn mt-5 transition-opacity duration-300 ${isValid && !loading ? "" : "opacity-50"}`}
         >
-          Crear Cuenta
+          {loading ? "Enviando..." : "Crear Cuenta"}
         </button>
       </form>
     </>

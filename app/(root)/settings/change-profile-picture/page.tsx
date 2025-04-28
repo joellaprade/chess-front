@@ -1,16 +1,24 @@
 "use client";
 
-import UploadInput from "@/components/ui/UploadInput";
-import { useState } from "react";
+import UploadInput from "@/reusable/components/ui/UploadInput";
+import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useFetchState } from "@/reusable/hooks/fetchState";
 
 export default function Page() {
-  const [file, setFile] = useState<File | null>(null);
+  const [formData, setFormData] = useState<FormData | undefined>(undefined);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const { data, isLoading, error, fetchData } = useFetchState(
+    "express",
+    "/file-manager/upload",
+    "POST",
+  );
 
   const getFile = (pFile: File) => {
     const filePreview = URL.createObjectURL(pFile);
-    setFile(pFile);
+    const fileToFormData = new FormData();
+    fileToFormData.append("upload-input", pFile);
+    setFormData(fileToFormData);
     setImagePreview(filePreview);
   };
 
@@ -20,16 +28,26 @@ export default function Page() {
       <UploadInput className="mt-5" getFile={getFile} />
 
       {imagePreview && (
-        <div className="mt-5 flex items-center gap-5">
-          <Image
-            src={`${imagePreview}`}
-            alt="profile-preview"
-            width={75}
-            height={75}
-            className="aspect-square rounded-full object-cover"
-          />
-          <h3>Username</h3>
-        </div>
+        <>
+          <div className="mt-5 flex items-center gap-5">
+            <Image
+              src={`${imagePreview}`}
+              alt="profile-preview"
+              width={75}
+              height={75}
+              className="aspect-square rounded-full object-cover"
+            />
+            <h3>Username</h3>
+          </div>
+          <button
+            onClick={(e) => fetchData(e, formData)}
+            className={`main-btn big-btn mt-20 transition-opacity duration-300 ${isLoading ? "opacity-50" : ""}`}
+            type={isLoading ? "button" : "submit"}
+          >
+            {isLoading ? "Enviando..." : "Enviar"}
+          </button>
+          <span className="error">{error}</span>
+        </>
       )}
     </div>
   );

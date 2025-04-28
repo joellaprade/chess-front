@@ -17,8 +17,8 @@ const sessionSchema = new Schema({
   },
   expiresAfter: {
     type: Date,
-    index: { expires: 0 },
-    default: () => new Date(Date.now() + 60 * 60 * 1000),
+    index: { expires: 3600 },
+    default: () => new Date(Date.now()),
   },
 });
 
