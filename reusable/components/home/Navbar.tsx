@@ -7,8 +7,9 @@ const Navbar = async () => {
   const session = await getSession();
   const allHeaders = await headers();
   const pathname = allHeaders.get("x-pathname");
+  console.log(pathname);
+
   let message;
-  // console.log(pathname);
 
   switch (pathname) {
     case "/home":

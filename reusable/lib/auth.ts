@@ -8,7 +8,9 @@ import db from "./db";
 
 export const createSession = async ({
   name,
+  username,
   email,
+  image,
   _id: userId,
 }: User): Promise<Session | null> => {
   const cookieStore = await cookies();
@@ -22,7 +24,9 @@ export const createSession = async ({
     playerId,
     user: {
       name,
+      username,
       email,
+      image,
     },
   });
 
@@ -43,7 +47,7 @@ export const createSession = async ({
   return session;
 };
 
-export const getSession = async (): Promise<Session | null> => {
+export const getSession = cache(async (): Promise<Session | null> => {
   try {
     await db();
     const cookieStore = await cookies();
@@ -58,4 +62,4 @@ export const getSession = async (): Promise<Session | null> => {
     console.error(e);
     return null;
   }
-};
+});

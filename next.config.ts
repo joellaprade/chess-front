@@ -4,8 +4,16 @@ const nextConfig: NextConfig = {
   /* config options here */
 };
 
-// module.exports = {
-//   reactStrictMode: false,
-// };
+module.exports = {
+  // reactStrictMode: false,
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+    ],
+  },
+};
 
 export default nextConfig;

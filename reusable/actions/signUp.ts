@@ -14,7 +14,7 @@ type formData = {
   password: string;
 };
 
-export async function signUp(formData: FormData): Promise<void> {
+export async function signup(formData: FormData): Promise<void> {
   await db();
   const { username, password, name, email } = getFormValues<formData>(formData);
   const hashedPassword = await bcrypt.hash(password, 10);
