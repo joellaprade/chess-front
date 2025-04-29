@@ -1,24 +1,19 @@
-"use client";
-
 import NavBg from "../ui/NavBg";
-import { ChevronLeft } from "lucide-react";
-import { usePathname } from "next/navigation";
-import { useRouter } from "next/navigation";
+import { headers } from "next/headers";
+import ChevronBtn from "../ui/ChevronBtn";
+import { getSession } from "@/reusable/lib/auth";
 
-const Navbar = () => {
-  const router = useRouter();
-  const pathname = usePathname();
+const Navbar = async () => {
+  const session = await getSession();
+  const allHeaders = await headers();
+  const pathname = allHeaders.get("x-pathname");
   let message;
-
-  const handleBack = () => {
-    if (window.history.length > 1) {
-      router.back();
-    } else {
-      router.push("/");
-    }
-  };
+  // console.log(pathname);
 
   switch (pathname) {
+    case "/home":
+      message = `Bienvenido, ${session?.user.name}`;
+      break;
     case "/signup":
       message = "Crear Cuenta";
       break;
@@ -41,7 +36,7 @@ const Navbar = () => {
 
   return (
     <nav className="relative">
-      <ChevronLeft className="chevron" onClick={handleBack} />
+      <ChevronBtn />
       <h1 className="absolute top-1/2 left-1/2 w-full -translate-x-1/2 -translate-y-1/2 text-center">
         {message}
       </h1>

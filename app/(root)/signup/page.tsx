@@ -38,10 +38,6 @@ export default function Page() {
   };
 
   useEffect(() => {
-    console.log(loading);
-  });
-
-  useEffect(() => {
     validateData();
   }, [data]);
 

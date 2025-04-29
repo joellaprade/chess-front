@@ -3,6 +3,8 @@ import { Session } from "../models/Session";
 import { User } from "../models/User";
 import crypto from "crypto";
 import { Player } from "../models/Player";
+import { cache } from "react";
+import db from "./db";
 
 export const createSession = async ({
   name,
@@ -39,4 +41,21 @@ export const createSession = async ({
   });
 
   return session;
+};
+
+export const getSession = async (): Promise<Session | null> => {
+  try {
+    await db();
+    const cookieStore = await cookies();
+    let sessionToken = cookieStore.get("sessionToken")?.value;
+
+    if (sessionToken) {
+      sessionToken = sessionToken;
+      const session = await Session.findOne({ sessionToken });
+      return session;
+    } else return null;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
 };

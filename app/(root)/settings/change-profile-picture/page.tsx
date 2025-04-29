@@ -1,11 +1,13 @@
 "use client";
 
 import UploadInput from "@/reusable/components/ui/UploadInput";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { useFetchState } from "@/reusable/hooks/fetchState";
+import { useAuth } from "@/reusable/context/AuthContext";
 
 export default function Page() {
+  const { session } = useAuth();
   const [formData, setFormData] = useState<FormData | undefined>(undefined);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { data, isLoading, error, fetchData } = useFetchState(
@@ -27,7 +29,28 @@ export default function Page() {
       <h2>Sube tu foto de perfil:</h2>
       <UploadInput className="mt-5" getFile={getFile} />
 
-      {imagePreview && (
+      {imagePreview ? (
+        <>
+          <div className="mt-5 flex items-center gap-5">
+            <Image
+              src={`${imagePreview}`}
+              alt="profile-preview"
+              width={75}
+              height={75}
+              className="aspect-square rounded-full object-cover"
+            />
+            <h3>Username</h3>
+          </div>
+          <button
+            onClick={(e) => fetchData(e, formData)}
+            className={`main-btn big-btn mt-20 transition-opacity duration-300 ${isLoading ? "opacity-50" : ""}`}
+            type={isLoading ? "button" : "submit"}
+          >
+            {isLoading ? "Enviando..." : "Enviar"}
+          </button>
+          <span className="error">{error}</span>
+        </>
+      ) : (
         <>
           <div className="mt-5 flex items-center gap-5">
             <Image
