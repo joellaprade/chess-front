@@ -1,0 +1,13 @@
+buscar amigos:
+
+por medio de fetch
+despues de 1 segundo del usuario escribiendo, se muestra automaticamente
+
+usuario escribe
+state se actualiza
+useEffect se dispara
+
+
+
+
+tener otro useEffect que cuando se actualize search, setea una variable bool

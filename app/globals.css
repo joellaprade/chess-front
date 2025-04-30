@@ -81,6 +81,10 @@ body {
     @apply bg-green;
   }
 
+  .profile-picture {
+    @apply rounded-full;
+  }
+
   .friend-list {
     @apply flex w-full flex-col gap-6;
   }

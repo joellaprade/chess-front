@@ -35,7 +35,7 @@ export default function Page() {
         <>
           <div className="mt-5 flex items-center gap-5">
             <Image
-              src={`${imagePreview}`}
+              src={imagePreview}
               alt="profile-preview"
               width={75}
               height={75}
@@ -55,7 +55,7 @@ export default function Page() {
       ) : (
         <div className="mt-5 flex items-center gap-5">
           <Image
-            src={`${currentProfilePicture}`}
+            src={currentProfilePicture || "/assets/profile-picture.svg"}
             alt="profile-preview"
             width={75}
             height={75}

@@ -1,12 +1,23 @@
 import Image from "next/image";
 import ProfilePlaceholder from "../home/ProfilePlaceholder";
 
-const Friend = () => {
+type Props = {
+  username: string;
+  image: string;
+};
+
+const Friend = ({ username, image }: Props) => {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-3">
-        <ProfilePlaceholder />
-        <h3>Usuario</h3>
+        <Image
+          className="profile-picture"
+          width={60}
+          height={60}
+          alt="profile-picture"
+          src={image || "/assets/profile-picture.svg"}
+        />
+        <h3>{username}</h3>
       </div>
       <button className="small-btn bg-green">
         <Image

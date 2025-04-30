@@ -1,15 +1,25 @@
-import NavBg from "../ui/NavBg";
-import { headers } from "next/headers";
-import ChevronBtn from "../ui/ChevronBtn";
-import { getSession } from "@/reusable/lib/auth";
+"use client";
 
-const Navbar = async () => {
-  const session = await getSession();
-  const allHeaders = await headers();
-  const pathname = allHeaders.get("x-pathname");
-  console.log(pathname);
+import NavBg from "../ui/NavBg";
+import { usePathname } from "next/navigation";
+import { useAuth } from "@/reusable/context/AuthContext";
+import { useRouter } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
+
+const Navbar = () => {
+  const { session } = useAuth();
+  const pathname = usePathname();
+  const router = useRouter();
 
   let message;
+
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/");
+    }
+  };
 
   switch (pathname) {
     case "/home":
@@ -37,7 +47,7 @@ const Navbar = async () => {
 
   return (
     <nav className="relative">
-      <ChevronBtn />
+      <ChevronLeft className="chevron" onClick={handleBack} />
       <h1 className="absolute top-1/2 left-1/2 w-full -translate-x-1/2 -translate-y-1/2 text-center">
         {message}
       </h1>
