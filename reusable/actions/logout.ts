@@ -13,6 +13,9 @@ export default async function logout(formData: FormData): Promise<void> {
 
   const session = await Session.findOneAndDelete({ sessionToken });
 
+  cookieStore.set("sessionToken", "", { maxAge: 0, path: "/" });
+  cookieStore.set("userId", "", { maxAge: 0, path: "/" });
+
   if (session) {
     redirect("/");
   } else {

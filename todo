@@ -11,3 +11,6 @@ useEffect se dispara
 
 
 tener otro useEffect que cuando se actualize search, setea una variable bool
+
+
+si cookies da problema, probar desde 10.45.1.112
