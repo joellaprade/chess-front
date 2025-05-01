@@ -4,6 +4,7 @@ import localFont from "next/font/local";
 import { AuthContextProvider } from "@/reusable/context/AuthContext";
 import { getSession } from "@/reusable/lib/auth";
 import { Session } from "@/reusable/models/Session";
+import { WsContextProvider } from "@/reusable/context/WsContext";
 
 const raleway = localFont({
   src: "../public/fonts/Raleway-VariableFont_wght.ttf",
@@ -27,7 +28,7 @@ export default async function RootLayout({
     <html className="h-full" lang="en">
       <body className={`${raleway.variable} flex h-full flex-col antialiased`}>
         <AuthContextProvider initialSession={JSON.stringify(session)}>
-          {children}
+          <WsContextProvider>{children}</WsContextProvider>
         </AuthContextProvider>
       </body>
     </html>

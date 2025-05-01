@@ -1,16 +1,12 @@
-buscar amigos:
+objetivo: implementar friend requests
 
-por medio de fetch
-despues de 1 segundo del usuario escribiendo, se muestra automaticamente
+1. boton de add en find friends
+2. se manda un socket request al server
+3. se agrega el id del sender al array de requests del reciver
+4. se revisa si el reciver esta activo
+5. se le manda un ws msg indicando que se muestre la notificacion al cliente
 
-usuario escribe
-state se actualiza
-useEffect se dispara
-
-
-
-
-tener otro useEffect que cuando se actualize search, setea una variable bool
-
-
-si cookies da problema, probar desde 10.45.1.112
+ANTES:
+implementar websockets
+implementar isActive trigguer
+implementar gameReqs y friendReqs a player

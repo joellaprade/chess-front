@@ -26,8 +26,6 @@ export default function Page() {
     setRunSearch(false);
   }, [runSearch]);
 
-  useEffect(() => console.log(friends), [friends]);
-
   return (
     <div className="mt-10 w-full flex-1">
       <input
@@ -37,8 +35,8 @@ export default function Page() {
         placeholder="Nombre de Usuario"
       />
       <div className="friend-list mt-10">
-        {friends.map((friend) => (
-          <Friend username={friend.username} image={friend.image} />
+        {friends.map((friend, i) => (
+          <Friend key={i} username={friend.username} image={friend.image} />
         ))}
       </div>
     </div>
