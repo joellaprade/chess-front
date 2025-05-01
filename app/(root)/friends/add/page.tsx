@@ -1,8 +1,10 @@
 "use client";
 
 import Friend from "@/reusable/components/home/Friend";
+import { useWs } from "@/reusable/context/WsContext";
 import { multiFetch } from "@/reusable/lib/utils";
 import { User } from "@/reusable/models/User";
+import { Instruction } from "@/reusable/types/instruction";
 import { useEffect, useState } from "react";
 
 export default function Page() {
@@ -10,6 +12,14 @@ export default function Page() {
   const [runSearch, setRunSearch] = useState(false);
   const [countDown, setCountDown] = useState<NodeJS.Timeout | null>(null);
   const [friends, setFriends] = useState<User[]>([]);
+  const { setOMsg } = useWs();
+
+  const addFriend = (username: string) => {
+    setOMsg({
+      action: "add-friend",
+      data: { username },
+    });
+  };
 
   useEffect(() => {
     if (countDown) clearTimeout(countDown);
@@ -36,7 +46,12 @@ export default function Page() {
       />
       <div className="friend-list mt-10">
         {friends.map((friend, i) => (
-          <Friend key={i} username={friend.username} image={friend.image} />
+          <Friend
+            key={i}
+            username={friend.username}
+            image={friend.image}
+            func={addFriend}
+          />
         ))}
       </div>
     </div>

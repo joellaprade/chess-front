@@ -10,8 +10,8 @@ export default function Page() {
         <div className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-300"></div>
       </Link>
       <div className="friend-list">
-        <Friend />
-        <Friend />
+        {/* <Friend />
+        <Friend /> */}
       </div>
       <Link className="w-full" href={"/friends/add"}>
         <button className="big-btn secondary-btn">Agregar Amigo</button>

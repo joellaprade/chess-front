@@ -26,7 +26,10 @@ export async function signup(formData: FormData): Promise<void> {
     password: hashedPassword,
   });
 
-  const player: Player = await Player.create({ userId: user._id });
+  const player: Player = await Player.create({
+    username,
+    userId: user._id,
+  });
   if (player) {
     await createSession(user);
     redirect("/home");
@@ -34,3 +37,6 @@ export async function signup(formData: FormData): Promise<void> {
     throw new Error("Ocurrió un error al crear un nuevo usuario.");
   }
 }
+
+// korina: https://res.cloudinary.com/dd86ogsbh/image/upload/v1746031289/iow5fmupmk4x2adtq4ki.jpg
+// horse: https://res.cloudinary.com/dd86ogsbh/image/upload/v1746031251/goxyjdvfysurhlfveetv.jpg
