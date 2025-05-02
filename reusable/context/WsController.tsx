@@ -5,7 +5,7 @@ import { useAuth } from "./AuthContext";
 const WsController = () => {
   const userId = useAuth().session?.userId;
   const wssUrl = process.env.NEXT_PUBLIC_WS_BACKEND_URL;
-  const { oMsg, setIMsg, setConnected } = useWs();
+  const { iMsg, oMsg, setIMsg, setConnected } = useWs();
   const [ws, setWs] = useState<WebSocket | null>(null);
 
   const connect = () => {

@@ -68,7 +68,7 @@ body {
   }
 
   .notification {
-    @apply bg-dark-gray absolute top-0 left-0 z-1 flex w-full -translate-y-full justify-between px-9 py-8 transition-transform duration-300;
+    @apply bg-dark-gray absolute left-0 z-1 flex w-full -translate-y-full justify-between px-9 py-8 transition-transform duration-300;
   }
 
   .toggle-switch {

@@ -9,8 +9,8 @@ type WsContextProviderProps = {
 
 type WsContextType = {
   connected: boolean;
-  iMsg: Instruction;
-  oMsg: Instruction;
+  iMsg: Instruction | null;
+  oMsg: Instruction | null;
   setConnected: (connected: boolean) => void;
   setIMsg: (instruction: Instruction) => void;
   setOMsg: (instruction: Instruction) => void;
@@ -18,8 +18,8 @@ type WsContextType = {
 
 const WsDefaultValues: WsContextType = {
   connected: false,
-  iMsg: {} as Instruction,
-  oMsg: {} as Instruction,
+  iMsg: null,
+  oMsg: null,
   setConnected: (connected: boolean) => {},
   setIMsg: (instruction: Instruction) => {},
   setOMsg: (instruction: Instruction) => {},
@@ -38,8 +38,8 @@ export const useWs = () => {
 
 export const WsContextProvider = ({ children }: WsContextProviderProps) => {
   const [connected, setConnected] = useState(false);
-  const [iMsg, setIMsg] = useState({} as Instruction);
-  const [oMsg, setOMsg] = useState({} as Instruction);
+  const [iMsg, setIMsg] = useState<Instruction | null>(null);
+  const [oMsg, setOMsg] = useState<Instruction | null>(null);
 
   return (
     <WsContext.Provider

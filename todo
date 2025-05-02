@@ -10,3 +10,7 @@ ANTES:
 implementar websockets
 implementar isActive trigguer
 implementar gameReqs y friendReqs a player
+
+
+
+refetch conection de ws al hacer login
