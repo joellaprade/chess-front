@@ -4,7 +4,6 @@ import Friend from "@/reusable/components/home/Friend";
 import { useWs } from "@/reusable/context/WsContext";
 import { multiFetch } from "@/reusable/lib/utils";
 import { User } from "@/reusable/models/User";
-import { Instruction } from "@/reusable/types/instruction";
 import { useEffect, useState } from "react";
 
 export default function Page() {
@@ -17,7 +16,7 @@ export default function Page() {
   const addFriend = (username: string) => {
     setOMsg({
       action: "add-friend",
-      data: { username },
+      payload: { username },
     });
   };
 

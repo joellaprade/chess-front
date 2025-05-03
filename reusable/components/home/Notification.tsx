@@ -2,27 +2,30 @@
 
 import { Check } from "lucide-react";
 import { X } from "lucide-react";
-import ProfilePlaceholder from "./ProfilePlaceholder";
 import Image from "next/image";
 import { useNotifications } from "@/reusable/context/NotificationContext";
 import { useEffect, useState } from "react";
-
-type notifType = {
-  username: string;
-  image: string;
-};
+import { Instruction } from "@/reusable/types/instruction";
+import { useWs } from "@/reusable/context/WsContext";
 
 const Notification = () => {
-  const notif = useNotifications().notif as notifType;
+  const { setOMsg } = useWs();
+  const notif = useNotifications().notif as Instruction;
   const [username, setUsername] = useState<string | null>(null);
   const [image, setImage] = useState<string | null>(null);
-  const [showNotif, setShowNotif] = useState(true);
+  const [showNotif, setShowNotif] = useState(false);
+
+  const runReplyAction = () => {
+    const reply = notif.replyAction;
+    if (!reply) return;
+
+    setOMsg({ ...reply });
+  };
 
   useEffect(() => {
-    console.log(notif, showNotif);
     if (notif) {
-      setUsername(notif.username);
-      setImage(notif.image);
+      setUsername(notif.payload.username);
+      setImage(notif.payload.image);
       setShowNotif(true);
     } else {
       setUsername(null);
@@ -35,18 +38,25 @@ const Notification = () => {
     <div className={`notification ${showNotif ? "translate-y-0" : ""} `}>
       <div className="flex items-center gap-3">
         <Image
+          className="profile-picture"
           src={image || "/assets/profile-picture.svg"}
           alt={username || "Profile Picture"}
           width={60}
           height={60}
         />
-        <h3>{username}</h3>
+        <div className="flex h-full flex-col justify-center">
+          <span className="text-gray-400">Amistad</span>
+          <h3>{username}</h3>
+        </div>
       </div>
       <div className="flex items-center gap-3">
-        <button className="bg-green small-btn">
+        <button onClick={() => runReplyAction()} className="bg-green small-btn">
           <Check />
         </button>
-        <button className="small-btn bg-red-400">
+        <button
+          onClick={() => setShowNotif(false)}
+          className="small-btn bg-red-400"
+        >
           <X />
         </button>
       </div>

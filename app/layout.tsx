@@ -3,7 +3,6 @@ import "./globals.css";
 import localFont from "next/font/local";
 import { AuthContextProvider } from "@/reusable/context/AuthContext";
 import { getSession } from "@/reusable/lib/auth";
-import { Session } from "@/reusable/models/Session";
 import { WsContextProvider } from "@/reusable/context/WsContext";
 import { NotificationContextProvider } from "@/reusable/context/NotificationContext";
 

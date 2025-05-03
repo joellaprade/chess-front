@@ -5,7 +5,7 @@ import { useAuth } from "./AuthContext";
 const WsController = () => {
   const userId = useAuth().session?.userId;
   const wssUrl = process.env.NEXT_PUBLIC_WS_BACKEND_URL;
-  const { iMsg, oMsg, setIMsg, setConnected } = useWs();
+  const { oMsg, setIMsg, setOMsg, setConnected } = useWs();
   const [ws, setWs] = useState<WebSocket | null>(null);
 
   const connect = () => {
@@ -30,13 +30,14 @@ const WsController = () => {
   };
 
   const sendMsg = () => {
+    console.log(oMsg);
     if (!ws || !oMsg) return;
 
     ws.send(JSON.stringify(oMsg));
   };
 
   useEffect(sendMsg, [oMsg]);
-  useEffect(connect, []);
+  useEffect(connect, [userId]);
 
   return <></>;
 };
