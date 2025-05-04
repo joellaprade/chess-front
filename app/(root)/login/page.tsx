@@ -33,7 +33,7 @@ export default function Page() {
       >
         <input
           value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={(e) => setUsername(e.target.value.toLowerCase())}
           type="text"
           placeholder="Nombre de Usuario"
           name="username"

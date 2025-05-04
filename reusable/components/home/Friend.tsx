@@ -1,9 +1,11 @@
+"use client";
+
 import Image from "next/image";
 
 type Props = {
   username: string;
   image: string;
-  func: (username: string) => void;
+  func?: (username: string) => void;
 };
 
 const Friend = ({ username, image, func }: Props) => {
@@ -19,7 +21,7 @@ const Friend = ({ username, image, func }: Props) => {
         />
         <h3>{username}</h3>
       </div>
-      <button onClick={() => func(username)} className="small-btn bg-green">
+      <button onClick={() => func?.(username)} className="small-btn bg-green">
         <Image
           src={"/assets/pawn-icon.png"}
           alt="small pawn"

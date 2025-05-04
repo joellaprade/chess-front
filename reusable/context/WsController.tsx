@@ -30,7 +30,6 @@ const WsController = () => {
   };
 
   const sendMsg = () => {
-    console.log(oMsg);
     if (!ws || !oMsg) return;
 
     ws.send(JSON.stringify(oMsg));

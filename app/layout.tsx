@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import "./globals.css";
 import localFont from "next/font/local";
 import { AuthContextProvider } from "@/reusable/context/AuthContext";
-import { getSession } from "@/reusable/lib/auth";
+import { getPlayer, getSession } from "@/reusable/lib/auth";
 import { WsContextProvider } from "@/reusable/context/WsContext";
 import { NotificationContextProvider } from "@/reusable/context/NotificationContext";
+import { PlayerContextProvider } from "@/reusable/context/PlayerContext";
 
 const raleway = localFont({
   src: "../public/fonts/Raleway-VariableFont_wght.ttf",
@@ -23,6 +24,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await getSession();
+  const player = await getPlayer();
 
   return (
     <html className="h-full" lang="en">
@@ -30,7 +32,9 @@ export default async function RootLayout({
         <AuthContextProvider initialSession={JSON.stringify(session)}>
           <WsContextProvider>
             <NotificationContextProvider>
-              {children}
+              <PlayerContextProvider playerData={JSON.stringify(player)}>
+                {children}
+              </PlayerContextProvider>
             </NotificationContextProvider>
           </WsContextProvider>
         </AuthContextProvider>

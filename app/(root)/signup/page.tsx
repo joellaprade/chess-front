@@ -61,7 +61,7 @@ export default function Page() {
         <input
           value={data.email}
           onChange={(e) => {
-            updateData(e.target.value, "email");
+            updateData(e.target.value.toLowerCase(), "email");
           }}
           name="email"
           type="email"
@@ -70,7 +70,7 @@ export default function Page() {
         <input
           value={data.username}
           onChange={(e) => {
-            updateData(e.target.value, "username");
+            updateData(e.target.value.toLowerCase(), "username");
           }}
           name="username"
           type="text"

@@ -1,12 +1,33 @@
-import Friend from "./Friend";
+"use client";
 
-const GameReqList = () => {
+import { Player } from "@/reusable/models/Player";
+import Friend from "./Friend";
+import { useWs } from "@/reusable/context/WsContext";
+
+type Props = {
+  reqs: Player[];
+};
+
+const FriendReqList = ({ reqs }: Props) => {
+  const { setOMsg } = useWs();
+  const sendAddRequest = (username: string) => {
+    setOMsg({
+      action: "add-friend",
+      payload: { username },
+    });
+  };
   return (
     <div className="friend-list">
-      <Friend />
-      <Friend />
+      {reqs.map((req, i) => (
+        <Friend
+          key={i}
+          username={req.username}
+          image={req.image}
+          func={() => sendAddRequest(req.username)}
+        />
+      ))}
     </div>
   );
 };
 
-export default GameReqList;
+export default FriendReqList;

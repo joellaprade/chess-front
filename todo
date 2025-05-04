@@ -1,16 +1,1 @@
-objetivo: implementar friend requests
-
-1. boton de add en find friends
-2. se manda un socket request al server
-3. se agrega el id del sender al array de requests del reciver
-4. se revisa si el reciver esta activo
-5. se le manda un ws msg indicando que se muestre la notificacion al cliente
-
-ANTES:
-implementar websockets
-implementar isActive trigguer
-implementar gameReqs y friendReqs a player
-
-
-
-refetch conection de ws al hacer login
+agregar image a player

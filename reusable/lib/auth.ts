@@ -54,9 +54,30 @@ export const getSession = cache(async (): Promise<Session | null> => {
     let sessionToken = cookieStore.get("sessionToken")?.value;
 
     if (sessionToken) {
-      sessionToken = sessionToken;
       const session = await Session.findOne({ sessionToken });
       return session;
+    } else return null;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+});
+
+export const getPlayer = cache(async (): Promise<Player | null> => {
+  try {
+    await db();
+    const cookieStore = await cookies();
+    let userId = cookieStore.get("userId")?.value;
+
+    if (userId) {
+      const player = await Player.findOne({ userId })
+        .populate([
+          { path: "friends" },
+          { path: "friendReqs" },
+          { path: "gameReqs" },
+        ])
+        .lean<Player | null>();
+      return player;
     } else return null;
   } catch (e) {
     console.error(e);

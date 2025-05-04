@@ -1,6 +1,7 @@
 "use client";
 
 import Friend from "@/reusable/components/home/Friend";
+import { useAuth } from "@/reusable/context/AuthContext";
 import { useWs } from "@/reusable/context/WsContext";
 import { multiFetch } from "@/reusable/lib/utils";
 import { User } from "@/reusable/models/User";
@@ -12,6 +13,7 @@ export default function Page() {
   const [countDown, setCountDown] = useState<NodeJS.Timeout | null>(null);
   const [friends, setFriends] = useState<User[]>([]);
   const { setOMsg } = useWs();
+  const { session } = useAuth();
 
   const addFriend = (username: string) => {
     setOMsg({
@@ -28,9 +30,12 @@ export default function Page() {
 
   useEffect(() => {
     if (runSearch && search) {
-      multiFetch<User[]>("express", `/user/get-user/${search}`).then((f) =>
-        setFriends(f),
-      );
+      multiFetch<User[]>("express", `/user/get-user/${search}`).then((f) => {
+        const filteredFriends = f.filter(
+          (friend) => friend.username !== session?.user.username,
+        );
+        setFriends(filteredFriends);
+      });
     }
     setRunSearch(false);
   }, [runSearch]);
