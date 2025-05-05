@@ -5,8 +5,7 @@ import WsController from "./WsController";
 
 type setOMsgOptions =
   | { action: "add-friend"; payload: any }
-  | { action: "remove-friend"; payload: any }
-  | { action: "send-message"; payload: any }
+  | { action: "notify-only"; payload: any }
   | { action: string; payload: any };
 
 type WsContextProviderProps = {

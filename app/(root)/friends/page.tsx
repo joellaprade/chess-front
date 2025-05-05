@@ -21,7 +21,7 @@ export default async function Page() {
       <div className="friend-list">
         {friends &&
           friends.map((friend, i) => (
-            <Friend key={i} username={friend?.username} image={friend?.image} />
+            <Friend key={i} player={JSON.stringify(friend)} />
           ))}
       </div>
       <Link className="w-full" href={"/friends/add"}>

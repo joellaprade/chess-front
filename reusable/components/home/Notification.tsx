@@ -13,6 +13,7 @@ const Notification = () => {
   const notif = useNotifications().notif as Instruction;
   const [username, setUsername] = useState<string | null>(null);
   const [image, setImage] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
   const [showNotif, setShowNotif] = useState(false);
 
   const runReplyAction = () => {
@@ -22,11 +23,31 @@ const Notification = () => {
     setOMsg({ ...reply });
   };
 
+  const getMessage = () => {
+    switch (notif.action) {
+      case "notify-friend-request":
+        setMessage("Solicitud de amistad de:");
+        break;
+      case "notify-only-new-friend":
+        setMessage("Nueva amistad con:");
+        break;
+      case "notify-only-is-online":
+        setMessage("Se ha conectado:");
+        break;
+      case "notify-only-is-not-online":
+        setMessage("Se ha desconectado:");
+        break;
+    }
+  };
+
   useEffect(() => {
     if (notif) {
       setUsername(notif.payload.username);
       setImage(notif.payload.image);
       setShowNotif(true);
+      getMessage();
+      const timeout = setTimeout(() => setShowNotif(false), 8000);
+      return () => clearTimeout(timeout);
     } else {
       setUsername(null);
       setImage(null);
@@ -45,12 +66,18 @@ const Notification = () => {
           height={60}
         />
         <div className="flex h-full flex-col justify-center">
-          <span className="text-gray-400">Amistad</span>
+          <span className="text-gray-400">{message}</span>
           <h3>{username}</h3>
         </div>
       </div>
-      <div className="flex items-center gap-3">
-        <button onClick={() => runReplyAction()} className="bg-green small-btn">
+      <div className={`flex items-center gap-3`}>
+        <button
+          onClick={() => {
+            runReplyAction();
+            setShowNotif(false);
+          }}
+          className={`${notif?.action.includes("only") ? "hidden" : ""} bg-green small-btn`}
+        >
           <Check />
         </button>
         <button

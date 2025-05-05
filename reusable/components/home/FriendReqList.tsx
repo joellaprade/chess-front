@@ -1,7 +1,7 @@
 "use client";
 
 import { Player } from "@/reusable/models/Player";
-import Friend from "./Friend";
+import PlayerComponent from "./PlayerComponent";
 import { useWs } from "@/reusable/context/WsContext";
 
 type Props = {
@@ -19,10 +19,9 @@ const FriendReqList = ({ reqs }: Props) => {
   return (
     <div className="friend-list">
       {reqs.map((req, i) => (
-        <Friend
+        <PlayerComponent
           key={i}
-          username={req.username}
-          image={req.image}
+          player={req}
           func={() => sendAddRequest(req.username)}
         />
       ))}

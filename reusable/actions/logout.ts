@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { Session } from "../models/Session";
 
-export default async function logout(formData: FormData): Promise<void> {
+export default async function logout(): Promise<void> {
   await db();
 
   const cookieStore = await cookies();

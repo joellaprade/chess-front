@@ -93,6 +93,9 @@ body {
     border-color: #ffffff60;
     @apply bg-dark-brown w-full border-2 border-dashed py-5;
   }
+  .online-icon {
+    @apply bg-green border-medium-brown absolute right-0 bottom-0 h-6 w-6 rounded-full border-5;
+  }
 }
 
 /* Game Components */
