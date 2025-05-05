@@ -14,7 +14,7 @@ type formData = {
   password: string;
 };
 
-export async function signup(formData: FormData): Promise<void> {
+export async function signup(formData: FormData): Promise<boolean> {
   await db();
   const { username, password, name, email } = getFormValues<formData>(formData);
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -32,7 +32,7 @@ export async function signup(formData: FormData): Promise<void> {
   });
   if (player) {
     await createSession(user);
-    redirect("/home");
+    return true;
   } else {
     throw new Error("Ocurrió un error al crear un nuevo usuario.");
   }

@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { Session } from "../models/Session";
 
-export default async function logout(): Promise<void> {
+export default async function logout(): Promise<boolean> {
   await db();
 
   const cookieStore = await cookies();
@@ -17,7 +17,7 @@ export default async function logout(): Promise<void> {
   cookieStore.set("userId", "", { maxAge: 0, path: "/" });
 
   if (session) {
-    redirect("/");
+    return true;
   } else {
     throw new Error("No se pudo encontrar la session.");
   }

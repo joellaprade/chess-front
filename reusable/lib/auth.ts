@@ -72,9 +72,9 @@ export const getPlayer = cache(async (): Promise<Player | null> => {
     if (userId) {
       const player = await Player.findOne({ userId })
         .populate([
-          { path: "friends" },
-          { path: "friendReqs" },
-          { path: "gameReqs" },
+          { path: "friends", select: "username image userid isOnline" },
+          { path: "friendReqs", select: "username image userid" },
+          { path: "gameReqs", select: "username image userid" },
         ])
         .lean<Player | null>();
       return player;

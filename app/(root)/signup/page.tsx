@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 
 export default function Page() {
   const [isValid, setIsValid] = useState(false);
-  const [data, setData] = useState({
+  const [fData, setFData] = useState({
     name: "",
     email: "",
     username: "",
@@ -14,14 +14,14 @@ export default function Page() {
     confirmPassword: "",
   });
 
-  const { loading, error, fetchData } = useFetchServerAction(signup);
+  const { data, loading, error, fetchData } = useFetchServerAction(signup);
 
-  const updateData = (data: any, field: string) => {
-    setData((prevState) => ({ ...prevState, [field]: data }));
+  const updateData = (fData: any, field: string) => {
+    setFData((prevState) => ({ ...prevState, [field]: fData }));
   };
 
-  const validateData = () => {
-    const { name, email, username, password, confirmPassword } = data;
+  const validateFData = () => {
+    const { name, email, username, password, confirmPassword } = fData;
     if (
       !name ||
       !email ||
@@ -37,9 +37,11 @@ export default function Page() {
     setIsValid(true);
   };
 
+  useEffect(validateFData, [fData]);
   useEffect(() => {
-    validateData();
-  }, [data]);
+    console.log(data);
+    if (data) window.location.href = "/";
+  });
 
   return (
     <>
@@ -50,7 +52,7 @@ export default function Page() {
         className="w-full"
       >
         <input
-          value={data.name}
+          value={fData.name}
           onChange={(e) => {
             updateData(e.target.value, "name");
           }}
@@ -59,7 +61,7 @@ export default function Page() {
           placeholder="Nombre"
         />
         <input
-          value={data.email}
+          value={fData.email}
           onChange={(e) => {
             updateData(e.target.value.toLowerCase(), "email");
           }}
@@ -68,7 +70,7 @@ export default function Page() {
           placeholder="Correo Electrónico"
         />
         <input
-          value={data.username}
+          value={fData.username}
           onChange={(e) => {
             updateData(e.target.value.toLowerCase(), "username");
           }}
@@ -77,7 +79,7 @@ export default function Page() {
           placeholder="Usuario"
         />
         <input
-          value={data.password}
+          value={fData.password}
           onChange={(e) => {
             updateData(e.target.value, "password");
           }}
@@ -86,7 +88,7 @@ export default function Page() {
           placeholder="Contraseña"
         />
         <input
-          value={data.confirmPassword}
+          value={fData.confirmPassword}
           onChange={(e) => {
             updateData(e.target.value, "confirmPassword");
           }}

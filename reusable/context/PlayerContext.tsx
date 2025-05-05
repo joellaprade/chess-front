@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { Player } from "../models/Player";
+import PlayerController from "./PlayerController";
 
 type PlayerContextProviderProps = {
   children: React.ReactNode;
@@ -18,18 +19,18 @@ type PlayerContextType = {
   friends: Array<Player>;
   friendReqs: Array<Player>;
   gameReqs: Array<Player>;
-  setFriends: (friends: Array<Player>) => void;
-  setFriendReqs: (friendReqs: Array<Player>) => void;
-  setGameReqs: (gameReqs: Array<Player>) => void;
+  setFriends: React.Dispatch<React.SetStateAction<Player[]>>; // ✅ Correct;
+  setFriendReqs: React.Dispatch<React.SetStateAction<Player[]>>; // ✅ Correct
+  setGameReqs: React.Dispatch<React.SetStateAction<Player[]>>; // ✅ Correct
 };
 
 const defaultPlayer: PlayerContextType = {
   friends: [],
   friendReqs: [],
   gameReqs: [],
-  setFriends: (friends: Array<Player>) => null,
-  setFriendReqs: (friendReqs: Array<Player>) => null,
-  setGameReqs: (gameReqs: Array<Player>) => null,
+  setFriends: () => {},
+  setFriendReqs: () => {},
+  setGameReqs: () => {},
 };
 
 export const PlayerContext = createContext(defaultPlayer);
@@ -49,9 +50,13 @@ export const PlayerContextProvider = ({
   playerData,
 }: PlayerContextProviderProps) => {
   let parsedPlayer: player = playerData ? JSON.parse(playerData) : null;
-  const [friends, setFriends] = useState(parsedPlayer?.friends || []);
-  const [friendReqs, setFriendReqs] = useState(parsedPlayer?.friendReqs || []);
-  const [gameReqs, setGameReqs] = useState(parsedPlayer?.gameReqs || []);
+  const [friends, setFriends] = useState<Player[]>(parsedPlayer?.friends || []);
+  const [friendReqs, setFriendReqs] = useState<Player[]>(
+    parsedPlayer?.friendReqs || [],
+  );
+  const [gameReqs, setGameReqs] = useState<Player[]>(
+    parsedPlayer?.gameReqs || [],
+  );
 
   return (
     <PlayerContext.Provider
@@ -65,6 +70,7 @@ export const PlayerContextProvider = ({
       }}
     >
       {children}
+      <PlayerController />
     </PlayerContext.Provider>
   );
 };

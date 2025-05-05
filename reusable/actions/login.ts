@@ -12,7 +12,7 @@ type formValues = {
   password: string;
 };
 
-export default async function login(formData: FormData): Promise<void> {
+export default async function login(formData: FormData): Promise<boolean> {
   await db();
 
   const { username, password } = getFormValues<formValues>(formData);
@@ -21,7 +21,7 @@ export default async function login(formData: FormData): Promise<void> {
 
   if (user && (await bcrypt.compare(password, user.password))) {
     await createSession(user);
-    redirect("/home");
+    return true;
   } else {
     throw new Error("El usuario o contraseña son incorrectos.");
   }

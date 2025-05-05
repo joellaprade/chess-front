@@ -1,14 +1,13 @@
+"use client";
+
 import Friend from "@/reusable/components/home/Friend";
-import { getPlayer } from "@/reusable/lib/auth";
-import { Player } from "@/reusable/models/Player";
+import { usePlayer } from "@/reusable/context/PlayerContext";
 import { Mail } from "lucide-react";
 import Link from "next/link";
 
-export default async function Page() {
-  const player = await getPlayer();
-  const friends = player?.friends as unknown as Player[];
-  const hasInvitations =
-    player?.gameReqs?.length > 0 || player?.friendReqs?.length > 0;
+export default function Page() {
+  const { friends, gameReqs, friendReqs } = usePlayer();
+  const hasInvitations = gameReqs.length > 0 || friendReqs.length > 0;
 
   return (
     <>
@@ -19,10 +18,9 @@ export default async function Page() {
         ></div>
       </Link>
       <div className="friend-list">
-        {friends &&
-          friends.map((friend, i) => (
-            <Friend key={i} player={JSON.stringify(friend)} />
-          ))}
+        {friends.map((friend, i) => (
+          <Friend key={i} player={friend} />
+        ))}
       </div>
       <Link className="w-full" href={"/friends/add"}>
         <button className="big-btn secondary-btn">Agregar Amigo</button>
