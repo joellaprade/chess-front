@@ -32,7 +32,7 @@ const WsDefaultValues: WsContextType = {
 
 export const WsContext = createContext<WsContextType>(WsDefaultValues);
 
-export const useWs = () => {
+export const useWsContext = () => {
   const context = useContext(WsContext);
   if (!context) {
     throw new Error("useWS must be used within a provider");
@@ -51,7 +51,6 @@ export const WsContextProvider = ({ children }: WsContextProviderProps) => {
       value={{ connected, iMsg, oMsg, setConnected, setIMsg, setOMsg }}
     >
       {children}
-      <WsController />
     </WsContext.Provider>
   );
 };

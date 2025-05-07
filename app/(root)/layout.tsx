@@ -1,11 +1,5 @@
 import Navbar from "@/reusable/components/home/Navbar";
 import Notification from "@/reusable/components/home/Notification";
-import { useNotifications } from "@/reusable/context/NotificationContext";
-
-type notifType = {
-  username: string;
-  image: string;
-};
 
 export default function RootLayout({
   children,

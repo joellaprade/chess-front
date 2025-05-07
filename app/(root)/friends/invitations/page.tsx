@@ -10,13 +10,9 @@ export default function Page() {
   const [selected, setSelected] = useState(0);
   const { friendReqs, gameReqs } = usePlayer();
 
-  const getChange = (index: number) => {
-    setSelected(index);
-  };
-
   return (
     <div className="flex w-full flex-1 flex-col items-center gap-10 pt-10">
-      <ToggleSwitch getChange={getChange} />
+      <ToggleSwitch getChange={setSelected} />
       {selected == 0 && <GameReqList reqs={gameReqs} />}
       {selected == 1 && <FriendReqList reqs={friendReqs} />}
     </div>

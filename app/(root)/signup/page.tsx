@@ -2,9 +2,14 @@
 
 import { signup } from "@/reusable/actions/signup";
 import useFetchServerAction from "@/reusable/hooks/fetchAction";
+import { multiFetch } from "@/reusable/lib/utils";
 import { useEffect, useState } from "react";
 
 export default function Page() {
+  multiFetch("express", "/mail/verification", "POST", {
+    email: "joellaprade1@gmail.com",
+  });
+
   const [isValid, setIsValid] = useState(false);
   const [fData, setFData] = useState({
     name: "",
@@ -39,9 +44,8 @@ export default function Page() {
 
   useEffect(validateFData, [fData]);
   useEffect(() => {
-    console.log(data);
     if (data) window.location.href = "/";
-  });
+  }, [data]);
 
   return (
     <>

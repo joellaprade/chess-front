@@ -2,7 +2,7 @@
 
 import PlayerComponent from "@/reusable/components/home/PlayerComponent";
 import { useAuth } from "@/reusable/context/AuthContext";
-import { useWs } from "@/reusable/context/WsContext";
+import useWs from "@/reusable/hooks/useWs";
 import { multiFetch } from "@/reusable/lib/utils";
 import { Player } from "@/reusable/models/Player";
 import { useEffect, useState } from "react";
@@ -12,15 +12,8 @@ export default function Page() {
   const [runSearch, setRunSearch] = useState(false);
   const [countDown, setCountDown] = useState<NodeJS.Timeout | null>(null);
   const [friends, setFriends] = useState<Player[]>([]);
-  const { setOMsg } = useWs();
+  const { addFriend } = useWs();
   const { session } = useAuth();
-
-  const addFriend = (username: string) => {
-    setOMsg({
-      action: "add-friend",
-      payload: { username },
-    });
-  };
 
   useEffect(() => {
     if (countDown) clearTimeout(countDown);

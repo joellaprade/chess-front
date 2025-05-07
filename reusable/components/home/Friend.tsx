@@ -1,24 +1,16 @@
 "use client";
 
-import { useWs } from "@/reusable/context/WsContext";
+import useWs from "@/reusable/hooks/useWs";
 import { Player } from "@/reusable/models/Player";
 import { X } from "lucide-react";
 import Image from "next/image";
-
 type Props = {
   player: Player;
 };
 
 const Friend = ({ player }: Props) => {
   const { username, image, isOnline } = player;
-  const { setOMsg } = useWs();
-
-  const handleRemoveFriend = () => {
-    setOMsg({
-      action: "remove-friend",
-      payload: { username },
-    });
-  };
+  const { handleRemoveFriend } = useWs();
 
   return (
     <div className="flex items-center justify-between">
@@ -45,7 +37,10 @@ const Friend = ({ player }: Props) => {
             className="object-contains"
           />
         </button>
-        <button onClick={handleRemoveFriend} className="small-btn bg-red-400">
+        <button
+          onClick={() => handleRemoveFriend(username)}
+          className="small-btn bg-red-400"
+        >
           <X className="h-[20px] w-[20px]" />
         </button>
       </div>

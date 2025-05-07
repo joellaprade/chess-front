@@ -6,23 +6,16 @@ import Image from "next/image";
 import { useNotifications } from "@/reusable/context/NotificationContext";
 import { useEffect, useState } from "react";
 import { Instruction } from "@/reusable/types/instruction";
-import { useWs } from "@/reusable/context/WsContext";
+import useWs from "@/reusable/hooks/useWs";
 
 const Notification = () => {
-  const { setOMsg } = useWs();
+  const { runReplyAction } = useWs();
   const notif = useNotifications().notif as Instruction;
   const [notification, setNotification] = useState<Instruction | null>(notif);
   const [message, setMessage] = useState<string | null>(null);
   const [showNotif, setShowNotif] = useState(false);
   const [showProfilePic, setShowProfilePic] = useState(false);
   const [showReplyActionBtn, setShowReplyActionBtn] = useState(false);
-
-  const runReplyAction = () => {
-    const reply = notif.replyAction;
-    if (!reply) return;
-
-    setOMsg({ ...reply });
-  };
 
   const getMessage = () => {
     switch (notif.action) {
@@ -83,7 +76,7 @@ const Notification = () => {
       <div className={`flex items-center gap-3`}>
         <button
           onClick={() => {
-            runReplyAction();
+            runReplyAction(notif);
             setShowNotif(false);
           }}
           className={`${showReplyActionBtn ? "" : "hidden"} bg-green small-btn`}

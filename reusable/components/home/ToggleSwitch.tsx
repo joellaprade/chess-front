@@ -11,10 +11,6 @@ type props = {
 const ToggleSwitch = ({ getChange, defaultIndex, className }: props) => {
   const [selected, setSelected] = useState(defaultIndex || 0);
 
-  const selectOption = (index: number) => {
-    setSelected(index);
-  };
-
   useEffect(() => {
     getChange(selected);
   }, [selected]);
@@ -22,14 +18,14 @@ const ToggleSwitch = ({ getChange, defaultIndex, className }: props) => {
   return (
     <div className={`toggle-switch ${className}`}>
       <h3
-        onClick={() => selectOption(0)}
+        onClick={() => setSelected(0)}
         className={selected == 0 ? "selected" : ""}
       >
         Juegos
       </h3>
       <h3
         className={selected == 1 ? "selected" : ""}
-        onClick={() => selectOption(1)}
+        onClick={() => setSelected(1)}
       >
         Amistades
       </h3>

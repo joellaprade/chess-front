@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { useWsContext } from "./WsContext";
-import { useAuth } from "./AuthContext";
+import { useWsContext } from "../context/WsContext";
+import { useAuth } from "../context/AuthContext";
+import { Instruction } from "../types/instruction";
 
-const WsController = () => {
+const useWs = () => {
   const userId = useAuth().session?.userId;
   const wssUrl = process.env.NEXT_PUBLIC_WS_BACKEND_URL;
-  const { oMsg, connected, setIMsg, setConnected } = useWsContext();
+  const { oMsg, connected, setIMsg, setOMsg, setConnected } = useWsContext();
   const [ws, setWs] = useState<WebSocket | null>(null);
 
   const connect = () => {
@@ -19,11 +20,9 @@ const WsController = () => {
       console.error(e);
     }
   };
-
   const close = () => {
     if (!connected) ws?.close();
   };
-
   const initWs = (ws: WebSocket) => {
     ws.onopen = () => setConnected(true);
     ws.onclose = () => setConnected(false);
@@ -32,18 +31,43 @@ const WsController = () => {
       setIMsg(message);
     };
   };
-
   const sendMsg = () => {
     if (!ws || !oMsg) return;
 
     ws.send(JSON.stringify(oMsg));
   };
 
+  // Messages
+  const sendAddRequest = (username: string) => {
+    setOMsg({
+      action: "add-friend",
+      payload: { username },
+    });
+  };
+  const addFriend = (username: string) => {
+    setOMsg({
+      action: "add-friend",
+      payload: { username },
+    });
+  };
+  const handleRemoveFriend = (username: string) => {
+    setOMsg({
+      action: "remove-friend",
+      payload: { username },
+    });
+  };
+  const runReplyAction = (notif: Instruction) => {
+    const reply = notif.replyAction;
+    if (!reply) return;
+
+    setOMsg({ ...reply });
+  };
+
   useEffect(sendMsg, [oMsg]);
   useEffect(connect, [userId]);
   useEffect(close, [connected]);
 
-  return <></>;
+  return { sendAddRequest, addFriend, handleRemoveFriend, runReplyAction };
 };
 
-export default WsController;
+export default useWs;

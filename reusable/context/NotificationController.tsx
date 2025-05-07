@@ -1,11 +1,11 @@
 "use client";
 import { useEffect } from "react";
 import { useNotifications } from "./NotificationContext";
-import { useWs } from "./WsContext";
+import { useWsContext } from "./WsContext";
 
 const NotificationController = () => {
   const { notif, setNotif } = useNotifications();
-  const { iMsg } = useWs();
+  const { iMsg } = useWsContext();
 
   useEffect(() => setNotif(iMsg), [iMsg]);
 

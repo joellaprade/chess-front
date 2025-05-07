@@ -1,16 +1,23 @@
 "use client";
 import { useEffect } from "react";
-import { useNotifications } from "./NotificationContext";
-import { useWs } from "./WsContext";
+import { useWsContext } from "./WsContext";
 import { usePlayer } from "./PlayerContext";
 import { Player } from "../models/Player";
 
 const PlayerController = () => {
-  const { iMsg } = useWs();
-  const { friends, friendReqs, setFriends, setFriendReqs } = usePlayer();
+  const { iMsg } = useWsContext();
+  const { setFriends, setFriendReqs } = usePlayer();
 
   const handleNewFriendReq = (player: Player) => {
     setFriendReqs((prevState) => [...prevState, player]);
+  };
+
+  const handleNewFriend = (player: Player) => {
+    setFriendReqs((prevState) =>
+      prevState.filter((fReq) => fReq.username !== player.username),
+    );
+
+    setFriends((prevState) => [...prevState, player]);
   };
 
   const handleRemoveFriend = (username: string) => {
@@ -36,6 +43,7 @@ const PlayerController = () => {
         handleNewFriendReq(iMsg.payload);
         break;
       case "notify-only-new-friend":
+        handleNewFriend(iMsg.payload);
         break;
       case "notify-only-is-online":
         handleOnlineStatus(true, iMsg.payload.username);
@@ -48,10 +56,6 @@ const PlayerController = () => {
         break;
     }
   };
-
-  useEffect(() => {
-    console.log(friendReqs);
-  }, [friends, friendReqs]);
 
   useEffect(handleIMsg, [iMsg]);
 
