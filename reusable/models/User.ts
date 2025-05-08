@@ -6,6 +6,7 @@ const userSchema = new Schema({
   image: { type: String, default: "" },
   username: { type: String, required: true },
   password: { type: String, required: true },
+  active: { type: Boolean, default: false },
 });
 
 export const User = models.User || model("User", userSchema);

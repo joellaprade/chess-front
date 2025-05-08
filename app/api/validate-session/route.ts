@@ -1,5 +1,5 @@
 import { Session } from "@/reusable/models/Session";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import db from "@/reusable/lib/db";
 import { cookies } from "next/headers";
 

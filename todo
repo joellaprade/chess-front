@@ -1,1 +1,11 @@
-agregar image a player
+por alguna razon, cuando verifico mi cuenta, se manda 1 coneccion, se elimina, y se manda otra estable
+log:
+
+Listening to port: 8000
+upgrading
+connected
+disconected
+upgrading
+connected
+
+hacer cambiar contrasena
