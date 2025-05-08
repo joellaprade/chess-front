@@ -6,6 +6,7 @@ import { getPlayer, getSession } from "@/reusable/lib/auth";
 import { WsContextProvider } from "@/reusable/context/WsContext";
 import { NotificationContextProvider } from "@/reusable/context/NotificationContext";
 import { PlayerContextProvider } from "@/reusable/context/PlayerContext";
+import { headers } from "next/headers";
 
 const raleway = localFont({
   src: "../public/fonts/Raleway-VariableFont_wght.ttf",

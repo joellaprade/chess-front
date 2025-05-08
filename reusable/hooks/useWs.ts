@@ -2,15 +2,17 @@ import { useEffect, useState } from "react";
 import { useWsContext } from "../context/WsContext";
 import { useAuth } from "../context/AuthContext";
 import { Instruction } from "../types/instruction";
+import { usePathname } from "next/navigation";
 
 const useWs = () => {
   const userId = useAuth().session?.userId;
   const wssUrl = process.env.NEXT_PUBLIC_WS_BACKEND_URL;
   const { oMsg, connected, setIMsg, setOMsg, setConnected } = useWsContext();
   const [ws, setWs] = useState<WebSocket | null>(null);
+  const pathname = usePathname();
 
   const connect = () => {
-    if (!userId || !wssUrl) return;
+    if (!userId || !wssUrl || pathname == "/login") return;
 
     try {
       const wsRes = new WebSocket(wssUrl);

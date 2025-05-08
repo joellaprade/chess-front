@@ -9,3 +9,14 @@ upgrading
 connected
 
 hacer cambiar contrasena
+pasar controllers a hooks
+
+
+
+
+flow:
+se corre login action
+corre layout
+corre useEffect de login page
+se corre layout
+se corre layout otra ves
