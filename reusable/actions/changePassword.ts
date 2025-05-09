@@ -13,20 +13,24 @@ type formValues = {
 };
 
 export const changePassword = async (formData: FormData) => {
-  const { password, code } = getFormValues<formValues>(formData);
-  const userId = (await cookies()).get("userId")?.value;
-  const [user, verificationCode]: [User | null, VerificationCode | null] =
-    await Promise.all([
-      User.findById(userId),
-      VerificationCode.findOne({ userId }),
-    ]);
+  try {
+    const { password, code } = getFormValues<formValues>(formData);
+    const userId = (await cookies()).get("userId")?.value;
+    const [user, verificationCode]: [User | null, VerificationCode | null] =
+      await Promise.all([
+        User.findById(userId),
+        VerificationCode.findOne({ userId }),
+      ]);
 
-  if (!user || !verificationCode || verificationCode.code !== code)
-    return false;
+    if (!user || !verificationCode || verificationCode.code !== code)
+      throw new Error("Error cambiando la contraseña");
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-  user.password = hashedPassword;
-  await user.save();
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user.password = hashedPassword;
+    await user.save();
 
-  redirect("/login");
+    redirect("/login");
+  } catch (e) {
+    throw e;
+  }
 };

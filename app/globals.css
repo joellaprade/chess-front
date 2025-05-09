@@ -56,7 +56,7 @@ body {
   }
 
   .main-btn {
-    @apply bg-green;
+    @apply bg-green transition-opacity duration-300;
   }
 
   .secondary-btn {

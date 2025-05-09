@@ -12,16 +12,20 @@ type formValues = {
 };
 
 export default async function login(formData: FormData): Promise<boolean> {
-  await db();
+  try {
+    await db();
 
-  const { username, password } = getFormValues<formValues>(formData);
+    const { username, password } = getFormValues<formValues>(formData);
 
-  const user: User | null = await User.findOne({ username });
+    const user: User | null = await User.findOne({ username });
 
-  if (user && user.active && (await bcrypt.compare(password, user.password))) {
-    await createSession(user);
-    return true;
-  } else {
-    throw new Error("El usuario o contraseña son incorrectos.");
+    if (user?.active && (await bcrypt.compare(password, user.password))) {
+      await createSession(user);
+      return true;
+    } else {
+      throw new Error("El usuario o contraseña son incorrectos.");
+    }
+  } catch (e) {
+    throw e;
   }
 }

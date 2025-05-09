@@ -42,12 +42,12 @@ export default function Page() {
           <UserProfile username={username} image={imagePreview} />
           <button
             onClick={(e) => fetchData(e, formData)}
-            className={`main-btn big-btn mt-20 transition-opacity duration-300 ${isLoading ? "opacity-50" : ""}`}
+            className={`main-btn big-btn mt-20 ${isLoading ? "opacity-50" : ""}`}
             type={isLoading ? "button" : "submit"}
           >
             {isLoading ? "Enviando..." : "Enviar"}
           </button>
-          <span className="error">{error}</span>
+          <span className={`${!error && "hidden"} error`}>{error}</span>{" "}
         </>
       ) : (
         <UserProfile

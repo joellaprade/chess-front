@@ -30,7 +30,9 @@ export default function Page() {
     <>
       <form
         className="w-full"
-        action={(formData: FormData) => fetchData(formData)}
+        action={(formData: FormData) => {
+          fetchData(formData);
+        }}
       >
         <input
           value={username}
@@ -46,13 +48,13 @@ export default function Page() {
           placeholder="Contraseña"
           name="password"
         />
-        <span className="error">{error}</span>
+        <span className={`${!error && "hidden"} error`}>{error}</span>{" "}
         <Link className="link" href={"/change-password/request"}>
           Olvidé mi Contraseña
         </Link>
         <button
           type={`${isValid && !loading ? "submit" : "button"}`}
-          className={`big-btn main-btn mt-6 transition-opacity duration-300 ${isValid && !loading ? "" : "opacity-50"}`}
+          className={`big-btn main-btn mt-6 ${isValid && !loading ? "" : "opacity-50"}`}
         >
           {loading ? "Enviando..." : "Ingresar"}
         </button>

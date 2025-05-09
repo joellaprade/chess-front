@@ -11,20 +11,29 @@ type formFields = {
   email: string;
 };
 
-export const handleChangePasswordRequest = async (formData: FormData) => {
-  const { email } = getFormValues<formFields>(formData);
-  const user = await User.findOne({ email });
-  const userId = user._id.toString();
-  const code = Math.floor(100000 + Math.random() * 900000);
-  const cookieStore = await cookies();
+export const handleChangePasswordRequest = async (
+  formData: FormData,
+): Promise<boolean> => {
+  try {
+    const { email } = getFormValues<formFields>(formData);
+    const user: User | null = await User.findOne({ email });
 
-  const subject = "Cambiar Contraseña";
-  const text = `Tu codigo de verificación es: ${code}`;
-  await sendMail(email, subject, text);
+    if (!user || !email)
+      throw new Error("No se encontró al usuario con el correo enviado");
 
-  await VerificationCode.findOneAndDelete({ userId });
-  await VerificationCode.create({ userId, code });
-  cookieStore.set("userId", userId);
+    const userId = user?._id.toString();
+    const code = Math.floor(100000 + Math.random() * 900000);
+    const cookieStore = await cookies();
+    const subject = "Cambiar Contraseña";
+    const text = `Tu codigo de verificación es: ${code}`;
 
-  redirect("/change-password");
+    await sendMail(email, subject, text);
+    await VerificationCode.findOneAndDelete({ userId });
+    await VerificationCode.create({ userId, code });
+    cookieStore.set("userId", userId);
+
+    redirect("/change-password");
+  } catch (e) {
+    throw e;
+  }
 };

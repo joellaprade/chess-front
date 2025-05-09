@@ -94,10 +94,10 @@ export default function Page() {
           type="password"
           placeholder="Confirmar Contraseña"
         />
-        <span className="error">{error}</span>
+        <span className={`${!error && "hidden"} error`}>{error}</span>{" "}
         <button
           type={`${isValid && !loading ? "submit" : "button"}`}
-          className={`big-btn main-btn mt-5 transition-opacity duration-300 ${isValid && !loading ? "" : "opacity-50"}`}
+          className={`big-btn main-btn mt-5 ${isValid && !loading ? "" : "opacity-50"}`}
         >
           {loading ? "Enviando..." : "Crear Cuenta"}
         </button>
