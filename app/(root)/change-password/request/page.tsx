@@ -1,11 +1,13 @@
 "use client";
 
-import { verifyMail } from "@/reusable/actions/verifyMail";
+import { handleChangePasswordRequest } from "@/reusable/actions/handleChangePasswordRequest";
 import useFetchServerAction from "@/reusable/hooks/fetchAction";
 import { useEffect } from "react";
 
 const Page = () => {
-  const { data, loading, fetchData } = useFetchServerAction(verifyMail);
+  const { data, loading, fetchData } = useFetchServerAction(
+    handleChangePasswordRequest,
+  );
 
   useEffect(() => {
     if (data) window.location.href = "/";
@@ -13,12 +15,12 @@ const Page = () => {
 
   return (
     <>
-      <h2>Introdusca el código que se envió a su correo</h2>
+      <h2>Introdusca su correo electrónico:</h2>
       <form className="w-full" action={fetchData}>
-        <input className="my-5" name="code" placeholder="Código" type="text" />
+        <input name="email" placeholder="Correo Electrónico" type="text" />
         <button
           type={loading ? "button" : "submit"}
-          className={`${loading ? "opacity-50" : ""} big-btn main-btn`}
+          className={`${loading ? "opacity-50" : ""} big-btn main-btn mt-5`}
         >
           {loading ? "Enviando..." : "Enviar"}
         </button>

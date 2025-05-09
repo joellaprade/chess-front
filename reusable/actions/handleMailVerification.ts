@@ -3,13 +3,12 @@
 import { VerificationCode } from "../models/VerificationCode";
 import db from "../lib/db";
 import { cookies } from "next/headers";
-import { sendVerificationMail } from "./sendVerificationMail";
+import { sendMail } from "./sendMail";
 
 export const handleMailVerification = async (email: string, userId: string) => {
   try {
     const cookieStore = await cookies();
-    const code = Math.floor(Math.random() * 1000000);
-
+    const code = Math.floor(100000 + Math.random() * 900000);
     cookieStore.set("userId", userId, {
       httpOnly: true,
       secure: true,
@@ -17,9 +16,11 @@ export const handleMailVerification = async (email: string, userId: string) => {
       path: "/",
     });
 
+    const subject = "Verifica tu Correo";
+    const text = `Tu codigo de verificación es: ${code}`;
+    await sendMail(email, subject, text);
     await db();
     await VerificationCode.create({ userId, code });
-    await sendVerificationMail(email, code);
   } catch (e) {
     console.error(e);
   }

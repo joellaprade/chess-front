@@ -47,7 +47,7 @@ export default function Page() {
           name="password"
         />
         <span className="error">{error}</span>
-        <Link className="link" href={"forgot-password"}>
+        <Link className="link" href={"/change-password/request"}>
           Olvidé mi Contraseña
         </Link>
         <button

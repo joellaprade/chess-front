@@ -15,6 +15,8 @@ export async function middleware(req: NextRequest) {
     "/signup",
     "/about",
     "/verify-account",
+    "/change-password",
+    "/change-password/request",
   ];
   const isProtectedRoute = !unprotectedRoutes.includes(pathname);
 

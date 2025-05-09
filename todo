@@ -1,22 +1,3 @@
-por alguna razon, cuando verifico mi cuenta, se manda 1 coneccion, se elimina, y se manda otra estable
-log:
+arreglar front de cambiar contra
 
-Listening to port: 8000
-upgrading
-connected
-disconected
-upgrading
-connected
-
-hacer cambiar contrasena
 pasar controllers a hooks
-
-
-
-
-flow:
-se corre login action
-corre layout
-corre useEffect de login page
-se corre layout
-se corre layout otra ves
