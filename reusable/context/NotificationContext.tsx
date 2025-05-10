@@ -1,7 +1,8 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import NotificationController from "./NotificationController";
+import { useWsContext } from "./WsContext";
 
 type NotificationContextProviderProps = {
   children: React.ReactNode;
@@ -32,10 +33,13 @@ export const NotificationContextProvider = ({
   children,
 }: NotificationContextProviderProps) => {
   const [notif, setNotif] = useState<unknown>(null);
+  const { iMsg } = useWsContext();
+
+  useEffect(() => setNotif(iMsg), [iMsg]);
+
   return (
     <NotificationContext.Provider value={{ notif, setNotif }}>
       {children}
-      <NotificationController />
     </NotificationContext.Provider>
   );
 };

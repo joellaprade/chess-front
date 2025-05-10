@@ -19,9 +19,9 @@ type PlayerContextType = {
   friends: Array<Player>;
   friendReqs: Array<Player>;
   gameReqs: Array<Player>;
-  setFriends: React.Dispatch<React.SetStateAction<Player[]>>; // ✅ Correct;
-  setFriendReqs: React.Dispatch<React.SetStateAction<Player[]>>; // ✅ Correct
-  setGameReqs: React.Dispatch<React.SetStateAction<Player[]>>; // ✅ Correct
+  setFriends: React.Dispatch<React.SetStateAction<Player[]>>;
+  setFriendReqs: React.Dispatch<React.SetStateAction<Player[]>>;
+  setGameReqs: React.Dispatch<React.SetStateAction<Player[]>>;
 };
 
 const defaultPlayer: PlayerContextType = {
