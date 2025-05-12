@@ -1,17 +1,19 @@
-import { useBoardContext } from "../context/BoardContext";
+"use client";
+
+import { useBoardContext } from "../../context/BoardContext";
+import { useBoardUtils } from "./useBoardUtils";
+import { useCheckMove } from "./useCheckMove";
 
 const useBoard = () => {
-  const { board, setBoard, selectedSquare, setSelectedSquare } =
-    useBoardContext();
+  const { selectedSquare, setBoard, setSelectedSquare } = useBoardContext();
+  const { checkMove, handleWrongMove } = useCheckMove();
+  const { getSquareById } = useBoardUtils();
 
-  const getSquareById = (index: number) => {
-    const row = Math.floor(index / 8);
-    const rowSquare = index - row * 8;
-
-    return board[row][rowSquare];
-  };
   const movePiece = (destination: number) => {
     const movingPiece = getSquareById(selectedSquare!).piece;
+
+    const isMoveValid = checkMove(selectedSquare!, destination);
+    if (!isMoveValid) return handleWrongMove();
 
     setBoard((prevBoard) =>
       prevBoard.map((row) =>

@@ -6,11 +6,11 @@ const Game = () => {
     players: [
       {
         username: "Joel",
-        isBlack: true,
+        isBlack: false,
       },
       {
         username: "Miguel",
-        isBlack: false,
+        isBlack: true,
       },
     ],
     time: 60 * 10,
