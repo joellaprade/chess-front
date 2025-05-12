@@ -1,19 +1,20 @@
 "use client";
 
+import { useBoardContext } from "@/reusable/context/BoardContext";
 import { useBoardUtils } from "./useBoardUtils";
 
 type Direction = "top" | "bottom" | "left" | "right";
 
 export const useCheckRook = () => {
   const { getSquareById } = useBoardUtils();
+  const { selectedPieceLegalMoves, setSelectedPieceLegalMoves } =
+    useBoardContext();
   let piece: string;
   let pieceColor: string;
 
   let origin: number;
   let oFile: number;
   let oCol: number;
-
-  let destination: number;
 
   let isLimit: Record<Direction, number | null> = {
     top: null,
@@ -33,7 +34,7 @@ export const useCheckRook = () => {
 
   const calculateMoves = (i: number, direction: Direction) => {
     if (isBlocked[direction]) return false;
-    const isTopLeft = ["top", "left"].includes(direction);
+    const isIndexDecreacing = ["top", "left"].includes(direction);
 
     let move;
     switch (direction) {
@@ -53,8 +54,8 @@ export const useCheckRook = () => {
 
     let limit = isLimit[direction] as number;
 
-    if (isTopLeft && move < limit) return false;
-    if (!isTopLeft && move > limit) return false;
+    if (isIndexDecreacing && move < limit) return false;
+    if (!isIndexDecreacing && move > limit) return false;
 
     let destinationSquare = getSquareById(move);
     if (destinationSquare.piece != "") {
@@ -71,12 +72,13 @@ export const useCheckRook = () => {
       calculateMoves(i, "left");
       calculateMoves(i, "right");
     }
+    setSelectedPieceLegalMoves(possibleMoves);
   };
-  const checkRook = (originParam: number, destinationParam: number) => {
+  const calculateRook = (originParam: number) => {
+    possibleMoves = [];
     piece = getSquareById(originParam).piece;
     pieceColor = piece.charAt(0);
 
-    destination = destinationParam;
     origin = originParam;
     oFile = Math.floor(origin / 8);
     oCol = Math.floor(origin - 8 * oFile);
@@ -86,13 +88,15 @@ export const useCheckRook = () => {
     isLimit.left = origin - oCol;
     isLimit.right = origin + (7 - oCol);
 
-    possibleMoves = [];
-
     calculatePossibleSquares();
 
-    if (possibleMoves.includes(destination)) return true;
+    return possibleMoves;
+  };
+  const validateRook = (destination: number) => {
+    setSelectedPieceLegalMoves([]);
+    if (selectedPieceLegalMoves.includes(destination)) return true;
     else return false;
   };
 
-  return { checkRook };
+  return { calculateRook, validateRook };
 };

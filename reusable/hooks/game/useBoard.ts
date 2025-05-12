@@ -5,14 +5,24 @@ import { useBoardUtils } from "./useBoardUtils";
 import { useCheckMove } from "./useCheckMove";
 
 const useBoard = () => {
-  const { selectedSquare, setBoard, setSelectedSquare } = useBoardContext();
-  const { checkMove, handleWrongMove } = useCheckMove();
+  const {
+    selectedSquare,
+    selectedPieceLegalMoves,
+    setBoard,
+    setSelectedSquare,
+    setSelectedPieceLegalMoves,
+  } = useBoardContext();
+  const { calculateLegalMoves, validateMove, handleWrongMove } = useCheckMove();
   const { getSquareById } = useBoardUtils();
 
+  const colorLegalSquares = (id: number) => {
+    if (!selectedSquare) return "";
+    if (selectedPieceLegalMoves.includes(id)) return "opacity-50";
+  };
   const movePiece = (destination: number) => {
     const movingPiece = getSquareById(selectedSquare!).piece;
 
-    const isMoveValid = checkMove(selectedSquare!, destination);
+    const isMoveValid = validateMove(selectedSquare!, destination);
     if (!isMoveValid) return handleWrongMove();
 
     setBoard((prevBoard) =>
@@ -44,6 +54,7 @@ const useBoard = () => {
   const handlePieceClick = (index: number) => {
     if (selectedSquare === null) {
       setSelectedSquare(index);
+      setSelectedPieceLegalMoves(calculateLegalMoves(index));
     } else if (index === selectedSquare) {
       setSelectedSquare(null);
     } else if (getSquareById(selectedSquare).piece !== "") {
@@ -54,7 +65,13 @@ const useBoard = () => {
     }
   };
 
-  return { getSquareById, movePiece, getColor, handlePieceClick };
+  return {
+    getSquareById,
+    movePiece,
+    getColor,
+    handlePieceClick,
+    colorLegalSquares,
+  };
 };
 
 export default useBoard;

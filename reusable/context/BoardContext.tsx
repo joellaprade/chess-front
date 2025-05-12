@@ -10,8 +10,10 @@ type BoardContextProviderProps = {
 type BoardContextType = {
   board: Board;
   selectedSquare: number | null;
+  selectedPieceLegalMoves: number[];
   setBoard: React.Dispatch<React.SetStateAction<Board>>;
   setSelectedSquare: React.Dispatch<React.SetStateAction<number | null>>;
+  setSelectedPieceLegalMoves: React.Dispatch<React.SetStateAction<number[]>>;
 };
 
 export const BoardContext = createContext({} as BoardContextType);
@@ -120,10 +122,20 @@ export const BoardContextProvider = ({
   ];
   const [board, setBoard] = useState<Board>(defaultBoard);
   const [selectedSquare, setSelectedSquare] = useState<number | null>(null);
+  const [selectedPieceLegalMoves, setSelectedPieceLegalMoves] = useState<
+    number[]
+  >([]);
 
   return (
     <BoardContext.Provider
-      value={{ board, setBoard, selectedSquare, setSelectedSquare }}
+      value={{
+        board,
+        selectedSquare,
+        selectedPieceLegalMoves,
+        setBoard,
+        setSelectedSquare,
+        setSelectedPieceLegalMoves,
+      }}
     >
       {children}
     </BoardContext.Provider>

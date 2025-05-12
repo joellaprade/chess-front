@@ -5,7 +5,7 @@ import { useBoardContext } from "@/reusable/context/BoardContext";
 
 type Direction = "tl" | "tr" | "bl" | "br";
 
-export const useCheckBishop = () => {
+export const useCheckKnight = () => {
   const { getSquareById } = useBoardUtils();
   const { selectedPieceLegalMoves, setSelectedPieceLegalMoves } =
     useBoardContext();
@@ -74,7 +74,7 @@ export const useCheckBishop = () => {
     }
     setSelectedPieceLegalMoves(possibleMoves);
   };
-  const calculateBishop = (originParam: number) => {
+  const calculateKnight = (originParam: number) => {
     possibleMoves = [];
     piece = getSquareById(originParam).piece;
     pieceColor = piece.charAt(0);
@@ -92,40 +92,11 @@ export const useCheckBishop = () => {
 
     return possibleMoves;
   };
-  const validateBishop = (destination: number) => {
+  const validateKnight = (destination: number) => {
     setSelectedPieceLegalMoves([]);
     if (selectedPieceLegalMoves.includes(destination)) return true;
     else return false;
   };
 
-  return { calculateBishop, validateBishop };
+  return { calculateKnight, validateKnight };
 };
-/*
-// 7: 7 (7, 7)
-// 5: 5 (7, 5)
-// 14: 6 (6, 6)
-// 23: 5 (5, 7)
-
-// 56: 0 (0, 0)
-// 40: 0 (1, 0)
-// 49: 1 (1, 1)
-// 58: 0 (0, 2)
-
-// bajo diagonal, superior derecha
-7 - Math.min(oFile, oCol);
-//sobre diagonal, superior derecha
-Math.max(oFile, oCol);
-
-//bajo diagonal, abajo izquierda
-7 - Math.max(oFile, oCol);
-// sobre diagonal, abajo izquierda
-Math.min(oFile, oCol);
-
-isLimit.bl = origin + 7 * (7 - Math.min(oFile, oCol));
-isLimit.bl = origin + 7 * Math.max(oFile, oCol);
-isLimit.bl = origin + 7 * (7 - Math.max(oFile, oCol));
-isLimit.bl = origin + 7 * Math.min(oFile, oCol);
-
-// isLimit.tr = (origin + 7 - 2 * oCol - 9 * Math.min(oFile, 7 - oCol)) + 7 - 2 * oCol;
-// isLimit.tr = 37 - 9 * Math.min(oFile, oCol);
-*/

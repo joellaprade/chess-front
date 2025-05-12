@@ -3,10 +3,11 @@
 import { useBoardContext } from "@/reusable/context/BoardContext";
 import useBoard from "@/reusable/hooks/game/useBoard";
 import Image from "next/image";
+import { useEffect } from "react";
 
 const Board = ({ isBlack }: { isBlack: boolean }) => {
-  const { board } = useBoardContext();
-  const { getColor, handlePieceClick } = useBoard();
+  const { board, selectedPieceLegalMoves } = useBoardContext();
+  const { getColor, handlePieceClick, colorLegalSquares } = useBoard();
 
   const renderBoard = () => {
     const finalBoard = !isBlack
@@ -20,7 +21,7 @@ const Board = ({ isBlack }: { isBlack: boolean }) => {
       <div className="row" key={rI}>
         {row.map((square, cI) => (
           <div
-            className={`square ${getColor(square.id)}`}
+            className={`square ${getColor(square.id)} ${colorLegalSquares(square.id)}`}
             onClick={() => handlePieceClick(square.id)}
             key={cI}
           >
