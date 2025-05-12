@@ -2,12 +2,14 @@
 
 import { useBoardUtils } from "./useBoardUtils";
 import { useCheckBishop } from "./useCheckBishop";
+import { useCheckKnight } from "./useCheckKnight";
 import { useCheckRook } from "./useCheckRook";
 
 export const useCheckMove = () => {
   const { getSquareById } = useBoardUtils();
   const { calculateRook, validateRook } = useCheckRook();
   const { calculateBishop, validateBishop } = useCheckBishop();
+  const { calculateKnight, validateKnight } = useCheckKnight();
 
   const calculateLegalMoves = (origin: number) => {
     const piece = getSquareById(origin).piece.charAt(1);
@@ -20,6 +22,7 @@ export const useCheckMove = () => {
         moves = calculateRook(origin);
         break;
       case "N":
+        moves = calculateKnight(origin);
         break;
       case "B":
         moves = calculateBishop(origin);
@@ -45,10 +48,11 @@ export const useCheckMove = () => {
         isValid = validateRook(destination);
         break;
       case "N":
-        isValid = true;
+        isValid = validateKnight(destination);
         break;
       case "B":
-        isValid = validateBishop(destination);
+        isValid = true;
+        // isValid = validateBishop(destination);
         break;
       case "Q":
         isValid = true;

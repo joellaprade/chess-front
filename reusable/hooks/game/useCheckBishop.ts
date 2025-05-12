@@ -13,8 +13,8 @@ export const useCheckBishop = () => {
   let pieceColor: string;
 
   let origin: number;
-  let oFile: number;
-  let oCol: number;
+  let row: number;
+  let col: number;
 
   let isLimit: Record<Direction, number | null> = {
     tl: null,
@@ -32,7 +32,7 @@ export const useCheckBishop = () => {
 
   let possibleMoves: number[] = [];
 
-  const calculateMoves = (i: number, direction: Direction) => {
+  const calculatePossibleSquares = (i: number, direction: Direction) => {
     if (isBlocked[direction]) return false;
     const isIndexDecreacing = ["tr", "tl"].includes(direction);
 
@@ -65,12 +65,12 @@ export const useCheckBishop = () => {
 
     possibleMoves.push(move);
   };
-  const calculatePossibleSquares = () => {
+  const calculateAllOrientations = () => {
     for (let i = 0; i < 7; i++) {
-      calculateMoves(i, "tr");
-      calculateMoves(i, "tl");
-      calculateMoves(i, "bl");
-      calculateMoves(i, "br");
+      calculatePossibleSquares(i, "tr");
+      calculatePossibleSquares(i, "tl");
+      calculatePossibleSquares(i, "bl");
+      calculatePossibleSquares(i, "br");
     }
     setSelectedPieceLegalMoves(possibleMoves);
   };
@@ -80,15 +80,15 @@ export const useCheckBishop = () => {
     pieceColor = piece.charAt(0);
 
     origin = originParam;
-    oFile = Math.floor(origin / 8);
-    oCol = Math.floor(origin - 8 * oFile);
+    row = Math.floor(origin / 8);
+    col = Math.floor(origin - 8 * row);
 
-    isLimit.tl = origin - 9 * Math.min(oFile, oCol);
-    isLimit.bl = origin + 7 * Math.min(7 - oFile, oCol);
-    isLimit.tr = origin - 7 * Math.min(oFile, 7 - oCol);
-    isLimit.br = origin + 9 * (7 - Math.max(oFile, oCol));
+    isLimit.tl = origin - 9 * Math.min(row, col);
+    isLimit.bl = origin + 7 * Math.min(7 - row, col);
+    isLimit.tr = origin - 7 * Math.min(row, 7 - col);
+    isLimit.br = origin + 9 * (7 - Math.max(row, col));
 
-    calculatePossibleSquares();
+    calculateAllOrientations();
 
     return possibleMoves;
   };
@@ -112,20 +112,20 @@ export const useCheckBishop = () => {
 // 58: 0 (0, 2)
 
 // bajo diagonal, superior derecha
-7 - Math.min(oFile, oCol);
+7 - Math.min(row, col);
 //sobre diagonal, superior derecha
-Math.max(oFile, oCol);
+Math.max(row, col);
 
 //bajo diagonal, abajo izquierda
-7 - Math.max(oFile, oCol);
+7 - Math.max(row, col);
 // sobre diagonal, abajo izquierda
-Math.min(oFile, oCol);
+Math.min(row, col);
 
-isLimit.bl = origin + 7 * (7 - Math.min(oFile, oCol));
-isLimit.bl = origin + 7 * Math.max(oFile, oCol);
-isLimit.bl = origin + 7 * (7 - Math.max(oFile, oCol));
-isLimit.bl = origin + 7 * Math.min(oFile, oCol);
+isLimit.bl = origin + 7 * (7 - Math.min(row, col));
+isLimit.bl = origin + 7 * Math.max(row, col);
+isLimit.bl = origin + 7 * (7 - Math.max(row, col));
+isLimit.bl = origin + 7 * Math.min(row, col);
 
-// isLimit.tr = (origin + 7 - 2 * oCol - 9 * Math.min(oFile, 7 - oCol)) + 7 - 2 * oCol;
-// isLimit.tr = 37 - 9 * Math.min(oFile, oCol);
+// isLimit.tr = (origin + 7 - 2 * col - 9 * Math.min(row, 7 - col)) + 7 - 2 * col;
+// isLimit.tr = 37 - 9 * Math.min(row, col);
 */

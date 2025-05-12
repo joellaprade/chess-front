@@ -13,8 +13,8 @@ export const useCheckRook = () => {
   let pieceColor: string;
 
   let origin: number;
-  let oFile: number;
-  let oCol: number;
+  let row: number;
+  let col: number;
 
   let isLimit: Record<Direction, number | null> = {
     top: null,
@@ -32,7 +32,7 @@ export const useCheckRook = () => {
 
   let possibleMoves: number[] = [];
 
-  const calculateMoves = (i: number, direction: Direction) => {
+  const calculatePossibleSquares = (i: number, direction: Direction) => {
     if (isBlocked[direction]) return false;
     const isIndexDecreacing = ["top", "left"].includes(direction);
 
@@ -65,12 +65,12 @@ export const useCheckRook = () => {
 
     possibleMoves.push(move);
   };
-  const calculatePossibleSquares = () => {
+  const calculateAllOrientations = () => {
     for (let i = 0; i < 7; i++) {
-      calculateMoves(i, "top");
-      calculateMoves(i, "bottom");
-      calculateMoves(i, "left");
-      calculateMoves(i, "right");
+      calculatePossibleSquares(i, "top");
+      calculatePossibleSquares(i, "bottom");
+      calculatePossibleSquares(i, "left");
+      calculatePossibleSquares(i, "right");
     }
     setSelectedPieceLegalMoves(possibleMoves);
   };
@@ -80,15 +80,15 @@ export const useCheckRook = () => {
     pieceColor = piece.charAt(0);
 
     origin = originParam;
-    oFile = Math.floor(origin / 8);
-    oCol = Math.floor(origin - 8 * oFile);
+    row = Math.floor(origin / 8);
+    col = Math.floor(origin - 8 * row);
 
-    isLimit.top = origin - oFile * 8;
-    isLimit.bottom = origin + (7 - oFile) * 8;
-    isLimit.left = origin - oCol;
-    isLimit.right = origin + (7 - oCol);
+    isLimit.top = origin - row * 8;
+    isLimit.bottom = origin + (7 - row) * 8;
+    isLimit.left = origin - col;
+    isLimit.right = origin + (7 - col);
 
-    calculatePossibleSquares();
+    calculateAllOrientations();
 
     return possibleMoves;
   };

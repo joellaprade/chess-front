@@ -13,66 +13,33 @@ export const useCheckKnight = () => {
   let pieceColor: string;
 
   let origin: number;
-  let oFile: number;
-  let oCol: number;
-
-  let isLimit: Record<Direction, number | null> = {
-    tl: null,
-    tr: null,
-    br: null,
-    bl: null,
-  };
-
-  let isBlocked = {
-    tl: false,
-    tr: false,
-    br: false,
-    bl: false,
-  };
+  let row: number;
+  let col: number;
 
   let possibleMoves: number[] = [];
 
-  const calculateMoves = (i: number, direction: Direction) => {
-    if (isBlocked[direction]) return false;
-    const isIndexDecreacing = ["tr", "tl"].includes(direction);
+  const calculatePossibleSquares = () => {
+    const moves = [
+      [origin - 17, origin - 15],
+      [origin - 10, origin - 6],
+      [origin + 6, origin + 10],
+      [origin + 15, origin + 17],
+    ];
 
-    let move;
-    switch (direction) {
-      case "tr":
-        move = origin - (i + 1) * 7;
-        break;
-      case "tl":
-        move = origin - (i + 1) * 9;
-        break;
-      case "bl":
-        move = origin + (i + 1) * 7;
-        break;
-      case "br":
-        move = origin + (i + 1) * 9;
-        break;
+    // Calcular cuales estan fuera del tablero
+    for (let i = 0; i < 4; i++) {
+      const [moveA, moveB] = moves[i];
+      if (col < 1 || row < 2) {
+        //eliminar square
+      }
     }
 
-    let limit = isLimit[direction] as number;
-
-    if (isIndexDecreacing && move < limit) return false;
-    if (!isIndexDecreacing && move > limit) return false;
-
-    let destinationSquare = getSquareById(move);
+    let destinationSquare = getSquareById(1);
     if (destinationSquare.piece != "") {
-      isBlocked[direction] = true;
       if (destinationSquare.piece.includes(pieceColor)) return false;
     }
 
-    possibleMoves.push(move);
-  };
-  const calculatePossibleSquares = () => {
-    for (let i = 0; i < 7; i++) {
-      calculateMoves(i, "tr");
-      calculateMoves(i, "tl");
-      calculateMoves(i, "bl");
-      calculateMoves(i, "br");
-    }
-    setSelectedPieceLegalMoves(possibleMoves);
+    possibleMoves = [...moves[0], ...moves[1], ...moves[2], ...moves[3]];
   };
   const calculateKnight = (originParam: number) => {
     possibleMoves = [];
@@ -80,13 +47,8 @@ export const useCheckKnight = () => {
     pieceColor = piece.charAt(0);
 
     origin = originParam;
-    oFile = Math.floor(origin / 8);
-    oCol = Math.floor(origin - 8 * oFile);
-
-    isLimit.tl = origin - 9 * Math.min(oFile, oCol);
-    isLimit.bl = origin + 7 * Math.min(7 - oFile, oCol);
-    isLimit.tr = origin - 7 * Math.min(oFile, 7 - oCol);
-    isLimit.br = origin + 9 * (7 - Math.max(oFile, oCol));
+    row = Math.floor(origin / 8);
+    col = Math.floor(origin - 8 * row);
 
     calculatePossibleSquares();
 
