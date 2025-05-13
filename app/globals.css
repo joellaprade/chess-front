@@ -128,6 +128,9 @@ body {
   .timer {
     @apply flex gap-5 rounded bg-white p-2;
   }
+  .valid-square-indicator {
+    @apply relative after:absolute after:inset-0 after:m-auto after:h-10 after:w-10 after:rounded-full after:bg-black after:opacity-50;
+  }
 }
 
 @layer utilities {

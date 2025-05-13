@@ -4,10 +4,17 @@ import { useBoardUtils } from "./useBoardUtils";
 import { useBoardContext } from "@/reusable/context/BoardContext";
 
 type DiagonalDirection = "tl" | "tr" | "bl" | "br";
+type PerpendicularDirection = "top" | "bottom" | "left" | "right";
+type Direction = DiagonalDirection | PerpendicularDirection;
 
-export const useCheckBishop = () => {
-  const { getSquareById, getRowCol, getDiagonals, getMoveByDirection } =
-    useBoardUtils();
+export const useCheckQueen = () => {
+  const {
+    getSquareById,
+    getRowCol,
+    getDiagonals,
+    getPerpendiculars,
+    getMoveByDirection,
+  } = useBoardUtils();
   const { selectedPieceLegalMoves, setSelectedPieceLegalMoves } =
     useBoardContext();
   let piece: string;
@@ -17,7 +24,11 @@ export const useCheckBishop = () => {
   let row: number;
   let col: number;
 
-  let isLimit: Record<DiagonalDirection, number | null> = {
+  let isLimit: Record<Direction, number | null> = {
+    top: null,
+    bottom: null,
+    left: null,
+    right: null,
     tl: null,
     tr: null,
     br: null,
@@ -25,6 +36,10 @@ export const useCheckBishop = () => {
   };
 
   let isBlocked = {
+    top: false,
+    bottom: false,
+    left: false,
+    right: false,
     tl: false,
     tr: false,
     br: false,
@@ -33,12 +48,9 @@ export const useCheckBishop = () => {
 
   let possibleMoves: number[] = [];
 
-  const calculatePossibleSquares = (
-    i: number,
-    direction: DiagonalDirection,
-  ) => {
+  const calculatePossibleSquares = (i: number, direction: Direction) => {
     if (isBlocked[direction]) return false;
-    const isIndexDecreacing = ["tr", "tl"].includes(direction);
+    const isIndexDecreacing = ["tr", "tl", "top", "left"].includes(direction);
     const move = getMoveByDirection(origin, i, direction);
     const limit = isLimit[direction] as number;
 
@@ -60,29 +72,36 @@ export const useCheckBishop = () => {
       calculatePossibleSquares(i, "tl");
       calculatePossibleSquares(i, "bl");
       calculatePossibleSquares(i, "br");
+
+      calculatePossibleSquares(i, "top");
+      calculatePossibleSquares(i, "bottom");
+      calculatePossibleSquares(i, "left");
+      calculatePossibleSquares(i, "right");
     }
     setSelectedPieceLegalMoves(possibleMoves);
   };
-  const calculateBishop = (originParam: number) => {
+  const calculateQueen = (originParam: number) => {
     possibleMoves = [];
     piece = getSquareById(originParam).piece;
     pieceColor = piece.charAt(0);
 
     origin = originParam;
     ({ row, col } = getRowCol(origin));
-    isLimit = getDiagonals(origin, row, col);
+    const dLimits = getDiagonals(origin, row, col);
+    const pLimits = getPerpendiculars(origin, row, col);
+    isLimit = { ...dLimits, ...pLimits };
 
     calculateAllOrientations();
 
     return possibleMoves;
   };
-  const validateBishop = (destination: number) => {
+  const validateQueen = (destination: number) => {
     setSelectedPieceLegalMoves([]);
     if (selectedPieceLegalMoves.includes(destination)) return true;
     else return false;
   };
 
-  return { calculateBishop, validateBishop };
+  return { calculateQueen, validateQueen };
 };
 /*
 // 7: 7 (7, 7)

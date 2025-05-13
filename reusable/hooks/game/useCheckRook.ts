@@ -3,10 +3,11 @@
 import { useBoardContext } from "@/reusable/context/BoardContext";
 import { useBoardUtils } from "./useBoardUtils";
 
-type Direction = "top" | "bottom" | "left" | "right";
+type PerpendicularDirection = "top" | "bottom" | "left" | "right";
 
 export const useCheckRook = () => {
-  const { getSquareById } = useBoardUtils();
+  const { getSquareById, getRowCol, getPerpendiculars, getMoveByDirection } =
+    useBoardUtils();
   const { selectedPieceLegalMoves, setSelectedPieceLegalMoves } =
     useBoardContext();
   let piece: string;
@@ -16,7 +17,7 @@ export const useCheckRook = () => {
   let row: number;
   let col: number;
 
-  let isLimit: Record<Direction, number | null> = {
+  let isLimit: Record<PerpendicularDirection, number | null> = {
     top: null,
     bottom: null,
     left: null,
@@ -32,32 +33,20 @@ export const useCheckRook = () => {
 
   let possibleMoves: number[] = [];
 
-  const calculatePossibleSquares = (i: number, direction: Direction) => {
+  const calculatePossibleSquares = (
+    i: number,
+    direction: PerpendicularDirection,
+  ) => {
     if (isBlocked[direction]) return false;
     const isIndexDecreacing = ["top", "left"].includes(direction);
-
-    let move;
-    switch (direction) {
-      case "top":
-        move = origin - (i + 1) * 8;
-        break;
-      case "bottom":
-        move = origin + (i + 1) * 8;
-        break;
-      case "left":
-        move = origin - (i + 1);
-        break;
-      case "right":
-        move = origin + i + 1;
-        break;
-    }
-
+    let move = getMoveByDirection(origin, i, direction);
     let limit = isLimit[direction] as number;
 
     if (isIndexDecreacing && move < limit) return false;
     if (!isIndexDecreacing && move > limit) return false;
 
-    let destinationSquare = getSquareById(move);
+    const destinationSquare = getSquareById(move);
+
     if (destinationSquare.piece != "") {
       isBlocked[direction] = true;
       if (destinationSquare.piece.includes(pieceColor)) return false;
@@ -80,13 +69,8 @@ export const useCheckRook = () => {
     pieceColor = piece.charAt(0);
 
     origin = originParam;
-    row = Math.floor(origin / 8);
-    col = Math.floor(origin - 8 * row);
-
-    isLimit.top = origin - row * 8;
-    isLimit.bottom = origin + (7 - row) * 8;
-    isLimit.left = origin - col;
-    isLimit.right = origin + (7 - col);
+    ({ row, col } = getRowCol(origin));
+    isLimit = getPerpendiculars(origin, row, col);
 
     calculateAllOrientations();
 

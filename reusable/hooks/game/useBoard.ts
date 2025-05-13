@@ -17,7 +17,7 @@ const useBoard = () => {
 
   const colorLegalSquares = (id: number) => {
     if (!selectedSquare) return "";
-    if (selectedPieceLegalMoves.includes(id)) return "opacity-50";
+    if (selectedPieceLegalMoves.includes(id)) return "valid-square-indicator";
   };
   const movePiece = (destination: number) => {
     const movingPiece = getSquareById(selectedSquare!).piece;

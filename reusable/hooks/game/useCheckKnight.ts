@@ -6,7 +6,7 @@ import { useBoardContext } from "@/reusable/context/BoardContext";
 type Direction = "tl" | "tr" | "bl" | "br";
 
 export const useCheckKnight = () => {
-  const { getSquareById } = useBoardUtils();
+  const { getSquareById, getRowCol } = useBoardUtils();
   const { selectedPieceLegalMoves, setSelectedPieceLegalMoves } =
     useBoardContext();
   let piece: string;
@@ -19,27 +19,29 @@ export const useCheckKnight = () => {
   let possibleMoves: number[] = [];
 
   const calculatePossibleSquares = () => {
-    const moves = [
-      [origin - 17, origin - 15],
-      [origin - 10, origin - 6],
-      [origin + 6, origin + 10],
-      [origin + 15, origin + 17],
-    ];
+    let moves: number[] = [];
 
-    // Calcular cuales estan fuera del tablero
-    for (let i = 0; i < 4; i++) {
-      const [moveA, moveB] = moves[i];
-      if (col < 1 || row < 2) {
-        //eliminar square
-      }
+    if (col >= 1 && row >= 2) moves.push(origin - 17);
+    if (col <= 6 && row >= 2) moves.push(origin - 15);
+
+    if (col >= 2 && row >= 1) moves.push(origin - 10);
+    if (col <= 5 && row >= 1) moves.push(origin - 6);
+
+    if (col >= 2 && row <= 6) moves.push(origin + 6);
+    if (col <= 5 && row <= 6) moves.push(origin + 10);
+
+    if (col >= 1 && row <= 5) moves.push(origin + 15);
+    if (col <= 6 && row <= 5) moves.push(origin + 17);
+
+    const movesLength = moves.length;
+    for (let i = 0; i < movesLength; i++) {
+      const invI = movesLength - 1 - i;
+      let destinationSquare = getSquareById(moves[invI]);
+
+      if (destinationSquare.piece.includes(pieceColor)) moves.splice(invI, 1);
     }
 
-    let destinationSquare = getSquareById(1);
-    if (destinationSquare.piece != "") {
-      if (destinationSquare.piece.includes(pieceColor)) return false;
-    }
-
-    possibleMoves = [...moves[0], ...moves[1], ...moves[2], ...moves[3]];
+    possibleMoves = moves;
   };
   const calculateKnight = (originParam: number) => {
     possibleMoves = [];
@@ -47,8 +49,7 @@ export const useCheckKnight = () => {
     pieceColor = piece.charAt(0);
 
     origin = originParam;
-    row = Math.floor(origin / 8);
-    col = Math.floor(origin - 8 * row);
+    ({ row, col } = getRowCol(origin));
 
     calculatePossibleSquares();
 
