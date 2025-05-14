@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useRef, useState } from "react";
 import { Board } from "../types/board";
 
 type BoardContextProviderProps = {
@@ -11,6 +11,8 @@ type BoardContextType = {
   board: Board;
   selectedSquare: number | null;
   selectedPieceLegalMoves: number[];
+  hasWKingMoved: React.RefObject<boolean>;
+  hasBKingMoved: React.RefObject<boolean>;
   setBoard: React.Dispatch<React.SetStateAction<Board>>;
   setSelectedSquare: React.Dispatch<React.SetStateAction<number | null>>;
   setSelectedPieceLegalMoves: React.Dispatch<React.SetStateAction<number[]>>;
@@ -125,6 +127,8 @@ export const BoardContextProvider = ({
   const [selectedPieceLegalMoves, setSelectedPieceLegalMoves] = useState<
     number[]
   >([]);
+  const hasWKingMoved = useRef(false);
+  const hasBKingMoved = useRef(false);
 
   return (
     <BoardContext.Provider
@@ -132,6 +136,8 @@ export const BoardContextProvider = ({
         board,
         selectedSquare,
         selectedPieceLegalMoves,
+        hasWKingMoved,
+        hasBKingMoved,
         setBoard,
         setSelectedSquare,
         setSelectedPieceLegalMoves,

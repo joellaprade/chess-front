@@ -2,8 +2,7 @@
 
 import { useBoardUtils } from "./useBoardUtils";
 import { useBoardContext } from "@/reusable/context/BoardContext";
-
-type DiagonalDirection = "tl" | "tr" | "bl" | "br";
+import { DiagonalDirection } from "@/reusable/types/directions";
 
 export const useCheckBishop = () => {
   const { getSquareById, getRowCol, getDiagonals, getMoveByDirection } =

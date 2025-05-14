@@ -2,10 +2,7 @@
 
 import { useBoardUtils } from "./useBoardUtils";
 import { useBoardContext } from "@/reusable/context/BoardContext";
-
-type DiagonalDirection = "tl" | "tr" | "bl" | "br";
-type PerpendicularDirection = "top" | "bottom" | "left" | "right";
-type Direction = DiagonalDirection | PerpendicularDirection;
+import { Direction } from "@/reusable/types/directions";
 
 export const useCheckQueen = () => {
   const {

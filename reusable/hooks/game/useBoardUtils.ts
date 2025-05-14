@@ -1,8 +1,8 @@
 "use client";
 
 import { useBoardContext } from "../../context/BoardContext";
-type DiagonalDirection = "tl" | "tr" | "bl" | "br";
-type PerpendicularDirection = "top" | "bottom" | "left" | "right";
+import { DiagonalDirection } from "@/reusable/types/directions";
+import { PerpendicularDirection } from "@/reusable/types/directions";
 
 export const useBoardUtils = () => {
   const { board } = useBoardContext();

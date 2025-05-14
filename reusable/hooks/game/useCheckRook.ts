@@ -2,8 +2,7 @@
 
 import { useBoardContext } from "@/reusable/context/BoardContext";
 import { useBoardUtils } from "./useBoardUtils";
-
-type PerpendicularDirection = "top" | "bottom" | "left" | "right";
+import { PerpendicularDirection } from "@/reusable/types/directions";
 
 export const useCheckRook = () => {
   const { getSquareById, getRowCol, getPerpendiculars, getMoveByDirection } =

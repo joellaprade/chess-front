@@ -3,8 +3,6 @@
 import { useBoardUtils } from "./useBoardUtils";
 import { useBoardContext } from "@/reusable/context/BoardContext";
 
-type Direction = "tl" | "tr" | "bl" | "br";
-
 export const useCheckKnight = () => {
   const { getSquareById, getRowCol } = useBoardUtils();
   const { selectedPieceLegalMoves, setSelectedPieceLegalMoves } =
