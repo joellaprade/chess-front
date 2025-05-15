@@ -100,7 +100,6 @@ body {
 
 /* Game Components */
 @layer components {
-  /* hacer board con tamano dinamico */
   .game {
     @apply flex h-full flex-col;
   }
@@ -130,6 +129,15 @@ body {
   }
   .valid-square-indicator {
     @apply relative after:absolute after:inset-0 after:m-auto after:h-10 after:w-10 after:rounded-full after:bg-black after:opacity-50;
+  }
+  .queen-popup-wrapper {
+    @apply absolute top-0 left-0 z-1 flex h-full w-full items-center justify-center bg-[#00000060];
+  }
+  .queen-popup {
+    @apply flex h-65 w-65 flex-col items-center justify-center gap-5 rounded-2xl bg-white;
+  }
+  .piece-container {
+    @apply rounded-2xl bg-[#26242140] p-4;
   }
 }
 

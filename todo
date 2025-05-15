@@ -1,16 +1,2 @@
-para calcular knight:
-
-hardcode los 8 calculos posibles basados en origin
-
-knight se puede mover entre 1-3 col/rows
-entonces puedo loopear por los rows 
-  y dentro de ellos loopeo los cols y checkeo
-
-que checkeo?
-  en el primer loop (revisando el row +2 arriba de origin)
-    que este a 1 o mas squares del row y row + 7 (origin - row * 8 >= 1)
-
-
-
-
-validate sesh on next: 7599ms
+aplicar onpessant
+si tengo un white pawn en el rank 2, el peon negro puede saltarselo por el first 2 hop move

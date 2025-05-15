@@ -11,11 +11,17 @@ type BoardContextType = {
   board: Board;
   selectedSquare: number | null;
   selectedPieceLegalMoves: number[];
+  showQueenPopup: boolean;
+  isWhiteTurn: boolean;
   hasWKingMoved: React.RefObject<boolean>;
   hasBKingMoved: React.RefObject<boolean>;
+  upgradingPawn: number | null;
   setBoard: React.Dispatch<React.SetStateAction<Board>>;
   setSelectedSquare: React.Dispatch<React.SetStateAction<number | null>>;
   setSelectedPieceLegalMoves: React.Dispatch<React.SetStateAction<number[]>>;
+  setShowQueenPopup: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsWhiteTurn: React.Dispatch<React.SetStateAction<boolean>>;
+  setUpgradingPawn: React.Dispatch<React.SetStateAction<number | null>>;
 };
 
 export const BoardContext = createContext({} as BoardContextType);
@@ -127,6 +133,9 @@ export const BoardContextProvider = ({
   const [selectedPieceLegalMoves, setSelectedPieceLegalMoves] = useState<
     number[]
   >([]);
+  const [showQueenPopup, setShowQueenPopup] = useState(false);
+  const [isWhiteTurn, setIsWhiteTurn] = useState(true);
+  const [upgradingPawn, setUpgradingPawn] = useState<number | null>(null);
   const hasWKingMoved = useRef(false);
   const hasBKingMoved = useRef(false);
 
@@ -136,11 +145,17 @@ export const BoardContextProvider = ({
         board,
         selectedSquare,
         selectedPieceLegalMoves,
+        showQueenPopup,
         hasWKingMoved,
         hasBKingMoved,
+        isWhiteTurn,
+        upgradingPawn,
         setBoard,
         setSelectedSquare,
         setSelectedPieceLegalMoves,
+        setShowQueenPopup,
+        setIsWhiteTurn,
+        setUpgradingPawn,
       }}
     >
       {children}

@@ -3,11 +3,12 @@
 import { useBoardContext } from "@/reusable/context/BoardContext";
 import useBoard from "@/reusable/hooks/game/useBoard";
 import Image from "next/image";
-import { useEffect } from "react";
+import QueenPopup from "./QueenPopup";
 
 const Board = ({ isBlack }: { isBlack: boolean }) => {
-  const { board, selectedPieceLegalMoves } = useBoardContext();
-  const { getColor, handlePieceClick, colorLegalSquares } = useBoard();
+  const { board } = useBoardContext();
+  const { getColor, handlePieceClick, colorLegalSquares, renderQueenPopup } =
+    useBoard();
 
   const renderBoard = () => {
     const finalBoard = !isBlack
@@ -40,7 +41,12 @@ const Board = ({ isBlack }: { isBlack: boolean }) => {
     ));
   };
 
-  return <div className="board">{renderBoard()}</div>;
+  return (
+    <div className="board">
+      {renderBoard()}
+      {renderQueenPopup()}
+    </div>
+  );
 };
 
 export default Board;

@@ -1,4 +1,5 @@
 import Board from "@/reusable/components/game/Board";
+import QueenPopup from "@/reusable/components/game/QueenPopup";
 import User from "@/reusable/components/game/User";
 
 const Game = () => {

@@ -1,5 +1,6 @@
 "use client";
 
+import QueenPopup from "@/reusable/components/game/QueenPopup";
 import { useBoardContext } from "../../context/BoardContext";
 import { useBoardUtils } from "./useBoardUtils";
 import { useCheckMove } from "./useCheckMove";
@@ -8,6 +9,9 @@ const useBoard = () => {
   const {
     selectedSquare,
     selectedPieceLegalMoves,
+    isWhiteTurn,
+    showQueenPopup,
+    upgradingPawn,
     setBoard,
     setSelectedSquare,
     setSelectedPieceLegalMoves,
@@ -41,6 +45,23 @@ const useBoard = () => {
       ),
     );
   };
+  const handleQueenUpgrade = (selectedPiece: string, destination: number) => {
+    setBoard((prevBoard) =>
+      prevBoard.map((row) =>
+        row.map((square) => {
+          if (square.id === selectedSquare) {
+            // remove selected piece
+            return { ...square, piece: "" };
+          } else if (square.id === destination) {
+            // replace piece on destination
+            return { ...square, piece: selectedPiece };
+          } else {
+            return square;
+          }
+        }),
+      ),
+    );
+  };
   const getColor = (id: number) => {
     let row = Math.floor(id / 8);
     let [evenColor, oddColor] =
@@ -64,6 +85,16 @@ const useBoard = () => {
       setSelectedSquare(null);
     }
   };
+  const renderQueenPopup = () => {
+    return (
+      showQueenPopup && (
+        <QueenPopup
+          color={isWhiteTurn ? "w" : "b"}
+          destination={upgradingPawn!}
+        />
+      )
+    );
+  };
 
   return {
     getSquareById,
@@ -71,6 +102,8 @@ const useBoard = () => {
     getColor,
     handlePieceClick,
     colorLegalSquares,
+    renderQueenPopup,
+    handleQueenUpgrade,
   };
 };
 
