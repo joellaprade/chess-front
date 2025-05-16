@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import PopupPiece from "./PopupPiece";
 import useBoard from "@/reusable/hooks/game/useBoard";
 import { useBoardContext } from "@/reusable/context/BoardContext";
@@ -12,13 +11,12 @@ const QueenPopup = ({
   color: string;
   destination: number;
 }) => {
-  const { handleQueenUpgrade } = useBoard();
+  const { handleMove } = useBoard();
   const { setShowQueenPopup } = useBoardContext();
 
   const getPiece = (p: string) => {
-    console.log(destination, p);
     setShowQueenPopup(false);
-    handleQueenUpgrade(p, destination);
+    handleMove(p, destination);
   };
 
   return (

@@ -3,7 +3,6 @@
 import { useBoardContext } from "@/reusable/context/BoardContext";
 import useBoard from "@/reusable/hooks/game/useBoard";
 import Image from "next/image";
-import QueenPopup from "./QueenPopup";
 
 const Board = ({ isBlack }: { isBlack: boolean }) => {
   const { board } = useBoardContext();

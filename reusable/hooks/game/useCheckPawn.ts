@@ -2,7 +2,8 @@
 
 import { useBoardUtils } from "./useBoardUtils";
 import { useBoardContext } from "@/reusable/context/BoardContext";
-import { Direction } from "@/reusable/types/directions";
+import { DiagonalDirection, Direction } from "@/reusable/types/directions";
+import { useEffect } from "react";
 
 export const useCheckPawn = () => {
   const {
@@ -15,9 +16,14 @@ export const useCheckPawn = () => {
   const {
     selectedSquare,
     selectedPieceLegalMoves,
+    doubleSquarePawn,
+    enPessantMove,
+    setBoard,
     setShowQueenPopup,
     setSelectedPieceLegalMoves,
     setUpgradingPawn,
+    setDoubleSquarePawn,
+    setEnPessantMove,
   } = useBoardContext();
   let piece: string;
   let pieceColor: string;
@@ -38,13 +44,48 @@ export const useCheckPawn = () => {
     bl: null,
   };
 
+  let enPessantDirection: DiagonalDirection | "";
+
   let possibleMoves: number[] = [];
 
+  const checkEnPessant = (isWhite: boolean): DiagonalDirection | "" => {
+    if (isWhite) {
+      if (origin + 1 == doubleSquarePawn) return "tr";
+      else if (origin - 1 == doubleSquarePawn) return "tl";
+    } else {
+      if (origin + 1 == doubleSquarePawn) return "br";
+      else if (origin - 1 == doubleSquarePawn) return "bl";
+    }
+
+    return "";
+  };
+  const checkIsTwoSquareMove = () => {
+    const isWhite = pieceColor === "w";
+    if (isWhite && selectedPieceLegalMoves.includes(destination + 8))
+      setDoubleSquarePawn(destination);
+    else if (!isWhite && selectedPieceLegalMoves.includes(destination - 8))
+      setDoubleSquarePawn(destination);
+    else setDoubleSquarePawn(null);
+  };
+  const calculateIsEnPessant = () => {
+    if (enPessantMove != destination) return;
+    const opponentPawn = pieceColor === "w" ? destination + 8 : destination - 8;
+    setBoard((prevBoard) =>
+      prevBoard.map((row) =>
+        row.map((square) => {
+          if (square.id === opponentPawn) {
+            // remove selected piece
+            return { ...square, piece: "" };
+          } else {
+            return square;
+          }
+        }),
+      ),
+    );
+  };
   const calculateIsQueen = () => {
-    if (
-      [0, 1, 2, 3, 4, 5, 6, 7].includes(destination) ||
-      [56, 57, 58, 59, 60, 61, 62, 63].includes(destination)
-    ) {
+    const row = Math.floor(destination / 8);
+    if (row == 0 || row == 7) {
       setUpgradingPawn(destination);
       setShowQueenPopup(true);
     }
@@ -59,6 +100,7 @@ export const useCheckPawn = () => {
 
     const destinationSquare = getSquareById(move);
     if (
+      direction != enPessantDirection &&
       ["tr", "tl", "br", "bl"].includes(direction) &&
       destinationSquare.piece == ""
     )
@@ -71,6 +113,35 @@ export const useCheckPawn = () => {
 
     possibleMoves.push(move);
   };
+  const checkSpecialMoves = (isWhite: boolean) => {
+    if (isWhite) {
+      //check for double move
+      if (row == 6) {
+        const hasPiece = getSquareById(origin - 8)?.piece;
+        !hasPiece && calculatePossibleSquares(1, "top");
+      }
+      // check for en pessant
+      if (row == 3) {
+        enPessantDirection = checkEnPessant(isWhite);
+        if (enPessantDirection != "") {
+          calculatePossibleSquares(0, enPessantDirection);
+          setEnPessantMove(possibleMoves[possibleMoves.length - 1]);
+        }
+      }
+    } else {
+      if (row == 1) {
+        const hasPiece = getSquareById(origin + 8)?.piece;
+        !hasPiece && calculatePossibleSquares(1, "bottom");
+      }
+      if (row == 4) {
+        enPessantDirection = checkEnPessant(isWhite);
+        if (enPessantDirection != "") {
+          calculatePossibleSquares(0, enPessantDirection);
+          setEnPessantMove(possibleMoves[-1]);
+        }
+      }
+    }
+  };
   const calculateAllOrientations = () => {
     const isWhite = pieceColor == "w";
     const directions: Direction[] = isWhite
@@ -81,13 +152,7 @@ export const useCheckPawn = () => {
       calculatePossibleSquares(0, direction);
     });
 
-    if (isWhite && [48, 49, 50, 51, 52, 53, 54, 55].includes(origin)) {
-      calculatePossibleSquares(1, "top");
-    }
-    if (!isWhite && [8, 9, 10, 11, 12, 13, 14, 15].includes(origin)) {
-      calculatePossibleSquares(1, "bottom");
-    }
-
+    checkSpecialMoves(isWhite);
     setSelectedPieceLegalMoves(possibleMoves);
   };
   const calculatePawn = (originParam: number) => {
@@ -106,14 +171,26 @@ export const useCheckPawn = () => {
     return possibleMoves;
   };
   const validatePawn = (destinationL: number) => {
+    const isValid = selectedPieceLegalMoves.includes(destinationL);
+    if (!isValid) return false;
+    console.log(selectedPieceLegalMoves);
     piece = getSquareById(selectedSquare!).piece;
     pieceColor = piece.charAt(0);
     destination = destinationL;
+    isValid && checkIsTwoSquareMove();
+
     calculateIsQueen();
+    calculateIsEnPessant();
     setSelectedPieceLegalMoves([]);
-    if (selectedPieceLegalMoves.includes(destinationL)) return true;
-    else return false;
+
+    return true;
   };
+
+  useEffect(() => {
+    console.log(enPessantMove);
+  }, [enPessantMove]);
 
   return { calculatePawn, validatePawn };
 };
+// si es blanco -> esta en row 4? -> tiene el square de row 5 en legalMoves? -> acaba de moverse 2
+// negro -> max

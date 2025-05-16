@@ -23,12 +23,7 @@ const useBoard = () => {
     if (!selectedSquare) return "";
     if (selectedPieceLegalMoves.includes(id)) return "valid-square-indicator";
   };
-  const movePiece = (destination: number) => {
-    const movingPiece = getSquareById(selectedSquare!).piece;
-
-    const isMoveValid = validateMove(selectedSquare!, destination);
-    if (!isMoveValid) return handleWrongMove();
-
+  const handleMove = (movingPiece: string, destination: number) => {
     setBoard((prevBoard) =>
       prevBoard.map((row) =>
         row.map((square) => {
@@ -45,22 +40,13 @@ const useBoard = () => {
       ),
     );
   };
-  const handleQueenUpgrade = (selectedPiece: string, destination: number) => {
-    setBoard((prevBoard) =>
-      prevBoard.map((row) =>
-        row.map((square) => {
-          if (square.id === selectedSquare) {
-            // remove selected piece
-            return { ...square, piece: "" };
-          } else if (square.id === destination) {
-            // replace piece on destination
-            return { ...square, piece: selectedPiece };
-          } else {
-            return square;
-          }
-        }),
-      ),
-    );
+  const movePiece = (destination: number) => {
+    const movingPiece = getSquareById(selectedSquare!).piece;
+
+    const isMoveValid = validateMove(selectedSquare!, destination);
+    if (!isMoveValid) return handleWrongMove();
+
+    handleMove(movingPiece, destination);
   };
   const getColor = (id: number) => {
     let row = Math.floor(id / 8);
@@ -103,7 +89,7 @@ const useBoard = () => {
     handlePieceClick,
     colorLegalSquares,
     renderQueenPopup,
-    handleQueenUpgrade,
+    handleMove,
   };
 };
 
