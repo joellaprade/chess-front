@@ -3,16 +3,26 @@
 import { useBoardContext } from "@/reusable/context/BoardContext";
 import { useBoardUtils } from "./useBoardUtils";
 import { PerpendicularDirection } from "@/reusable/types/directions";
+import { useRef } from "react";
 
 export const useCheckRook = () => {
   const { getSquareById, getRowCol, getPerpendiculars, getMoveByDirection } =
     useBoardUtils();
-  const { selectedPieceLegalMoves, setSelectedPieceLegalMoves } =
-    useBoardContext();
-  let piece: string;
-  let pieceColor: string;
+  const {
+    selectedPieceLegalMoves,
+    setSelectedPieceLegalMoves,
+    hasRookMoveRef,
+  } = useBoardContext();
 
-  let origin: number;
+  const pieceColorRef = useRef<string>("");
+  const originRef = useRef<number>(NaN);
+
+  let pieceColor = pieceColorRef.current;
+  let origin = originRef.current;
+  let hasRookMove = hasRookMoveRef.current;
+
+  let piece: string;
+
   let row: number;
   let col: number;
 
@@ -32,6 +42,33 @@ export const useCheckRook = () => {
 
   let possibleMoves: number[] = [];
 
+  const checkHasMoved = () => {
+    const isWhite = pieceColor === "w";
+
+    if (isWhite) {
+      if (hasRookMove.hasWhiteMoved) return;
+
+      if (origin == 56) {
+        hasRookMove.white.left = true;
+        hasRookMoveRef.current = hasRookMove;
+      }
+      if (origin == 63) {
+        hasRookMove.white.right = true;
+        hasRookMoveRef.current = hasRookMove;
+      }
+    } else {
+      if (hasRookMove.hasBlackMoved) return;
+
+      if (origin == 0) {
+        hasRookMove.black.left = true;
+        hasRookMoveRef.current = hasRookMove;
+      }
+      if (origin == 7) {
+        hasRookMove.black.right = true;
+        hasRookMoveRef.current = hasRookMove;
+      }
+    }
+  };
   const calculatePossibleSquares = (
     i: number,
     direction: PerpendicularDirection,
@@ -66,8 +103,10 @@ export const useCheckRook = () => {
     possibleMoves = [];
     piece = getSquareById(originParam).piece;
     pieceColor = piece.charAt(0);
+    pieceColorRef.current = pieceColor;
 
     origin = originParam;
+    originRef.current = origin;
     ({ row, col } = getRowCol(origin));
     isLimit = getPerpendiculars(origin, row, col);
 
@@ -77,9 +116,13 @@ export const useCheckRook = () => {
   };
   const validateRook = (destination: number) => {
     setSelectedPieceLegalMoves([]);
-    if (selectedPieceLegalMoves.includes(destination)) return true;
-    else return false;
+    const isValid = selectedPieceLegalMoves.includes(destination);
+    if (!isValid) return false;
+
+    checkHasMoved();
+
+    return true;
   };
 
-  return { calculateRook, validateRook };
+  return { hasRookMoveRef, calculateRook, validateRook };
 };

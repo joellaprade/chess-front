@@ -14,7 +14,7 @@ const QueenPopup = ({
   const { handleMove } = useBoard();
   const { setShowQueenPopup } = useBoardContext();
 
-  const getPiece = (p: string) => {
+  const handlePieceChange = (p: string) => {
     setShowQueenPopup(false);
     handleMove(p, destination);
   };
@@ -23,12 +23,12 @@ const QueenPopup = ({
     <div className="queen-popup-wrapper">
       <div className="queen-popup">
         <div className="flex gap-5">
-          <PopupPiece onClick={getPiece} piece={`${color}Q`} />
-          <PopupPiece onClick={getPiece} piece={`${color}R`} />
+          <PopupPiece onClick={handlePieceChange} piece={`${color}Q`} />
+          <PopupPiece onClick={handlePieceChange} piece={`${color}R`} />
         </div>
         <div className="flex gap-5">
-          <PopupPiece onClick={getPiece} piece={`${color}N`} />
-          <PopupPiece onClick={getPiece} piece={`${color}B`} />
+          <PopupPiece onClick={handlePieceChange} piece={`${color}N`} />
+          <PopupPiece onClick={handlePieceChange} piece={`${color}B`} />
         </div>
       </div>
     </div>

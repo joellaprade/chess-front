@@ -3,6 +3,8 @@
 import { useBoardUtils } from "./useBoardUtils";
 import { useBoardContext } from "@/reusable/context/BoardContext";
 import { Direction } from "@/reusable/types/directions";
+import { useRef } from "react";
+import { useCheckRook } from "./useCheckRook";
 
 export const useCheckKing = () => {
   const {
@@ -13,14 +15,20 @@ export const useCheckKing = () => {
     getMoveByDirection,
   } = useBoardUtils();
   const {
-    selectedSquare,
     selectedPieceLegalMoves,
-    hasWKingMoved,
-    hasBKingMoved,
     setSelectedPieceLegalMoves,
+    hasRookMoveRef,
   } = useBoardContext();
+  const hasWKingMovedRef = useRef(false);
+  const hasBKingMovedRef = useRef(false);
+  const pieceColorRef = useRef("");
+
+  let hasWKingMoved = hasWKingMovedRef.current;
+  let hasBKingMoved = hasBKingMovedRef.current;
+  let pieceColor = pieceColorRef.current;
+  let hasRookMove = hasRookMoveRef.current;
+
   let piece: string;
-  let pieceColor: string;
 
   let origin: number;
   let row: number;
@@ -39,6 +47,16 @@ export const useCheckKing = () => {
 
   let possibleMoves: number[] = [];
 
+  const checkHasMoved = () => {
+    if (!hasWKingMoved && pieceColor == "w") {
+      hasWKingMoved = true;
+      hasWKingMovedRef.current = hasWKingMoved;
+    }
+    if (!hasBKingMoved && pieceColor == "b") {
+      hasBKingMoved = true;
+      hasBKingMovedRef.current = hasBKingMoved;
+    }
+  };
   const checkIsRowClear = (row: 0 | 7) => {
     let canCastleL = true;
     let canCastleR = true;
@@ -59,15 +77,13 @@ export const useCheckKing = () => {
   };
   const calculateCastle = () => {
     if (pieceColor == "w") {
-      if (hasWKingMoved.current) return;
+      if (hasWKingMoved) return;
       let { canCastleL, canCastleR } = checkIsRowClear(7);
 
-      if (canCastleL) {
-        possibleMoves.push(56);
-      }
-      if (canCastleR) possibleMoves.push(63);
+      if (canCastleL && !hasRookMove.white.left) possibleMoves.push(56);
+      if (canCastleR && !hasRookMove.white.right) possibleMoves.push(63);
     } else {
-      if (hasBKingMoved.current) return;
+      if (hasBKingMoved) return;
       let { canCastleL, canCastleR } = checkIsRowClear(0);
 
       if (canCastleL) possibleMoves.push(0);
@@ -109,6 +125,7 @@ export const useCheckKing = () => {
     possibleMoves = [];
     piece = getSquareById(originParam).piece;
     pieceColor = piece.charAt(0);
+    pieceColorRef.current = pieceColor;
 
     origin = originParam;
     ({ row, col } = getRowCol(origin));
@@ -122,10 +139,7 @@ export const useCheckKing = () => {
     return possibleMoves;
   };
   const validateKing = (destination: number) => {
-    const pieceColor = getSquareById(selectedSquare!).piece.charAt(0);
-    if (pieceColor == "w") hasWKingMoved.current = true;
-    if (pieceColor == "b") hasBKingMoved.current = true;
-
+    checkHasMoved();
     setSelectedPieceLegalMoves([]);
     if (selectedPieceLegalMoves.includes(destination)) return true;
     else return false;
