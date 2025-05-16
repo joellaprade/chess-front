@@ -1,3 +1,11 @@
-ver como reemplazo los states por refs en context
 
 hacer una lista de las "miras" o squares siendo atacados por w/b
+
+como check si es check:
+(
+  si oponent move IS CHECK
+  si my move would be check
+  si mover una pieza (w/b) would be check
+)
+
+cuando este calcuando POSSIBLE_MOVES de x pieza, ver si en alguno de los squares, square.piece.charAt(1) == K

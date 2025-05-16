@@ -3,7 +3,7 @@
 import { useBoardContext } from "@/reusable/context/BoardContext";
 import { useBoardUtils } from "./useBoardUtils";
 import { PerpendicularDirection } from "@/reusable/types/directions";
-import { useRef } from "react";
+import useRefState from "../useRefState";
 
 export const useCheckRook = () => {
   const { getSquareById, getRowCol, getPerpendiculars, getMoveByDirection } =
@@ -11,15 +11,12 @@ export const useCheckRook = () => {
   const {
     selectedPieceLegalMoves,
     setSelectedPieceLegalMoves,
-    hasRookMoveRef,
+    getHasRookMove,
+    setHasRookMove,
   } = useBoardContext();
 
-  const pieceColorRef = useRef<string>("");
-  const originRef = useRef<number>(NaN);
-
-  let pieceColor = pieceColorRef.current;
-  let origin = originRef.current;
-  let hasRookMove = hasRookMoveRef.current;
+  const [getPieceColor, setPieceColor] = useRefState("");
+  const [getOrigin, setOrigin] = useRefState(NaN);
 
   let piece: string;
 
@@ -43,29 +40,26 @@ export const useCheckRook = () => {
   let possibleMoves: number[] = [];
 
   const checkHasMoved = () => {
-    const isWhite = pieceColor === "w";
+    const isWhite = getPieceColor() === "w";
+    const hasRookMove = getHasRookMove();
 
     if (isWhite) {
       if (hasRookMove.hasWhiteMoved) return;
 
-      if (origin == 56) {
-        hasRookMove.white.left = true;
-        hasRookMoveRef.current = hasRookMove;
+      if (getOrigin() == 56) {
+        setHasRookMove(true, "white.left");
       }
-      if (origin == 63) {
-        hasRookMove.white.right = true;
-        hasRookMoveRef.current = hasRookMove;
+      if (getOrigin() == 63) {
+        setHasRookMove(true, "white.right");
       }
     } else {
       if (hasRookMove.hasBlackMoved) return;
 
-      if (origin == 0) {
-        hasRookMove.black.left = true;
-        hasRookMoveRef.current = hasRookMove;
+      if (getOrigin() == 0) {
+        setHasRookMove(true, "black.left");
       }
-      if (origin == 7) {
-        hasRookMove.black.right = true;
-        hasRookMoveRef.current = hasRookMove;
+      if (getOrigin() == 7) {
+        setHasRookMove(true, "black.right");
       }
     }
   };
@@ -75,7 +69,7 @@ export const useCheckRook = () => {
   ) => {
     if (isBlocked[direction]) return false;
     const isIndexDecreacing = ["top", "left"].includes(direction);
-    let move = getMoveByDirection(origin, i, direction);
+    let move = getMoveByDirection(getOrigin(), i, direction);
     let limit = isLimit[direction] as number;
 
     if (isIndexDecreacing && move < limit) return false;
@@ -85,7 +79,7 @@ export const useCheckRook = () => {
 
     if (destinationSquare.piece != "") {
       isBlocked[direction] = true;
-      if (destinationSquare.piece.includes(pieceColor)) return false;
+      if (destinationSquare.piece.includes(getPieceColor())) return false;
     }
 
     possibleMoves.push(move);
@@ -102,13 +96,11 @@ export const useCheckRook = () => {
   const calculateRook = (originParam: number) => {
     possibleMoves = [];
     piece = getSquareById(originParam).piece;
-    pieceColor = piece.charAt(0);
-    pieceColorRef.current = pieceColor;
+    setPieceColor(piece.charAt(0));
 
-    origin = originParam;
-    originRef.current = origin;
-    ({ row, col } = getRowCol(origin));
-    isLimit = getPerpendiculars(origin, row, col);
+    setOrigin(originParam);
+    [row, col] = getRowCol(getOrigin());
+    isLimit = getPerpendiculars(getOrigin(), row, col);
 
     calculateAllOrientations();
 
@@ -124,5 +116,5 @@ export const useCheckRook = () => {
     return true;
   };
 
-  return { hasRookMoveRef, calculateRook, validateRook };
+  return { calculateRook, validateRook };
 };

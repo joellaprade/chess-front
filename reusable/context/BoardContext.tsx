@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useRef, useState } from "react";
 import { Board } from "../types/board";
+import useRefState from "../hooks/useRefState";
 
 type BoardContextProviderProps = {
   children: React.ReactNode;
@@ -14,7 +15,8 @@ type BoardContextType = {
   showQueenPopup: boolean;
   isWhiteTurn: boolean;
   upgradingPawn: number | null;
-  hasRookMoveRef: React.RefObject<Record<string, any>>;
+  getHasRookMove: () => any;
+  setHasRookMove: (newValue: any, path?: string) => void;
   setBoard: React.Dispatch<React.SetStateAction<Board>>;
   setSelectedSquare: React.Dispatch<React.SetStateAction<number | null>>;
   setSelectedPieceLegalMoves: React.Dispatch<React.SetStateAction<number[]>>;
@@ -135,7 +137,7 @@ export const BoardContextProvider = ({
   const [showQueenPopup, setShowQueenPopup] = useState(false);
   const [isWhiteTurn, setIsWhiteTurn] = useState(true);
   const [upgradingPawn, setUpgradingPawn] = useState<number | null>(null);
-  const hasRookMoveRef = useRef<Record<string, any>>({
+  const [getHasRookMove, setHasRookMove] = useRefState({
     hasWhiteMoved: false,
     hasBlackMoved: false,
     white: {
@@ -157,7 +159,8 @@ export const BoardContextProvider = ({
         showQueenPopup,
         isWhiteTurn,
         upgradingPawn,
-        hasRookMoveRef,
+        getHasRookMove,
+        setHasRookMove,
         setBoard,
         setSelectedSquare,
         setSelectedPieceLegalMoves,

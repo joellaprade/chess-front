@@ -83,7 +83,7 @@ export const useCheckQueen = () => {
     pieceColor = piece.charAt(0);
 
     origin = originParam;
-    ({ row, col } = getRowCol(origin));
+    [row, col] = getRowCol(origin);
     const dLimits = getDiagonals(origin, row, col);
     const pLimits = getPerpendiculars(origin, row, col);
     isLimit = { ...dLimits, ...pLimits };

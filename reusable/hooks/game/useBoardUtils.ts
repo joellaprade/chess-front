@@ -13,11 +13,11 @@ export const useBoardUtils = () => {
 
     return board[row][rowSquare];
   };
-  const getRowCol = (origin: number) => {
+  const getRowCol = (origin: number): [number, number] => {
     const row = Math.floor(origin / 8);
     const col = origin - 8 * row;
 
-    return { row, col };
+    return [row, col];
   };
   const getDiagonals = (origin: number, row: number, col: number) => {
     let isLimit: Record<DiagonalDirection, number> = {

@@ -47,7 +47,7 @@ export const useCheckKnight = () => {
     pieceColor = piece.charAt(0);
 
     origin = originParam;
-    ({ row, col } = getRowCol(origin));
+    [row, col] = getRowCol(origin);
 
     calculatePossibleSquares();
 

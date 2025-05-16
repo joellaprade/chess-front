@@ -3,7 +3,7 @@
 import { useBoardUtils } from "./useBoardUtils";
 import { useBoardContext } from "@/reusable/context/BoardContext";
 import { DiagonalDirection, Direction } from "@/reusable/types/directions";
-import { useRef } from "react";
+import useRefState from "../useRefState";
 
 export const useCheckPawn = () => {
   const {
@@ -22,10 +22,8 @@ export const useCheckPawn = () => {
     setUpgradingPawn,
   } = useBoardContext();
 
-  let doubleSquarePawnRef = useRef<number | null>(null);
-  let enPessantMoveRef = useRef<number | null>(null);
-  let doubleSquarePawn = doubleSquarePawnRef.current;
-  let enPessantMove = enPessantMoveRef.current;
+  const [getDoubleSquarePawn, setDoubleSquarePawn] = useRefState(null);
+  const [getEnPessantMove, setEnPessantMove] = useRefState(null);
 
   let piece: string;
   let pieceColor: string;
@@ -52,11 +50,11 @@ export const useCheckPawn = () => {
 
   const checkIsEnPessant = (isWhite: boolean): DiagonalDirection | "" => {
     if (isWhite) {
-      if (origin + 1 == doubleSquarePawn) return "tr";
-      else if (origin - 1 == doubleSquarePawn) return "tl";
+      if (origin + 1 == getDoubleSquarePawn()) return "tr";
+      else if (origin - 1 == getDoubleSquarePawn()) return "tl";
     } else {
-      if (origin + 1 == doubleSquarePawn) return "br";
-      else if (origin - 1 == doubleSquarePawn) return "bl";
+      if (origin + 1 == getDoubleSquarePawn()) return "br";
+      else if (origin - 1 == getDoubleSquarePawn()) return "bl";
     }
 
     return "";
@@ -64,14 +62,11 @@ export const useCheckPawn = () => {
   const checkIsTwoSquareMove = () => {
     const isWhite = pieceColor === "w";
     if (isWhite && selectedPieceLegalMoves.includes(destination + 8)) {
-      doubleSquarePawn = destination;
-      doubleSquarePawnRef.current = doubleSquarePawn;
+      setDoubleSquarePawn(destination);
     } else if (!isWhite && selectedPieceLegalMoves.includes(destination - 8)) {
-      doubleSquarePawn = destination;
-      doubleSquarePawnRef.current = doubleSquarePawn;
+      setDoubleSquarePawn(destination);
     } else {
-      doubleSquarePawn = null;
-      doubleSquarePawnRef.current = doubleSquarePawn;
+      setDoubleSquarePawn(null);
     }
   };
   const checkSpecialMoves = (isWhite: boolean) => {
@@ -86,8 +81,7 @@ export const useCheckPawn = () => {
         enPessantDirection = checkIsEnPessant(isWhite);
         if (enPessantDirection != "") {
           calculatePossibleSquares(0, enPessantDirection);
-          enPessantMove = possibleMoves[possibleMoves.length - 1];
-          enPessantMoveRef.current = enPessantMove;
+          setEnPessantMove(possibleMoves[possibleMoves.length - 1]);
         }
       }
     } else {
@@ -99,14 +93,13 @@ export const useCheckPawn = () => {
         enPessantDirection = checkIsEnPessant(isWhite);
         if (enPessantDirection != "") {
           calculatePossibleSquares(0, enPessantDirection);
-          enPessantMove = possibleMoves[possibleMoves.length - 1];
-          enPessantMoveRef.current = enPessantMove;
+          setEnPessantMove(possibleMoves[possibleMoves.length - 1]);
         }
       }
     }
   };
   const handleIsEnPessant = () => {
-    if (enPessantMove != destination) return;
+    if (getEnPessantMove() != destination) return;
     const opponentPawn = pieceColor === "w" ? destination + 8 : destination - 8;
     setBoard((prevBoard) =>
       prevBoard.map((row) =>
@@ -173,7 +166,7 @@ export const useCheckPawn = () => {
     pieceColor = piece.charAt(0);
 
     origin = originParam;
-    ({ row, col } = getRowCol(origin));
+    [row, col] = getRowCol(origin);
     const dLimits = getDiagonals(origin, row, col);
     const pLimits = getPerpendiculars(origin, row, col);
     isLimit = { ...dLimits, ...pLimits };

@@ -68,7 +68,7 @@ export const useCheckBishop = () => {
     pieceColor = piece.charAt(0);
 
     origin = originParam;
-    ({ row, col } = getRowCol(origin));
+    [row, col] = getRowCol(origin);
     isLimit = getDiagonals(origin, row, col);
 
     calculateAllOrientations();
