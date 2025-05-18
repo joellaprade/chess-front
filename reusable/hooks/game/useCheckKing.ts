@@ -3,8 +3,6 @@
 import { useBoardUtils } from "./useBoardUtils";
 import { useBoardContext } from "@/reusable/context/BoardContext";
 import { Direction } from "@/reusable/types/directions";
-import { useRef } from "react";
-import { useCheckRook } from "./useCheckRook";
 import useRefState from "../useRefState";
 
 export const useCheckKing = () => {
@@ -19,11 +17,13 @@ export const useCheckKing = () => {
     selectedPieceLegalMoves,
     setSelectedPieceLegalMoves,
     getHasRookMove,
-    setHasRookMove,
   } = useBoardContext();
 
-  const [getHasWKingMoved, setHasWKingMoved] = useRefState(false);
-  const [getHasBKingMoved, setHasBKingMoved] = useRefState(false);
+  const [getHasKingMoved, setHasKingMoved] = useRefState({
+    white: false,
+    black: false,
+  });
+
   const [getPieceColor, setPieceColor] = useRefState("");
 
   let piece: string;
@@ -46,11 +46,11 @@ export const useCheckKing = () => {
   let possibleMoves: number[] = [];
 
   const checkHasMoved = () => {
-    if (!getHasWKingMoved() && getPieceColor() == "w") {
-      setHasWKingMoved(true);
+    if (!getHasKingMoved().white && getPieceColor() == "w") {
+      setHasKingMoved(true, "white");
     }
-    if (!getHasBKingMoved() && getPieceColor() == "b") {
-      setHasBKingMoved(true);
+    if (!getHasKingMoved().black && getPieceColor() == "b") {
+      setHasKingMoved(true, "black");
     }
   };
   const checkIsRowClear = (row: 0 | 7) => {
@@ -73,13 +73,13 @@ export const useCheckKing = () => {
   };
   const calculateCastle = () => {
     if (getPieceColor() == "w") {
-      if (getHasWKingMoved()) return;
+      if (getHasKingMoved().white) return;
       let { canCastleL, canCastleR } = checkIsRowClear(7);
 
       if (canCastleL && !getHasRookMove().white.left) possibleMoves.push(56);
       if (canCastleR && !getHasRookMove().white.right) possibleMoves.push(63);
     } else {
-      if (getHasBKingMoved()) return;
+      if (getHasKingMoved().black) return;
       let { canCastleL, canCastleR } = checkIsRowClear(0);
 
       if (canCastleL && !getHasRookMove().black.left) possibleMoves.push(0);

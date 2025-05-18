@@ -46,7 +46,9 @@ export const useCheckBishop = () => {
 
     const destinationSquare = getSquareById(move);
 
+    console.log(destinationSquare.piece);
     if (destinationSquare.piece != "") {
+      console.log(destinationSquare.piece);
       isBlocked[direction] = true;
       if (destinationSquare.piece.includes(pieceColor)) return false;
     }

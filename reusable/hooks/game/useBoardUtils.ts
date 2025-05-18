@@ -74,6 +74,7 @@ export const useBoardUtils = () => {
 
     return move;
   };
+  const checkIsCheck = () => {};
 
   return {
     getSquareById,
