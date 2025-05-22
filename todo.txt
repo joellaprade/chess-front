@@ -31,10 +31,30 @@ usar direction para determinar que caso aplicar (los casos siendo si me puedo mo
 
 si un bishop me esta pineando y su linea de ataque es br, yo solo me puedo mover tl o br (pq tr por ejemplo abriria la diagonal)
 
+[
+  33: {
+    pinning: 51,
+    direction: "bl",
+    
+}]
 
 
 
 
+comun:
+
+
+que hay que persistir?
+piece, origin, 
+
+que ocupa evalSquare:
+
+i
+isBlocked
+direction
+origin
+isLimit
+piece
 
 
 

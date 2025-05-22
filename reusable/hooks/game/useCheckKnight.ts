@@ -1,13 +1,14 @@
 "use client";
 
+import useRefState from "../useRefState";
 import { useBoardUtils } from "./useBoardUtils";
 import { useBoardContext } from "@/reusable/context/BoardContext";
 
 export const useCheckKnight = () => {
-  const { getSquareById, getRowCol } = useBoardUtils();
+  const { getSquareById, getRowCol, checkIsCheck } = useBoardUtils();
   const { selectedPieceLegalMoves, setSelectedPieceLegalMoves } =
     useBoardContext();
-  let piece: string;
+  const [getPiece, setPiece] = useRefState(null);
   let pieceColor: string;
 
   let origin: number;
@@ -16,7 +17,7 @@ export const useCheckKnight = () => {
 
   let possibleMoves: number[] = [];
 
-  const calculatePossibleSquares = () => {
+  const evaluateSquare = () => {
     let moves: number[] = [];
 
     if (col >= 1 && row >= 2) moves.push(origin - 17);
@@ -43,17 +44,19 @@ export const useCheckKnight = () => {
   };
   const calculateKnight = (originParam: number) => {
     possibleMoves = [];
-    piece = getSquareById(originParam).piece;
-    pieceColor = piece.charAt(0);
+    setPiece(getSquareById(originParam).piece);
+    pieceColor = getPiece().charAt(0);
 
     origin = originParam;
     [row, col] = getRowCol(origin);
 
-    calculatePossibleSquares();
+    evaluateSquare();
 
     return possibleMoves;
   };
   const validateKnight = (destination: number) => {
+    const isCheck = checkIsCheck(getPiece(), destination);
+
     setSelectedPieceLegalMoves([]);
     if (selectedPieceLegalMoves.includes(destination)) return true;
     else return false;

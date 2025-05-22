@@ -86,7 +86,7 @@ export const useCheckKing = () => {
       if (canCastleR && !getHasRookMove().black.right) possibleMoves.push(7);
     }
   };
-  const calculatePossibleSquares = (i: number, direction: Direction) => {
+  const evaluateSquare = (i: number, direction: Direction) => {
     const isIndexDecreacing = ["tr", "tl", "top", "left"].includes(direction);
     const move = getMoveByDirection(origin, i, direction);
     const limit = isLimit[direction] as number;
@@ -113,7 +113,7 @@ export const useCheckKing = () => {
     ];
 
     directions.forEach((direction: Direction) => {
-      calculatePossibleSquares(0, direction);
+      evaluateSquare(0, direction);
     });
     setSelectedPieceLegalMoves(possibleMoves);
   };

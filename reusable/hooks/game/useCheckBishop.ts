@@ -3,14 +3,19 @@
 import { useBoardUtils } from "./useBoardUtils";
 import { useBoardContext } from "@/reusable/context/BoardContext";
 import { DiagonalDirection } from "@/reusable/types/directions";
+import useRefState from "../useRefState";
 
 export const useCheckBishop = () => {
-  const { getSquareById, getRowCol, getDiagonals, getMoveByDirection } =
-    useBoardUtils();
+  const {
+    getSquareById,
+    getRowCol,
+    getDiagonals,
+    getMoveByDirection,
+    checkIsCheck,
+  } = useBoardUtils();
   const { selectedPieceLegalMoves, setSelectedPieceLegalMoves } =
     useBoardContext();
-  let piece: string;
-  let pieceColor: string;
+  const [getPiece, setPiece] = useRefState(null);
 
   let origin: number;
   let row: number;
@@ -32,12 +37,9 @@ export const useCheckBishop = () => {
 
   let possibleMoves: number[] = [];
 
-  const calculatePossibleSquares = (
-    i: number,
-    direction: DiagonalDirection,
-  ) => {
+  const evaluateSquare = (i: number, direction: DiagonalDirection) => {
     if (isBlocked[direction]) return false;
-    const isIndexDecreacing = ["tr", "tl"].includes(direction);
+    const isIndexDecreacing = ["tr", "tl", "top", "left"].includes(direction);
     const move = getMoveByDirection(origin, i, direction);
     const limit = isLimit[direction] as number;
 
@@ -46,38 +48,33 @@ export const useCheckBishop = () => {
 
     const destinationSquare = getSquareById(move);
 
-    console.log(destinationSquare.piece);
     if (destinationSquare.piece != "") {
-      console.log(destinationSquare.piece);
       isBlocked[direction] = true;
-      if (destinationSquare.piece.includes(pieceColor)) return false;
+      if (destinationSquare.piece.includes(getPiece().charAt(0))) return false;
     }
 
     possibleMoves.push(move);
   };
-  const calculateAllOrientations = () => {
-    for (let i = 0; i < 7; i++) {
-      calculatePossibleSquares(i, "tr");
-      calculatePossibleSquares(i, "tl");
-      calculatePossibleSquares(i, "bl");
-      calculatePossibleSquares(i, "br");
-    }
-    setSelectedPieceLegalMoves(possibleMoves);
-  };
   const calculateBishop = (originParam: number) => {
+    const directions: DiagonalDirection[] = ["tr", "tl", "bl", "br"];
     possibleMoves = [];
-    piece = getSquareById(originParam).piece;
-    pieceColor = piece.charAt(0);
+    setPiece(getSquareById(originParam).piece);
 
     origin = originParam;
     [row, col] = getRowCol(origin);
     isLimit = getDiagonals(origin, row, col);
 
-    calculateAllOrientations();
+    for (let i = 0; i < 7; i++) {
+      directions.forEach((direction) => {
+        evaluateSquare(i, direction);
+      });
+    }
+    setSelectedPieceLegalMoves(possibleMoves);
 
     return possibleMoves;
   };
   const validateBishop = (destination: number) => {
+    const isCheck = checkIsCheck(getPiece(), destination);
     setSelectedPieceLegalMoves([]);
     if (selectedPieceLegalMoves.includes(destination)) return true;
     else return false;

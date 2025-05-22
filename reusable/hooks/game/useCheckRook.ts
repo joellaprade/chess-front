@@ -6,8 +6,13 @@ import { PerpendicularDirection } from "@/reusable/types/directions";
 import useRefState from "../useRefState";
 
 export const useCheckRook = () => {
-  const { getSquareById, getRowCol, getPerpendiculars, getMoveByDirection } =
-    useBoardUtils();
+  const {
+    getSquareById,
+    getRowCol,
+    getPerpendiculars,
+    getMoveByDirection,
+    checkIsCheck,
+  } = useBoardUtils();
   const {
     selectedPieceLegalMoves,
     setSelectedPieceLegalMoves,
@@ -15,10 +20,8 @@ export const useCheckRook = () => {
     setHasRookMove,
   } = useBoardContext();
 
-  const [getPieceColor, setPieceColor] = useRefState("");
+  const [getPiece, setPiece] = useRefState(null);
   const [getOrigin, setOrigin] = useRefState(NaN);
-
-  let piece: string;
 
   let row: number;
   let col: number;
@@ -63,12 +66,9 @@ export const useCheckRook = () => {
       }
     }
   };
-  const calculatePossibleSquares = (
-    i: number,
-    direction: PerpendicularDirection,
-  ) => {
+  const evaluateSquare = (i: number, direction: PerpendicularDirection) => {
     if (isBlocked[direction]) return false;
-    const isIndexDecreacing = ["top", "left"].includes(direction);
+    const isIndexDecreacing = ["tr", "tl", "top", "left"].includes(direction);
     let move = getMoveByDirection(getOrigin(), i, direction);
     let limit = isLimit[direction] as number;
 
@@ -79,35 +79,40 @@ export const useCheckRook = () => {
 
     if (destinationSquare.piece != "") {
       isBlocked[direction] = true;
-      if (destinationSquare.piece.includes(getPieceColor())) return false;
+      if (destinationSquare.piece.includes(getPiece().charAt(0))) return false;
     }
 
     possibleMoves.push(move);
   };
-  const calculateAllOrientations = () => {
-    for (let i = 0; i < 7; i++) {
-      calculatePossibleSquares(i, "top");
-      calculatePossibleSquares(i, "bottom");
-      calculatePossibleSquares(i, "left");
-      calculatePossibleSquares(i, "right");
-    }
-    setSelectedPieceLegalMoves(possibleMoves);
-  };
   const calculateRook = (originParam: number) => {
+    const directions: PerpendicularDirection[] = [
+      "top",
+      "bottom",
+      "left",
+      "right",
+    ];
     possibleMoves = [];
-    piece = getSquareById(originParam).piece;
-    setPieceColor(piece.charAt(0));
+    setPiece(getSquareById(originParam).piece);
 
     setOrigin(originParam);
     [row, col] = getRowCol(getOrigin());
     isLimit = getPerpendiculars(getOrigin(), row, col);
 
-    calculateAllOrientations();
+    // test({ possibleMoves, pieceColor, piece, origin, row, col, isLimit });
 
+    for (let i = 0; i < 7; i++) {
+      directions.forEach((direction) => {
+        evaluateSquare(i, direction);
+      });
+    }
+    setSelectedPieceLegalMoves(possibleMoves);
     return possibleMoves;
   };
   const validateRook = (destination: number) => {
     setSelectedPieceLegalMoves([]);
+
+    const isCheck = checkIsCheck(getPiece(), destination);
+
     const isValid = selectedPieceLegalMoves.includes(destination);
     if (!isValid) return false;
 

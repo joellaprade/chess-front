@@ -74,25 +74,25 @@ export const useCheckPawn = () => {
       //check for double move
       if (row == 6) {
         const hasPiece = getSquareById(origin - 8)?.piece;
-        !hasPiece && calculatePossibleSquares(1, "top");
+        !hasPiece && evaluateSquare(1, "top");
       }
       // check for en pessant
       if (row == 3) {
         enPessantDirection = checkIsEnPessant(isWhite);
         if (enPessantDirection != "") {
-          calculatePossibleSquares(0, enPessantDirection);
+          evaluateSquare(0, enPessantDirection);
           setEnPessantMove(possibleMoves[possibleMoves.length - 1]);
         }
       }
     } else {
       if (row == 1) {
         const hasPiece = getSquareById(origin + 8)?.piece;
-        !hasPiece && calculatePossibleSquares(1, "bottom");
+        !hasPiece && evaluateSquare(1, "bottom");
       }
       if (row == 4) {
         enPessantDirection = checkIsEnPessant(isWhite);
         if (enPessantDirection != "") {
-          calculatePossibleSquares(0, enPessantDirection);
+          evaluateSquare(0, enPessantDirection);
           setEnPessantMove(possibleMoves[possibleMoves.length - 1]);
         }
       }
@@ -121,7 +121,7 @@ export const useCheckPawn = () => {
       setShowQueenPopup(true);
     }
   };
-  const calculatePossibleSquares = (i: number, direction: Direction) => {
+  const evaluateSquare = (i: number, direction: Direction) => {
     const isIndexDecreacing = ["tr", "tl", "top"].includes(direction);
     const move = getMoveByDirection(origin, i, direction);
     const limit = isLimit[direction] as number;
@@ -154,7 +154,7 @@ export const useCheckPawn = () => {
       : ["br", "bl", "bottom"];
 
     directions.forEach((direction: Direction) => {
-      calculatePossibleSquares(0, direction);
+      evaluateSquare(0, direction);
     });
 
     checkSpecialMoves(isWhite);

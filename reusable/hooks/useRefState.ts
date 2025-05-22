@@ -8,7 +8,6 @@ export default function useRefValue(initialValue: any): GetSetRef {
   const get = () => ref.current;
 
   const set = (newValue: any, path?: string) => {
-    console.log(ref.current);
     if (!path) {
       ref.current = newValue;
       return;
