@@ -207,11 +207,13 @@ export const useBoardUtils = () => {
         break;
     }
   };
-  const calculateIncrementalPiece = (origin: number) => {
-    let possibleMoves: number[] = [];
-    const piece = getSquareById(origin).piece;
+  const calculateLongReachPiece = (origin: number, _piece?: string) => {
+    const piece = _piece || getSquareById(origin).piece;
+    console.log(getSquareById(origin), origin);
     const directions = getDirectionByPiece(piece);
     const isLimit = getLimits(origin, piece);
+    let possibleMoves: number[] = [];
+    let isCheck = false;
     let isBlocked: Record<string, boolean> = {
       top: false,
       bottom: false,
@@ -237,16 +239,18 @@ export const useBoardUtils = () => {
 
         const destinationSquare = getSquareById(move);
 
-        if (destinationSquare.piece != "") {
+        if (destinationSquare.piece != "" && destinationSquare.piece != piece) {
           isBlocked[direction] = true;
           if (destinationSquare.piece.includes(piece.charAt(0))) return false;
         }
+
+        if (destinationSquare.piece.includes("K")) isCheck = true;
 
         possibleMoves.push(move);
       });
     }
     setSelectedPieceLegalMoves(possibleMoves);
-    return possibleMoves;
+    return { possibleMoves, isCheck };
   };
 
   return {
@@ -256,5 +260,6 @@ export const useBoardUtils = () => {
     getDiagonals,
     getMoveByDirection,
     checkIsCheck,
+    calculateLongReachPiece,
   };
 };

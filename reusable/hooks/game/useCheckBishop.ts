@@ -2,79 +2,25 @@
 
 import { useBoardUtils } from "./useBoardUtils";
 import { useBoardContext } from "@/reusable/context/BoardContext";
-import { DiagonalDirection } from "@/reusable/types/directions";
 import useRefState from "../useRefState";
 
 export const useCheckBishop = () => {
-  const {
-    getSquareById,
-    getRowCol,
-    getDiagonals,
-    getMoveByDirection,
-    checkIsCheck,
-  } = useBoardUtils();
+  const { calculateLongReachPiece, getSquareById, getMoveByDirection } =
+    useBoardUtils();
   const { selectedPieceLegalMoves, setSelectedPieceLegalMoves } =
     useBoardContext();
-  const [getPiece, setPiece] = useRefState(null);
 
-  let origin: number;
-  let row: number;
-  let col: number;
+  const [getOrigin, setOrigin] = useRefState(null);
 
-  let isLimit: Record<DiagonalDirection, number | null> = {
-    tl: null,
-    tr: null,
-    br: null,
-    bl: null,
-  };
-
-  let isBlocked = {
-    tl: false,
-    tr: false,
-    br: false,
-    bl: false,
-  };
-
-  let possibleMoves: number[] = [];
-
-  const evaluateSquare = (i: number, direction: DiagonalDirection) => {
-    if (isBlocked[direction]) return false;
-    const isIndexDecreacing = ["tr", "tl", "top", "left"].includes(direction);
-    const move = getMoveByDirection(origin, i, direction);
-    const limit = isLimit[direction] as number;
-
-    if (isIndexDecreacing && move < limit) return false;
-    if (!isIndexDecreacing && move > limit) return false;
-
-    const destinationSquare = getSquareById(move);
-
-    if (destinationSquare.piece != "") {
-      isBlocked[direction] = true;
-      if (destinationSquare.piece.includes(getPiece().charAt(0))) return false;
-    }
-
-    possibleMoves.push(move);
-  };
-  const calculateBishop = (originParam: number) => {
-    const directions: DiagonalDirection[] = ["tr", "tl", "bl", "br"];
-    possibleMoves = [];
-    setPiece(getSquareById(originParam).piece);
-
-    origin = originParam;
-    [row, col] = getRowCol(origin);
-    isLimit = getDiagonals(origin, row, col);
-
-    for (let i = 0; i < 7; i++) {
-      directions.forEach((direction) => {
-        evaluateSquare(i, direction);
-      });
-    }
-    setSelectedPieceLegalMoves(possibleMoves);
-
+  const calculateBishop = (origin: number) => {
+    setOrigin(origin);
+    const { possibleMoves } = calculateLongReachPiece(origin);
     return possibleMoves;
   };
   const validateBishop = (destination: number) => {
-    const isCheck = checkIsCheck(getPiece(), destination);
+    const piece = getSquareById(getOrigin()).piece;
+    const { isCheck } = calculateLongReachPiece(destination, piece);
+    console.log(isCheck);
     setSelectedPieceLegalMoves([]);
     if (selectedPieceLegalMoves.includes(destination)) return true;
     else return false;
