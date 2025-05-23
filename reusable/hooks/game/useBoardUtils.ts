@@ -149,6 +149,7 @@ export const useBoardUtils = () => {
     piece,
     isCheck,
     possibleMoves,
+    extras,
   }: EvalSquareParam) => {
     if (isBlocked[direction]) return false;
     const isIndexDecreacing = ["tr", "tl", "top", "left"].includes(direction);
@@ -162,10 +163,20 @@ export const useBoardUtils = () => {
 
     if (destinationSquare.piece != "" && destinationSquare.piece != piece) {
       isBlocked[direction] = true;
-      if (destinationSquare.piece.includes(piece.charAt(0))) return false;
     }
-
+    if (destinationSquare.piece.includes(piece.charAt(0))) return false;
     if (piece.charAt(1) === "P") {
+      if (
+        ["top", "bottom"].includes(direction) &&
+        destinationSquare.piece != ""
+      )
+        return false;
+      if (
+        (direction != extras?.direction || origin != extras?.origin) &&
+        ["tr", "tl", "br", "bl"].includes(direction) &&
+        destinationSquare.piece == ""
+      )
+        return false;
     }
 
     if (destinationSquare.piece.includes("K")) isCheck = true;
@@ -280,5 +291,6 @@ export const useBoardUtils = () => {
     getMoveByDirection,
     calculatePossibleMoves,
     getLimits,
+    evaluateSquare,
   };
 };

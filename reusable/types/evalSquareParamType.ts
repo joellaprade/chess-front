@@ -9,4 +9,5 @@ export type EvalSquareParam = {
   piece: string;
   isCheck: boolean;
   possibleMoves: number[];
+  extras?: Record<string, any>;
 };

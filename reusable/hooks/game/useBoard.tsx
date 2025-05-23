@@ -15,6 +15,7 @@ const useBoard = () => {
     setBoard,
     setSelectedSquare,
     setSelectedPieceLegalMoves,
+
   } = useBoardContext();
   const { calculateLegalMoves, validateMove, handleWrongMove } = useCheckMove();
   const { getSquareById } = useBoardUtils();

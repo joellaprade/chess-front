@@ -8,10 +8,10 @@ import { EvalSquareParam } from "@/reusable/types/evalSquareParamType";
 
 export const useCheckPawn = () => {
   const {
+    evaluateSquare,
     calculatePossibleMoves,
     getSquareById,
     getRowCol,
-    getMoveByDirection,
     getLimits,
   } = useBoardUtils();
   const {
@@ -27,7 +27,10 @@ export const useCheckPawn = () => {
   const [getPieceColor, setPieceColor] = useRefState(null);
   const [getDoubleSquarePawn, setDoubleSquarePawn] = useRefState(null);
   const [getEnPessantMove, setEnPessantMove] = useRefState(null);
-  const [getEnPessantDirection, setEnPessantDirection] = useRefState(null);
+  const [getEnPessant, setEnPessant] = useRefState({
+    origin: null,
+    direction: null,
+  });
 
   // Before
   const checkIsEnPessant = (isWhite: boolean): DiagonalDirection | "" => {
@@ -73,12 +76,15 @@ export const useCheckPawn = () => {
     }
     // check for en pessant
     if (row == enPessantMoveRow) {
-      setEnPessantDirection(checkIsEnPessant(isWhite));
-      if (getEnPessantDirection() != "") {
+      const direction = checkIsEnPessant(isWhite);
+      console.log(checkIsEnPessant(isWhite));
+      if (getEnPessant().direction) {
+        setEnPessant({ origin, direction });
         evaluateSquare({
           ...evalParam,
           i: 0,
-          direction: getEnPessantDirection(),
+          direction: getEnPessant().direction,
+          extras: getEnPessant(),
         });
         setEnPessantMove(possibleMoves[possibleMoves.length - 1]);
       }
@@ -112,6 +118,7 @@ export const useCheckPawn = () => {
       setShowQueenPopup(true);
     }
   };
+  /*
   const evaluateSquare = ({
     isBlocked,
     direction,
@@ -133,7 +140,7 @@ export const useCheckPawn = () => {
     // si es diagonal (y NO en pessant) revisa si hay una pieza comible
     const destinationSquare = getSquareById(move);
     if (
-      direction != getEnPessantDirection() &&
+      // direction != getEnPessantDirection() &&
       ["tr", "tl", "br", "bl"].includes(direction) &&
       destinationSquare.piece == ""
     )
@@ -147,6 +154,7 @@ export const useCheckPawn = () => {
 
     possibleMoves.push(move);
   };
+  */
   const calculatePawn = (origin: number) => {
     const piece = getSquareById(origin).piece;
     const [possibleMoves] = calculatePossibleMoves(origin, piece);
@@ -172,8 +180,7 @@ export const useCheckPawn = () => {
       isCheck: false,
       possibleMoves,
     };
-    const specialMoves = checkSpecialMoves(evalParam, possibleMoves);
-    // possibleMoves.push([...specialMoves]);
+    checkSpecialMoves(evalParam, possibleMoves);
 
     return possibleMoves;
     /*
@@ -239,7 +246,7 @@ export const useCheckPawn = () => {
     return true;
   };
 
-  return { calculatePawn, validatePawn };
+  return { calculatePawn, validatePawn, getEnPessant, setEnPessant };
 };
 
 /*

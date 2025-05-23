@@ -15,7 +15,8 @@ export const useCheckMove = () => {
   const { calculateKnight, validateKnight } = useCheckKnight();
   const { calculateQueen, validateQueen } = useCheckQueen();
   const { calculateKing, validateKing } = useCheckKing();
-  const { calculatePawn, validatePawn } = useCheckPawn();
+  const { calculatePawn, validatePawn, getEnPessant, setEnPessant } =
+    useCheckPawn();
 
   const calculateLegalMoves = (origin: number) => {
     const piece = getSquareById(origin).piece.charAt(1);
@@ -68,6 +69,8 @@ export const useCheckMove = () => {
         isValid = validateKing(destination);
         break;
     }
+
+    setEnPessant({ direction: null, origin: null });
 
     return isValid;
   };

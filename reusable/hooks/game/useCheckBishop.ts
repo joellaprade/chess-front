@@ -5,8 +5,7 @@ import { useBoardContext } from "@/reusable/context/BoardContext";
 import useRefState from "../useRefState";
 
 export const useCheckBishop = () => {
-  const { calculatePossibleMoves, getSquareById, getMoveByDirection } =
-    useBoardUtils();
+  const { calculatePossibleMoves, getSquareById } = useBoardUtils();
   const { selectedPieceLegalMoves, setSelectedPieceLegalMoves } =
     useBoardContext();
 
