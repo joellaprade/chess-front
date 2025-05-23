@@ -4,14 +4,15 @@ import { useBoardUtils } from "./useBoardUtils";
 import { useBoardContext } from "@/reusable/context/BoardContext";
 import { DiagonalDirection, Direction } from "@/reusable/types/directions";
 import useRefState from "../useRefState";
+import { EvalSquareParam } from "@/reusable/types/evalSquareParamType";
 
 export const useCheckPawn = () => {
   const {
+    calculatePossibleMoves,
     getSquareById,
     getRowCol,
-    getDiagonals,
-    getPerpendiculars,
     getMoveByDirection,
+    getLimits,
   } = useBoardUtils();
   const {
     selectedSquare,
@@ -22,33 +23,15 @@ export const useCheckPawn = () => {
     setUpgradingPawn,
   } = useBoardContext();
 
+  const [getOrigin, setOrigin] = useRefState(null);
+  const [getPieceColor, setPieceColor] = useRefState(null);
   const [getDoubleSquarePawn, setDoubleSquarePawn] = useRefState(null);
   const [getEnPessantMove, setEnPessantMove] = useRefState(null);
+  const [getEnPessantDirection, setEnPessantDirection] = useRefState(null);
 
-  let piece: string;
-  let pieceColor: string;
-
-  let destination: number;
-  let origin: number;
-  let row: number;
-  let col: number;
-
-  let isLimit: Record<Direction, number | null> = {
-    top: null,
-    bottom: null,
-    left: null,
-    right: null,
-    tl: null,
-    tr: null,
-    br: null,
-    bl: null,
-  };
-
-  let enPessantDirection: DiagonalDirection | "";
-
-  let possibleMoves: number[] = [];
-
+  // Before
   const checkIsEnPessant = (isWhite: boolean): DiagonalDirection | "" => {
+    const origin = getOrigin();
     if (isWhite) {
       if (origin + 1 == getDoubleSquarePawn()) return "tr";
       else if (origin - 1 == getDoubleSquarePawn()) return "tl";
@@ -59,8 +42,9 @@ export const useCheckPawn = () => {
 
     return "";
   };
-  const checkIsTwoSquareMove = () => {
-    const isWhite = pieceColor === "w";
+  // After
+  const checkIsTwoSquareMove = (destination: number) => {
+    const isWhite = getPieceColor() === "w";
     if (isWhite && selectedPieceLegalMoves.includes(destination + 8)) {
       setDoubleSquarePawn(destination);
     } else if (!isWhite && selectedPieceLegalMoves.includes(destination - 8)) {
@@ -69,38 +53,44 @@ export const useCheckPawn = () => {
       setDoubleSquarePawn(null);
     }
   };
-  const checkSpecialMoves = (isWhite: boolean) => {
-    if (isWhite) {
-      //check for double move
-      if (row == 6) {
-        const hasPiece = getSquareById(origin - 8)?.piece;
-        !hasPiece && evaluateSquare(1, "top");
-      }
-      // check for en pessant
-      if (row == 3) {
-        enPessantDirection = checkIsEnPessant(isWhite);
-        if (enPessantDirection != "") {
-          evaluateSquare(0, enPessantDirection);
-          setEnPessantMove(possibleMoves[possibleMoves.length - 1]);
-        }
-      }
-    } else {
-      if (row == 1) {
-        const hasPiece = getSquareById(origin + 8)?.piece;
-        !hasPiece && evaluateSquare(1, "bottom");
-      }
-      if (row == 4) {
-        enPessantDirection = checkIsEnPessant(isWhite);
-        if (enPessantDirection != "") {
-          evaluateSquare(0, enPessantDirection);
-          setEnPessantMove(possibleMoves[possibleMoves.length - 1]);
-        }
+  // Before
+  const checkSpecialMoves = (
+    evalParam: Omit<EvalSquareParam, "i" | "direction">,
+    possibleMoves: number[],
+  ) => {
+    const origin = getOrigin();
+    const [row, _] = getRowCol(origin);
+    const isWhite = getPieceColor() === "w";
+    const doubleMoveRow = isWhite ? 6 : 1;
+    const enPessantMoveRow = isWhite ? 3 : 4;
+    const possiblePieceOrigin = isWhite ? origin - 8 : origin + 8;
+    const direction = isWhite ? "top" : "bottom";
+
+    //check for double move
+    if (row == doubleMoveRow) {
+      const hasPiece = getSquareById(possiblePieceOrigin)?.piece;
+      !hasPiece && evaluateSquare({ ...evalParam, i: 1, direction });
+    }
+    // check for en pessant
+    if (row == enPessantMoveRow) {
+      setEnPessantDirection(checkIsEnPessant(isWhite));
+      if (getEnPessantDirection() != "") {
+        evaluateSquare({
+          ...evalParam,
+          i: 0,
+          direction: getEnPessantDirection(),
+        });
+        setEnPessantMove(possibleMoves[possibleMoves.length - 1]);
       }
     }
+
+    return possibleMoves;
   };
-  const handleIsEnPessant = () => {
+  // After
+  const handleIsEnPessant = (destination: number) => {
     if (getEnPessantMove() != destination) return;
-    const opponentPawn = pieceColor === "w" ? destination + 8 : destination - 8;
+    const opponentPawn =
+      getPieceColor() === "w" ? destination + 8 : destination - 8;
     setBoard((prevBoard) =>
       prevBoard.map((row) =>
         row.map((square) => {
@@ -114,16 +104,26 @@ export const useCheckPawn = () => {
       ),
     );
   };
-  const handleIsQueen = () => {
+  // After
+  const handleIsQueen = (destination: number) => {
     const row = Math.floor(destination / 8);
     if (row == 0 || row == 7) {
       setUpgradingPawn(destination);
       setShowQueenPopup(true);
     }
   };
-  const evaluateSquare = (i: number, direction: Direction) => {
+  const evaluateSquare = ({
+    isBlocked,
+    direction,
+    origin,
+    i,
+    isLimit,
+    piece,
+    isCheck,
+    possibleMoves,
+  }: EvalSquareParam) => {
     const isIndexDecreacing = ["tr", "tl", "top"].includes(direction);
-    const move = getMoveByDirection(origin, i, direction);
+    const move = getMoveByDirection(origin, 0, direction);
     const limit = isLimit[direction] as number;
 
     // checks que no este afuera del tablero
@@ -133,7 +133,7 @@ export const useCheckPawn = () => {
     // si es diagonal (y NO en pessant) revisa si hay una pieza comible
     const destinationSquare = getSquareById(move);
     if (
-      direction != enPessantDirection &&
+      direction != getEnPessantDirection() &&
       ["tr", "tl", "br", "bl"].includes(direction) &&
       destinationSquare.piece == ""
     )
@@ -143,53 +143,123 @@ export const useCheckPawn = () => {
     if (["top", "bottom"].includes(direction) && destinationSquare.piece != "")
       return false;
 
-    if (destinationSquare.piece.includes(pieceColor)) return false;
+    if (destinationSquare.piece.includes(getPieceColor())) return false;
 
     possibleMoves.push(move);
   };
-  const calculateAllOrientations = () => {
-    const isWhite = pieceColor == "w";
-    const directions: Direction[] = isWhite
-      ? ["tr", "tl", "top"]
-      : ["br", "bl", "bottom"];
+  const calculatePawn = (origin: number) => {
+    const piece = getSquareById(origin).piece;
+    const [possibleMoves] = calculatePossibleMoves(origin, piece);
+    setOrigin(origin);
+    setPieceColor(piece.charAt(0));
 
-    directions.forEach((direction: Direction) => {
-      evaluateSquare(0, direction);
-    });
-
-    checkSpecialMoves(isWhite);
-    setSelectedPieceLegalMoves(possibleMoves);
-  };
-  const calculatePawn = (originParam: number) => {
-    possibleMoves = [];
-    piece = getSquareById(originParam).piece;
-    pieceColor = piece.charAt(0);
-
-    origin = originParam;
-    [row, col] = getRowCol(origin);
-    const dLimits = getDiagonals(origin, row, col);
-    const pLimits = getPerpendiculars(origin, row, col);
-    isLimit = { ...dLimits, ...pLimits };
-
-    calculateAllOrientations();
+    let isBlocked: Record<Direction, boolean> = {
+      top: false,
+      bottom: false,
+      left: false,
+      right: false,
+      tl: false,
+      tr: false,
+      br: false,
+      bl: false,
+    };
+    const isLimit = getLimits(origin, piece);
+    let evalParam = {
+      isBlocked,
+      origin,
+      isLimit,
+      piece,
+      isCheck: false,
+      possibleMoves,
+    };
+    const specialMoves = checkSpecialMoves(evalParam, possibleMoves);
+    // possibleMoves.push([...specialMoves]);
 
     return possibleMoves;
+    /*
+
+
+
+
+
+    */
+    // let isCheck = false;
+    // let isBlocked: Record<Direction, boolean> = {
+    //   top: false,
+    //   bottom: false,
+    //   left: false,
+    //   right: false,
+    //   tl: false,
+    //   tr: false,
+    //   br: false,
+    //   bl: false,
+    // };
+    // let possibleMoves: number[] = [];
+    // let piece = getSquareById(origin).piece;
+
+    // setOrigin(origin);
+    // const [row, col] = getRowCol(origin);
+    // const dLimits = getDiagonals(origin, row, col);
+    // const pLimits = getPerpendiculars(origin, row, col);
+    // const isLimit = { ...dLimits, ...pLimits };
+    // const isWhite = getPieceColor() == "w";
+    // const directions: Direction[] = isWhite
+    //   ? ["tr", "tl", "top"]
+    //   : ["br", "bl", "bottom"];
+
+    // let evalParam = {
+    //   isBlocked,
+    //   origin,
+    //   isLimit,
+    //   piece,
+    //   isCheck,
+    //   possibleMoves,
+    // };
+
+    // directions.forEach((direction: Direction) => {
+    //   evaluateSquare({ ...evalParam, direction, i: 0 });
+    // });
+
+    // checkSpecialMoves(evalParam, row, possibleMoves);
+    // setSelectedPieceLegalMoves(possibleMoves);
+    // return possibleMoves;
   };
-  const validatePawn = (destinationL: number) => {
-    setSelectedPieceLegalMoves([]);
-
-    const isValid = selectedPieceLegalMoves.includes(destinationL);
+  const validatePawn = (destination: number) => {
+    const isValid = selectedPieceLegalMoves.includes(destination);
     if (!isValid) return false;
-    piece = getSquareById(selectedSquare!).piece;
-    pieceColor = piece.charAt(0);
-    destination = destinationL;
-    isValid && checkIsTwoSquareMove();
 
-    handleIsQueen();
-    handleIsEnPessant();
+    checkIsTwoSquareMove(destination);
+    handleIsQueen(destination);
+    handleIsEnPessant(destination);
 
+    const piece = getSquareById(selectedSquare!).piece;
+    // const [_, isCheck] = calculatePossibleMoves(destination, piece);
+
+    setSelectedPieceLegalMoves([]);
     return true;
   };
 
   return { calculatePawn, validatePawn };
 };
+
+/*
+
+cual es el plan?
+
+utilizar evalSquare de utils en pawn
+
+que hay que hacer?
+integrar las reglas de pawn a evalSquare
+
+checkSpecialMoves usa evalSquare
+
+
+
+
+*/
+
+/*
+
+
+
+*/

@@ -7,6 +7,7 @@ import useRefState from "../useRefState";
 
 export const useCheckKing = () => {
   const {
+    calculatePossibleMoves,
     getSquareById,
     getRowCol,
     getDiagonals,
@@ -18,38 +19,18 @@ export const useCheckKing = () => {
     setSelectedPieceLegalMoves,
     getHasRookMove,
   } = useBoardContext();
-
+  const [getOrigin, setOrigin] = useRefState(null);
   const [getHasKingMoved, setHasKingMoved] = useRefState({
     white: false,
     black: false,
   });
 
-  const [getPieceColor, setPieceColor] = useRefState("");
-
-  let piece: string;
-
-  let origin: number;
-  let row: number;
-  let col: number;
-
-  let isLimit: Record<Direction, number | null> = {
-    top: null,
-    bottom: null,
-    left: null,
-    right: null,
-    tl: null,
-    tr: null,
-    br: null,
-    bl: null,
-  };
-
-  let possibleMoves: number[] = [];
-
   const checkHasMoved = () => {
-    if (!getHasKingMoved().white && getPieceColor() == "w") {
+    const pieceColor = getSquareById(getOrigin()).piece.charAt(0);
+    if (!getHasKingMoved().white && pieceColor == "w") {
       setHasKingMoved(true, "white");
     }
-    if (!getHasKingMoved().black && getPieceColor() == "b") {
+    if (!getHasKingMoved().black && pieceColor == "b") {
       setHasKingMoved(true, "black");
     }
   };
@@ -72,73 +53,45 @@ export const useCheckKing = () => {
     return { canCastleL, canCastleR };
   };
   const calculateCastle = () => {
-    if (getPieceColor() == "w") {
-      if (getHasKingMoved().white) return;
+    const pieceColor = getSquareById(getOrigin()).piece.charAt(0);
+    let possibleMoves: number[] = [];
+
+    if (pieceColor == "w") {
+      if (getHasKingMoved().white) return [];
       let { canCastleL, canCastleR } = checkIsRowClear(7);
 
       if (canCastleL && !getHasRookMove().white.left) possibleMoves.push(56);
       if (canCastleR && !getHasRookMove().white.right) possibleMoves.push(63);
     } else {
-      if (getHasKingMoved().black) return;
+      if (getHasKingMoved().black) return [];
       let { canCastleL, canCastleR } = checkIsRowClear(0);
 
       if (canCastleL && !getHasRookMove().black.left) possibleMoves.push(0);
       if (canCastleR && !getHasRookMove().black.right) possibleMoves.push(7);
     }
+
+    return possibleMoves;
   };
-  const evaluateSquare = (i: number, direction: Direction) => {
-    const isIndexDecreacing = ["tr", "tl", "top", "left"].includes(direction);
-    const move = getMoveByDirection(origin, i, direction);
-    const limit = isLimit[direction] as number;
-
-    if (isIndexDecreacing && move < limit) return false;
-    if (!isIndexDecreacing && move > limit) return false;
-
-    const destinationSquare = getSquareById(move);
-
-    if (destinationSquare.piece.includes(getPieceColor())) return false;
-
-    possibleMoves.push(move);
-  };
-  const calculateAllOrientations = () => {
-    const directions: Direction[] = [
-      "tr",
-      "tl",
-      "bl",
-      "br",
-      "top",
-      "bottom",
-      "left",
-      "right",
-    ];
-
-    directions.forEach((direction: Direction) => {
-      evaluateSquare(0, direction);
-    });
-    setSelectedPieceLegalMoves(possibleMoves);
-  };
-  const calculateKing = (originParam: number) => {
-    possibleMoves = [];
-    piece = getSquareById(originParam).piece;
-    setPieceColor(piece.charAt(0));
-
-    origin = originParam;
-    [row, col] = getRowCol(origin);
-    const dLimits = getDiagonals(origin, row, col);
-    const pLimits = getPerpendiculars(origin, row, col);
-    isLimit = { ...dLimits, ...pLimits };
-
-    calculateAllOrientations();
-    calculateCastle();
+  const calculateKing = (origin: number) => {
+    const piece = getSquareById(origin).piece;
+    let [possibleMoves] = calculatePossibleMoves(origin, piece);
+    setOrigin(origin);
+    const castleMoves = calculateCastle();
+    possibleMoves.push(...castleMoves);
 
     return possibleMoves;
   };
   const validateKing = (destination: number) => {
+    const isValid = selectedPieceLegalMoves.includes(destination);
+    if (!isValid) return false;
+
     checkHasMoved();
     setSelectedPieceLegalMoves([]);
-    if (selectedPieceLegalMoves.includes(destination)) return true;
-    else return false;
+
+    return true;
   };
 
   return { calculateKing, validateKing };
 };
+
+// Integrar al rey dentro de calcLongPieces (y cambiar ese nombre)

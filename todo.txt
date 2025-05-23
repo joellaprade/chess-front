@@ -1,5 +1,7 @@
 hacer una lista de las "miras" o squares siendo atacados por w/b
 
+KING PUEDE HACER DISCOVERED CHECK
+
 como check si es check:
 (
   1. enemigo me hace check

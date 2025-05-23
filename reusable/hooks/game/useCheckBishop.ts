@@ -5,7 +5,7 @@ import { useBoardContext } from "@/reusable/context/BoardContext";
 import useRefState from "../useRefState";
 
 export const useCheckBishop = () => {
-  const { calculateLongReachPiece, getSquareById, getMoveByDirection } =
+  const { calculatePossibleMoves, getSquareById, getMoveByDirection } =
     useBoardUtils();
   const { selectedPieceLegalMoves, setSelectedPieceLegalMoves } =
     useBoardContext();
@@ -13,17 +13,21 @@ export const useCheckBishop = () => {
   const [getOrigin, setOrigin] = useRefState(null);
 
   const calculateBishop = (origin: number) => {
+    const piece = getSquareById(origin).piece;
+    const [possibleMoves] = calculatePossibleMoves(origin, piece);
     setOrigin(origin);
-    const { possibleMoves } = calculateLongReachPiece(origin);
+
     return possibleMoves;
   };
   const validateBishop = (destination: number) => {
+    const isValid = selectedPieceLegalMoves.includes(destination);
+    if (!isValid) return false;
+
     const piece = getSquareById(getOrigin()).piece;
-    const { isCheck } = calculateLongReachPiece(destination, piece);
-    console.log(isCheck);
+    const [_, isCheck] = calculatePossibleMoves(destination, piece);
+
     setSelectedPieceLegalMoves([]);
-    if (selectedPieceLegalMoves.includes(destination)) return true;
-    else return false;
+    return true;
   };
 
   return { calculateBishop, validateBishop };

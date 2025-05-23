@@ -3,6 +3,7 @@
 import { useBoardContext } from "../../context/BoardContext";
 import { DiagonalDirection, Direction } from "@/reusable/types/directions";
 import { PerpendicularDirection } from "@/reusable/types/directions";
+import { EvalSquareParam } from "@/reusable/types/evalSquareParamType";
 
 export const useBoardUtils = () => {
   const { board, setSelectedPieceLegalMoves } = useBoardContext();
@@ -48,6 +49,18 @@ export const useBoardUtils = () => {
         limit = getDiagonals(origin, row, col);
         break;
       case "Q":
+        limit = {
+          ...getPerpendiculars(origin, row, col),
+          ...getDiagonals(origin, row, col),
+        };
+        break;
+      case "K":
+        limit = {
+          ...getPerpendiculars(origin, row, col),
+          ...getDiagonals(origin, row, col),
+        };
+        break;
+      case "P":
         limit = {
           ...getPerpendiculars(origin, row, col),
           ...getDiagonals(origin, row, col),
@@ -114,107 +127,61 @@ export const useBoardUtils = () => {
       case "Q":
         directions = allDirections;
         break;
+      case "K":
+        directions = allDirections;
+        break;
+      case "P":
+        directions =
+          piece.charAt(0) === "w"
+            ? ["tr", "tl", "top"]
+            : ["br", "bl", "bottom"];
+        break;
     }
 
     return directions;
   };
-  const evaluateRBQ = (piece: string, origin: number) => {
-    const diagonalDirections: DiagonalDirection[] = ["bl", "br", "tl", "tr"];
-    const perpendicularDirection: PerpendicularDirection[] = [
-      "top",
-      "bottom",
-      "left",
-      "right",
-    ];
-    const [row, col] = getRowCol(origin);
-    const dLimits = getDiagonals(origin, row, col);
-    const pLimits = getPerpendiculars(origin, row, col);
-    const isLimit = { ...dLimits, ...pLimits };
+  const evaluateSquare = ({
+    isBlocked,
+    direction,
+    origin,
+    i,
+    isLimit,
+    piece,
+    isCheck,
+    possibleMoves,
+  }: EvalSquareParam) => {
+    if (isBlocked[direction]) return false;
+    const isIndexDecreacing = ["tr", "tl", "top", "left"].includes(direction);
+    let move = getMoveByDirection(origin, i, direction);
+    let limit = isLimit[direction] as number;
 
-    let possibleMoves = [];
-    let isBlocked: Record<string, boolean> = {
-      top: false,
-      bottom: false,
-      left: false,
-      right: false,
-      tl: false,
-      tr: false,
-      br: false,
-      bl: false,
-    };
-    let directions: Direction[] = [];
-    let isCheck = false;
+    if (isIndexDecreacing && move < limit) return false;
+    if (!isIndexDecreacing && move > limit) return false;
 
-    switch (piece.charAt(1)) {
-      case "R":
-        directions = perpendicularDirection as Direction[];
-        break;
-      case "B":
-        directions = diagonalDirections as Direction[];
-        break;
-      case "Q":
-        directions = [...perpendicularDirection, ...diagonalDirections];
-        break;
+    const destinationSquare = getSquareById(move);
+
+    if (destinationSquare.piece != "" && destinationSquare.piece != piece) {
+      isBlocked[direction] = true;
+      if (destinationSquare.piece.includes(piece.charAt(0))) return false;
     }
 
-    for (let i = 0; i < 7; i++) {
-      directions.forEach((direction) => {
-        if (isBlocked[direction]) return false;
-        const isIndexDecreacing = ["tr", "tl", "top", "left"].includes(
-          direction,
-        );
-        const move = getMoveByDirection(origin, i, direction);
-        const limit = isLimit[direction] as number;
-
-        if (isIndexDecreacing && move < limit) return false;
-        if (!isIndexDecreacing && move > limit) return false;
-
-        const destSquarePiece = getSquareById(move).piece;
-        const originPieceColor = piece.charAt(0);
-
-        if (destSquarePiece != "" && destSquarePiece != piece) {
-          isBlocked[direction] = true;
-          if (destSquarePiece.includes(originPieceColor)) return false;
-        }
-
-        if (destSquarePiece.includes("K")) isCheck = true;
-
-        possibleMoves.push(move);
-      });
+    if (piece.charAt(1) === "P") {
     }
-    return isCheck;
+
+    if (destinationSquare.piece.includes("K")) isCheck = true;
+
+    possibleMoves.push(move);
   };
-  const evaluateKnight = (piece: string, origin: number) => {
-    console.log("ramn");
-  };
-  const evaluatePawn = (piece: string, origin: number) => {};
-  const checkIsCheck = (piece: string, origin: number) => {
-    switch (piece.charAt(1)) {
-      case "R":
-        evaluateRBQ(piece, origin);
-        break;
-      case "B":
-        evaluateRBQ(piece, origin);
-        break;
-      case "Q":
-        evaluateRBQ(piece, origin);
-        break;
-      case "N":
-        evaluateKnight(piece, origin);
-        break;
-      case "P":
-        evaluatePawn(piece, origin);
-        break;
-    }
-  };
-  const calculateLongReachPiece = (origin: number, _piece?: string) => {
-    const piece = _piece || getSquareById(origin).piece;
-    console.log(getSquareById(origin), origin);
+  const calculateLinearMoves = (
+    origin: number,
+    piece: string,
+  ): [number[], boolean] => {
     const directions = getDirectionByPiece(piece);
     const isLimit = getLimits(origin, piece);
+    const loops = ["K", "P"].includes(piece.charAt(1)) ? 1 : 7;
     let possibleMoves: number[] = [];
     let isCheck = false;
-    let isBlocked: Record<string, boolean> = {
+    let isBlocked: Record<Direction, boolean> = {
       top: false,
       bottom: false,
       left: false,
@@ -225,32 +192,84 @@ export const useBoardUtils = () => {
       bl: false,
     };
 
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < loops; i++) {
       directions.forEach((direction) => {
-        if (isBlocked[direction]) return false;
-        const isIndexDecreacing = ["tr", "tl", "top", "left"].includes(
+        evaluateSquare({
+          isBlocked,
           direction,
-        );
-        let move = getMoveByDirection(origin, i, direction);
-        let limit = isLimit[direction] as number;
-
-        if (isIndexDecreacing && move < limit) return false;
-        if (!isIndexDecreacing && move > limit) return false;
-
-        const destinationSquare = getSquareById(move);
-
-        if (destinationSquare.piece != "" && destinationSquare.piece != piece) {
-          isBlocked[direction] = true;
-          if (destinationSquare.piece.includes(piece.charAt(0))) return false;
-        }
-
-        if (destinationSquare.piece.includes("K")) isCheck = true;
-
-        possibleMoves.push(move);
+          origin,
+          i,
+          isLimit,
+          piece,
+          isCheck,
+          possibleMoves,
+        });
       });
     }
     setSelectedPieceLegalMoves(possibleMoves);
-    return { possibleMoves, isCheck };
+    return [possibleMoves, isCheck];
+  };
+  const calculateKnight = (
+    origin: number,
+    piece: string,
+  ): [number[], boolean] => {
+    let [row, col] = getRowCol(origin);
+    let possibleMoves: number[] = [];
+    let isCheck = false;
+
+    if (col >= 1 && row >= 2) possibleMoves.push(origin - 17);
+    if (col <= 6 && row >= 2) possibleMoves.push(origin - 15);
+
+    if (col >= 2 && row >= 1) possibleMoves.push(origin - 10);
+    if (col <= 5 && row >= 1) possibleMoves.push(origin - 6);
+
+    if (col >= 2 && row <= 6) possibleMoves.push(origin + 6);
+    if (col <= 5 && row <= 6) possibleMoves.push(origin + 10);
+
+    if (col >= 1 && row <= 5) possibleMoves.push(origin + 15);
+    if (col <= 6 && row <= 5) possibleMoves.push(origin + 17);
+
+    const movesLength = possibleMoves.length;
+    for (let i = 0; i < movesLength; i++) {
+      const invI = movesLength - 1 - i;
+      let destinationSquare = getSquareById(possibleMoves[invI]);
+
+      if (destinationSquare.piece.includes(piece.charAt(0)))
+        possibleMoves.splice(invI, 1);
+      if (destinationSquare.piece.includes("K")) isCheck = true;
+    }
+
+    return [possibleMoves, isCheck];
+  };
+  const calculatePossibleMoves = (
+    origin: number,
+    piece: string,
+  ): [number[], boolean] => {
+    let possibleMoves: number[] = [];
+    let isCheck: boolean = false;
+    const pieceInitial = piece.charAt(1);
+    switch (pieceInitial) {
+      case "B":
+        [possibleMoves, isCheck] = calculateLinearMoves(origin, piece);
+        break;
+      case "R":
+        [possibleMoves, isCheck] = calculateLinearMoves(origin, piece);
+        break;
+      case "Q":
+        [possibleMoves, isCheck] = calculateLinearMoves(origin, piece);
+        break;
+      case "K":
+        [possibleMoves, isCheck] = calculateLinearMoves(origin, piece);
+        break;
+      case "N":
+        [possibleMoves, isCheck] = calculateKnight(origin, piece);
+        break;
+      case "P":
+        [possibleMoves, isCheck] = calculateLinearMoves(origin, piece);
+        break;
+    }
+
+    return [possibleMoves, isCheck];
   };
 
   return {
@@ -259,7 +278,7 @@ export const useBoardUtils = () => {
     getPerpendiculars,
     getDiagonals,
     getMoveByDirection,
-    checkIsCheck,
-    calculateLongReachPiece,
+    calculatePossibleMoves,
+    getLimits,
   };
 };
