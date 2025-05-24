@@ -15,7 +15,7 @@ export const useCheckMove = () => {
   const { calculateKnight, validateKnight } = useCheckKnight();
   const { calculateQueen, validateQueen } = useCheckQueen();
   const { calculateKing, validateKing } = useCheckKing();
-  const { calculatePawn, validatePawn, getEnPessant, setEnPessant } =
+  const { calculatePawn, validatePawn, getEnPessant, setDoubleSquarePawn } =
     useCheckPawn();
 
   const calculateLegalMoves = (origin: number) => {
@@ -47,9 +47,9 @@ export const useCheckMove = () => {
   };
   const validateMove = (origin: number, destination: number) => {
     let isValid = false;
-    const piece = getSquareById(origin).piece.charAt(1);
+    const piece = getSquareById(origin).piece;
 
-    switch (piece) {
+    switch (piece.charAt(1)) {
       case "P":
         isValid = validatePawn(destination);
         break;
@@ -70,7 +70,8 @@ export const useCheckMove = () => {
         break;
     }
 
-    setEnPessant({ direction: null, origin: null });
+    getEnPessant().color === piece.charAt(0) && setDoubleSquarePawn(null);
+    console.log(getEnPessant(), piece.charAt(0));
 
     return isValid;
   };

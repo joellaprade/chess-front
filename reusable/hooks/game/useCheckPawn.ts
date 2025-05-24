@@ -30,10 +30,13 @@ export const useCheckPawn = () => {
   const [getEnPessant, setEnPessant] = useRefState({
     origin: null,
     direction: null,
+    color: null,
   });
 
   // Before
   const checkIsEnPessant = (isWhite: boolean): DiagonalDirection | "" => {
+    console.log(getDoubleSquarePawn());
+    if (!getDoubleSquarePawn()) return "";
     const origin = getOrigin();
     if (isWhite) {
       if (origin + 1 == getDoubleSquarePawn()) return "tr";
@@ -48,13 +51,17 @@ export const useCheckPawn = () => {
   // After
   const checkIsTwoSquareMove = (destination: number) => {
     const isWhite = getPieceColor() === "w";
-    if (isWhite && selectedPieceLegalMoves.includes(destination + 8)) {
-      setDoubleSquarePawn(destination);
-    } else if (!isWhite && selectedPieceLegalMoves.includes(destination - 8)) {
+    const destinationOffset = isWhite ? destination + 8 : destination - 8;
+    if (selectedPieceLegalMoves.includes(destinationOffset)) {
       setDoubleSquarePawn(destination);
     } else {
       setDoubleSquarePawn(null);
     }
+    console.log(
+      isWhite,
+      selectedPieceLegalMoves.includes(destinationOffset),
+      getDoubleSquarePawn(),
+    );
   };
   // Before
   const checkSpecialMoves = (
@@ -77,9 +84,8 @@ export const useCheckPawn = () => {
     // check for en pessant
     if (row == enPessantMoveRow) {
       const direction = checkIsEnPessant(isWhite);
-      console.log(checkIsEnPessant(isWhite));
-      if (getEnPessant().direction) {
-        setEnPessant({ origin, direction });
+      if (direction) {
+        setEnPessant({ origin, direction, color: getPieceColor() });
         evaluateSquare({
           ...evalParam,
           i: 0,
@@ -246,7 +252,13 @@ export const useCheckPawn = () => {
     return true;
   };
 
-  return { calculatePawn, validatePawn, getEnPessant, setEnPessant };
+  return {
+    calculatePawn,
+    validatePawn,
+    getDoubleSquarePawn,
+    setDoubleSquarePawn,
+    getEnPessant,
+  };
 };
 
 /*
