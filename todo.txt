@@ -1,4 +1,5 @@
-hacer una lista de las "miras" o squares siendo atacados por w/b
+no sirve  castle
+
 
 KING PUEDE HACER DISCOVERED CHECK
 
@@ -19,6 +20,34 @@ como check si es check:
       I. si en checkIsCheck evaluo que estoy apuntando al rey, agregar un array conteniendo el origen del atacante y origen de la pieza pineada
       II. cuando este en calcMoves, reviso que el origen de mi pieza != pinned[1] 
 )
+
+
+
+
+
+utilizar eval y encapsularlo en checkIsCheck, esta func va hacer lo que ya estaba haciendo, pero ademas, va a limpiar el array de pieza apuntando y las va a recalcular
+
+
+
+
+
+poner el check del rey al inicio
+sin importar que, si el rey esta en su linea de ataque, marcarlo
+como marcarlo?
+
+solo poner el origin donde esta la pieza atacante
+
+cuando muevo al rey, busco las piezas apuntando al rey, las calculo y veo si el destination del rey esta dentro de esos cuadros
+
+
+
+
+
+
+
+
+
+
 
 cuando este calcuando POSSIBLE_MOVES de x pieza, ver si en alguno de los squares, square.piece.charAt(1) == K
 

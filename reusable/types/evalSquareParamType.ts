@@ -8,6 +8,8 @@ export type EvalSquareParam = {
   isLimit: Record<any, number>;
   piece: string;
   isCheck: boolean;
+  isAttacked: boolean;
   possibleMoves: number[];
+  recursionLayer: number;
   extras?: Record<string, any>;
 };

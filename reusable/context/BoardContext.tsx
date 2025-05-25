@@ -15,6 +15,8 @@ type BoardContextType = {
   showQueenPopup: boolean;
   isWhiteTurn: boolean;
   upgradingPawn: number | null;
+  getIsAimingAtKing: () => number[];
+  setIsAimingAtKing: (newValue: number[], path?: string) => void;
   getHasRookMove: () => any;
   setHasRookMove: (newValue: any, path?: string) => void;
   setBoard: React.Dispatch<React.SetStateAction<Board>>;
@@ -149,6 +151,7 @@ export const BoardContextProvider = ({
       right: false,
     },
   });
+  const [getIsAimingAtKing, setIsAimingAtKing] = useRefState<number[]>([]);
 
   return (
     <BoardContext.Provider
@@ -167,6 +170,8 @@ export const BoardContextProvider = ({
         setShowQueenPopup,
         setIsWhiteTurn,
         setUpgradingPawn,
+        getIsAimingAtKing,
+        setIsAimingAtKing,
       }}
     >
       {children}

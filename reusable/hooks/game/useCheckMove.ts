@@ -71,7 +71,6 @@ export const useCheckMove = () => {
     }
 
     getEnPessant().color === piece.charAt(0) && setDoubleSquarePawn(null);
-    console.log(getEnPessant(), piece.charAt(0));
 
     return isValid;
   };
