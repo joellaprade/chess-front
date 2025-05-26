@@ -149,8 +149,6 @@ export const useBoardUtils = () => {
     destination: number,
     piece: string,
   ) => {
-    console.log(piece);
-
     const directions = getDirectionByPiece(piece);
     const isLimit = getLimits(destination, piece);
     let possibleMoves: number[] = [];
@@ -197,37 +195,127 @@ export const useBoardUtils = () => {
     const [dRow, dCol] = getRowCol(destSquare.id);
     const oDiagonal = getDiagonals(origin, oRow, oCol);
     const dDiagonal = getDiagonals(destSquare.id, dRow, dCol);
+    const knightSquare = getSquareById(origin);
+    const knightPossibleMoves = calculateKnight(origin, knightSquare.piece);
+    // console.log("e", knightPossibleMoves);
     let isAttacked = false;
 
-    switch (destSquare.piece.charAt(1)) {
-      case "Q":
-        isAttacked =
-          oRow == dRow ||
-          oCol == dCol ||
-          oDiagonal.tl == dDiagonal.tl ||
-          oDiagonal.tr == dDiagonal.tr;
-        break;
-      case "K":
-        isAttacked =
-          oRow == dRow ||
-          oCol == dCol ||
-          oDiagonal.tl == dDiagonal.tl ||
-          oDiagonal.tr == dDiagonal.tr;
-        break;
-      case "R":
-        isAttacked = oRow == dRow || oCol == dCol;
-        break;
-      case "B":
-        isAttacked =
-          oDiagonal.tl == dDiagonal.tl || oDiagonal.tr == dDiagonal.tr;
-        break;
-      case "N":
-        break;
-      case "P":
-        break;
+    if (destSquare.piece.charAt(0))
+      switch (destSquare.piece.charAt(1)) {
+        case "Q":
+          isAttacked =
+            oRow == dRow ||
+            oCol == dCol ||
+            oDiagonal.tl == dDiagonal.tl ||
+            oDiagonal.tr == dDiagonal.tr;
+          break;
+        case "K":
+          isAttacked =
+            oRow == dRow ||
+            oCol == dCol ||
+            oDiagonal.tl == dDiagonal.tl ||
+            oDiagonal.tr == dDiagonal.tr;
+          break;
+        case "R":
+          isAttacked = oRow == dRow || oCol == dCol;
+          break;
+        case "B":
+          isAttacked =
+            oDiagonal.tl == dDiagonal.tl || oDiagonal.tr == dDiagonal.tr;
+          break;
+        case "N":
+          break;
+        case "P":
+          break;
+      }
+
+    if (isAttacked) {
+      console.log(9);
     }
 
     return isAttacked;
+  };
+  const runChecks = (
+    destSquare: {
+      id: number;
+      code: string;
+      piece: string;
+    },
+    piece: string,
+    isCheck: boolean,
+    recursionLayer: number,
+    isAttacked: boolean,
+    origin: number,
+    isBlocked?: Record<Direction, boolean> | undefined,
+    direction?: Direction,
+  ): [boolean, boolean, Record<Direction, boolean>] => {
+    // Evalua si una pieza esta bloqueando a otra (como un peon a un arfil)
+    if (
+      isBlocked &&
+      direction &&
+      destSquare.piece != "" &&
+      destSquare.piece != piece
+    )
+      isBlocked[direction] = true;
+    // Evalua si el atacante puede alcanzar al rey
+    if (destSquare.piece.charAt(1) === "K" && destSquare.piece != piece)
+      isCheck = true;
+    if (recursionLayer == 0) {
+      // Decide si debe interpretar este square como possibleMove de rey
+      if (
+        piece.charAt(1) == "K" &&
+        calculateIsSquareBeingAttacked(destSquare.id, piece)
+      )
+        isAttacked = true;
+      // Decide si debe interpretar este square como isBeingAttacked
+    } else if (recursionLayer == 1) {
+      // Evalua si el cuadro esta siendo atacado
+      if (
+        piece.charAt(1) == "K" &&
+        piece.charAt(0) != destSquare.piece.charAt(0) &&
+        evaluateIsBeingAttacked(origin, destSquare)
+      )
+        isAttacked = true;
+    }
+
+    return [
+      isCheck,
+      isAttacked,
+      isBlocked || ({} as Record<Direction, boolean>),
+    ];
+  };
+  const runValidations = (
+    destSquare: {
+      id: number;
+      code: string;
+      piece: string;
+    },
+    piece: string,
+    isAttacked: boolean,
+    origin: number,
+    extras: any,
+    isBlocked: Record<Direction, boolean>,
+    direction: Direction,
+  ): boolean => {
+    // Si la pieza bloqueando es del mismo color, retorna para NO agregarla a possible moves
+    if (destSquare.piece.charAt(0) == piece.charAt(0)) return false;
+    // Reglas de peon
+    if (piece.charAt(1) === "P") {
+      // Calcula que no haya una pieza al frente (peones solo comen en diagonal)
+      if (["top", "bottom"].includes(direction) && destSquare.piece != "")
+        return false;
+      // Revisa que haya una pieza diagonalmente para comersela
+      if (
+        (direction != extras?.direction || origin != extras?.origin) &&
+        ["tr", "tl", "br", "bl"].includes(direction) &&
+        destSquare.piece == ""
+      )
+        return false;
+    }
+    // Reglas de rey
+    if (piece.charAt(1) === "K" && isAttacked) return false;
+
+    return true;
   };
   const evaluateSquare = ({
     isBlocked,
@@ -245,66 +333,42 @@ export const useBoardUtils = () => {
     const isIndexDecreacing = ["tr", "tl", "top", "left"].includes(direction);
     let move = getMoveByDirection(origin, i, direction);
     let limit = isLimit[direction] as number;
-
     // Calcula que el move siendo calculado este dentro del tablero
     if (isIndexDecreacing && move < limit)
       return [possibleMoves, isCheck, isAttacked];
     if (!isIndexDecreacing && move > limit)
       return [possibleMoves, isCheck, isAttacked];
-
-    const destSquare = getSquareById(move);
-
     // Evalua si el atacante esta viendo al rey
+    const destSquare = getSquareById(move);
     if (destSquare.piece.includes("K")) {
       const aiming: number[] = getIsAimingAtKing();
       aiming.push(origin);
       setIsAimingAtKing(aiming);
     }
-
     // Evalua si ya habia una pieza bloqueando este paso
     if (isBlocked[direction]) return [possibleMoves, isCheck, isAttacked];
 
-    // Evalua si una pieza esta bloqueando a otra (como un peon a un arfil)
-    if (destSquare.piece != "" && destSquare.piece != piece)
-      isBlocked[direction] = true;
+    [isCheck, isAttacked, isBlocked] = runChecks(
+      destSquare,
+      piece,
+      isCheck,
+      recursionLayer,
+      isAttacked,
+      origin,
+      isBlocked,
+      direction,
+    );
+    const isValid = runValidations(
+      destSquare,
+      piece,
+      isAttacked,
+      origin,
+      extras,
+      isBlocked,
+      direction,
+    );
 
-    // Si la pieza bloqueando es del mismo color, retorna para NO agregarla a possible moves
-    if (destSquare.piece.charAt(0) == piece.charAt(0))
-      return [possibleMoves, isCheck, isAttacked];
-
-    // Evalua si el atacante puede alcanzar al rey
-    if (destSquare.piece.charAt(1) === "K") isCheck = true;
-
-    // Decide si debe interpretar este square como possibleMove de ray
-    if (recursionLayer == 0) {
-      if (calculateIsSquareBeingAttacked(destSquare.id, piece))
-        isAttacked = true;
-      // Decide si debe interpretar este square como isBeingAttacked
-    } else {
-      // Evalua si el cuadro esta siendo atacado
-      if (evaluateIsBeingAttacked(origin, destSquare)) isAttacked = true;
-    }
-
-    // Reglas de peon
-    if (piece.charAt(1) === "P") {
-      // Calcula que no haya una pieza al frente (peones solo comen en diagonal)
-      if (["top", "bottom"].includes(direction) && destSquare.piece != "")
-        return [possibleMoves, isCheck, isAttacked];
-
-      // Revisa que haya una pieza diagonalmente para comersela
-      if (
-        (direction != extras?.direction || origin != extras?.origin) &&
-        ["tr", "tl", "br", "bl"].includes(direction) &&
-        destSquare.piece == ""
-      )
-        return [possibleMoves, isCheck, isAttacked];
-    }
-
-    if (recursionLayer == 0) console.log([possibleMoves, isCheck, isAttacked]);
-
-    // Reglas de rey
-    if (piece.charAt(1) === "K" && isAttacked)
-      return [possibleMoves, isCheck, isAttacked];
+    if (!isValid) return [possibleMoves, isCheck, isAttacked];
 
     possibleMoves.push(move);
     return [possibleMoves, isCheck, isAttacked];
@@ -356,6 +420,7 @@ export const useBoardUtils = () => {
     let [row, col] = getRowCol(origin);
     let possibleMoves: number[] = [];
     let isCheck = false;
+    let isAttacked = false;
 
     if (col >= 1 && row >= 2) possibleMoves.push(origin - 17);
     if (col <= 6 && row >= 2) possibleMoves.push(origin - 15);
@@ -373,6 +438,15 @@ export const useBoardUtils = () => {
     for (let i = 0; i < movesLength; i++) {
       const invI = movesLength - 1 - i;
       let destSquare = getSquareById(possibleMoves[invI]);
+
+      [isCheck, isAttacked] = runChecks(
+        destSquare,
+        piece,
+        isCheck,
+        0,
+        isAttacked,
+        origin,
+      );
 
       if (destSquare.piece.includes(piece.charAt(0)))
         possibleMoves.splice(invI, 1);

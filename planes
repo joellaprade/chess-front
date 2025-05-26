@@ -1,0 +1,33 @@
+poner logica de knight en evalSquare y correrla condicionalmente
+
+que tipos de ocdigo tenemos en eval?
+para validar squares
+para detectar extras (isAttacked, isCheck, aimingAtKing, )
+
+infos que ocupo 100% del tiempo:
+INFO 1
+
+
+
+
+
+
+KING PUEDE HACER DISCOVERED CHECK
+
+como check si es check:
+(
+  1. enemigo me hace check
+    a. revisar en validateMove de enemigo
+      I. validar move de enemigo
+      II. revisar si algun square.piece.contains("K")
+      III. revisar que el path no este bloqueado
+      IV. declarar check o agregar el nuevo square del enemigo + square de la pieza pineada
+  2. si el square al que me voy a mover seria check
+    a. escanear squares en validateMove del rey
+      I. con destination + checkIsCheck (que tomaria un square index y evaluaria row, col y diagonals)
+      II. seteamos isValid
+  3. si mover una pieza (w/b) seria check
+    a. tener una lista de piezas apuntando al rey
+      I. si en checkIsCheck evaluo que estoy apuntando al rey, agregar un array conteniendo el origen del atacante y origen de la pieza pineada
+      II. cuando este en calcMoves, reviso que el origen de mi pieza != pinned[1] 
+)

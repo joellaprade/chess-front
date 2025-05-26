@@ -1,45 +1,19 @@
+revisar desde
+ else if (recursionLayer == 1) 
+para ver que enciende isAttacked
+
+
 no sirve  castle
+white knght en square 0 sirve pero sus indicadores no
 
 
-KING PUEDE HACER DISCOVERED CHECK
 
-como check si es check:
-(
-  1. enemigo me hace check
-    a. revisar en validateMove de enemigo
-      I. validar move de enemigo
-      II. revisar si algun square.piece.contains("K")
-      III. revisar que el path no este bloqueado
-      IV. declarar check o agregar el nuevo square del enemigo + square de la pieza pineada
-  2. si el square al que me voy a mover seria check
-    a. escanear squares en validateMove del rey
-      I. con destination + checkIsCheck (que tomaria un square index y evaluaria row, col y diagonals)
-      II. seteamos isValid
-  3. si mover una pieza (w/b) seria check
-    a. tener una lista de piezas apuntando al rey
-      I. si en checkIsCheck evaluo que estoy apuntando al rey, agregar un array conteniendo el origen del atacante y origen de la pieza pineada
-      II. cuando este en calcMoves, reviso que el origen de mi pieza != pinned[1] 
-)
 
 
 
 
 
 utilizar eval y encapsularlo en checkIsCheck, esta func va hacer lo que ya estaba haciendo, pero ademas, va a limpiar el array de pieza apuntando y las va a recalcular
-
-
-
-
-
-poner el check del rey al inicio
-sin importar que, si el rey esta en su linea de ataque, marcarlo
-como marcarlo?
-
-solo poner el origin donde esta la pieza atacante
-
-cuando muevo al rey, busco las piezas apuntando al rey, las calculo y veo si el destination del rey esta dentro de esos cuadros
-
-
 
 
 
@@ -68,24 +42,6 @@ si un bishop me esta pineando y su linea de ataque es br, yo solo me puedo mover
     direction: "bl",
     
 }]
-
-
-
-
-comun:
-
-
-que hay que persistir?
-piece, origin, 
-
-que ocupa evalSquare:
-
-i
-isBlocked
-direction
-origin
-isLimit
-piece
 
 
 
