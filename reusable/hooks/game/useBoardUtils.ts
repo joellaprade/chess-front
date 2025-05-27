@@ -4,6 +4,7 @@ import { useBoardContext } from "../../context/BoardContext";
 import { DiagonalDirection, Direction } from "@/reusable/types/directions";
 import { PerpendicularDirection } from "@/reusable/types/directions";
 import { EvalSquareParam } from "@/reusable/types/evalSquareParamType";
+import { PinData } from "@/reusable/types/pinData";
 
 export const useBoardUtils = () => {
   const { board, setSelectedPieceLegalMoves, getPinData, setPinData } = useBoardContext();
@@ -309,8 +310,9 @@ export const useBoardUtils = () => {
     const pinData = getPinData();
 
     for (let i = 0; i < pinData.length; i++) {
-      if (pinData[i].pinned == origin)
-        if (!validateMoveUnderPin(pinData[i].direction, direction)) {
+      const pd = pinData[i];
+      if (!pd.isPinBlocked && pd.pinned == origin)
+        if (!validateMoveUnderPin(pd.direction, direction)) {
           return false;
         }
     }
@@ -352,9 +354,7 @@ export const useBoardUtils = () => {
         const [blockingPiecesCount] = countBlockingPieces(coinsidingLimit, pinData.attacker);
         const attackerOldSquare = getSquareById(pinData.attacker);
 
-        if (blockingPiecesCount > 1) {
-          pinData.pinned = undefined;
-        }
+        pinData.isPinBlocked = blockingPiecesCount > 1;
 
         if (attackerOldSquare.piece == "") {
           let pinnedPieces = getPinData();
@@ -394,9 +394,7 @@ export const useBoardUtils = () => {
     const descendingDirections = ["top", "left", "tr", "tl"];
     const ascendingDirections = ["bottom", "right", "br", "bl"];
     let directions = origin > destSquare.id ? descendingDirections : ascendingDirections;
-    let pinData:
-      | { direction: Direction; limit: number; attacker: number; pinned: number | undefined }
-      | undefined;
+    let pinData: PinData | undefined;
 
     // Reviso si rey y atacante comparten row, col o diag
     directions.forEach((direction) => {
@@ -406,6 +404,7 @@ export const useBoardUtils = () => {
           limit: kLimits[direction],
           attacker: origin,
           pinned: undefined,
+          isPinBlocked: false,
         };
 
         // Se cuentan piezas bloqueando

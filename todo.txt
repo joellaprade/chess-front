@@ -1,9 +1,12 @@
-en evaluateIsBeingAttacked, para determinar si rey A puede moverse a x square, reviso si pieza (rey) B comparte diagonal
-esto resulta en el rey A siendo calculado como una reina (por que erroneamente se asume que rey A y B no pueden compartir diagonal)
 
-pawn aun no sirve en evaluateIsBeingAttacked
+tengo funcion que calcula si atacante esta pineando 
+(por ejemplo, si muevo mi reina para pinear un peon)
+
+ahora, hacer func para ver si defendiente esta pineado
+(si la reina le hace check a mi rey y defiendo con un caballo)
+
+
 
 
 
 no sirve  castle
-white knght en square 0 sirve pero sus indicadores no

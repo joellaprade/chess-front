@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { Board } from "../types/board";
 import useRefState from "../hooks/useRefState";
 import { Direction } from "../types/directions";
+import { PinData } from "@/reusable/types/pinData";
 
 type BoardContextProviderProps = {
   children: React.ReactNode;
@@ -17,25 +18,8 @@ type BoardContextType = {
   isWhiteTurn: boolean;
   upgradingPawn: number | null;
 
-  getPinData: () => [
-    {
-      direction: Direction;
-      limit: number;
-      attacker: number;
-      pinned: number | undefined;
-    },
-  ];
-  setPinData: (
-    newValue: [
-      {
-        direction: Direction;
-        limit: number;
-        attacker: number;
-        pinned: number | undefined;
-      },
-    ],
-    path?: string,
-  ) => void;
+  getPinData: () => [PinData];
+  setPinData: (newValue: [PinData], path?: string) => void;
   getHasRookMove: () => any;
   setHasRookMove: (newValue: any, path?: string) => void;
   setBoard: React.Dispatch<React.SetStateAction<Board>>;
