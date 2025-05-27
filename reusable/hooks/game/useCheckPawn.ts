@@ -7,13 +7,8 @@ import useRefState from "../useRefState";
 import { EvalSquareParam } from "@/reusable/types/evalSquareParamType";
 
 export const useCheckPawn = () => {
-  const {
-    evaluateSquare,
-    calculatePossibleMoves,
-    getSquareById,
-    getRowCol,
-    getLimits,
-  } = useBoardUtils();
+  const { evaluateSquare, calculatePossibleMoves, getSquareById, getRowCol, getLimits } =
+    useBoardUtils();
   const {
     selectedSquare,
     selectedPieceLegalMoves,
@@ -91,8 +86,7 @@ export const useCheckPawn = () => {
   };
   const handleIsEnPessant = (destination: number) => {
     if (getEnPessantMove() != destination) return;
-    const opponentPawn =
-      getPieceColor() === "w" ? destination + 8 : destination - 8;
+    const opponentPawn = getPieceColor() === "w" ? destination + 8 : destination - 8;
     setBoard((prevBoard) =>
       prevBoard.map((row) =>
         row.map((square) => {
@@ -115,7 +109,7 @@ export const useCheckPawn = () => {
   };
   const calculatePawn = (origin: number) => {
     const piece = getSquareById(origin).piece;
-    const [possibleMoves] = calculatePossibleMoves(origin, piece);
+    const [possibleMoves] = calculatePossibleMoves(origin, piece, true);
     setOrigin(origin);
     setPieceColor(piece.charAt(0));
 
@@ -151,7 +145,7 @@ export const useCheckPawn = () => {
     handleIsEnPessant(destination);
 
     const piece = getSquareById(getOrigin()).piece;
-    const [_, isCheck] = calculatePossibleMoves(destination, piece);
+    const [_, isCheck] = calculatePossibleMoves(destination, piece, false);
 
     setSelectedPieceLegalMoves([]);
     return true;

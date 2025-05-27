@@ -110,7 +110,7 @@ body {
     @apply flex;
   }
   .square {
-    @apply aspect-square flex-1;
+    @apply aspect-square min-h-[100px] flex-1;
   }
   .square.green {
     @apply bg-dark-green;

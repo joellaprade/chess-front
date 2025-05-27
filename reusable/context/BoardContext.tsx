@@ -15,8 +15,9 @@ type BoardContextType = {
   showQueenPopup: boolean;
   isWhiteTurn: boolean;
   upgradingPawn: number | null;
-  getIsAimingAtKing: () => number[];
-  setIsAimingAtKing: (newValue: number[], path?: string) => void;
+
+  getPinData: () => [any];
+  setPinData: (newValue: [any], path?: string) => void;
   getHasRookMove: () => any;
   setHasRookMove: (newValue: any, path?: string) => void;
   setBoard: React.Dispatch<React.SetStateAction<Board>>;
@@ -38,9 +39,7 @@ export const useBoardContext = () => {
   return context;
 };
 
-export const BoardContextProvider = ({
-  children,
-}: BoardContextProviderProps) => {
+export const BoardContextProvider = ({ children }: BoardContextProviderProps) => {
   const defaultBoard = [
     [
       // 8
@@ -133,9 +132,7 @@ export const BoardContextProvider = ({
   ];
   const [board, setBoard] = useState<Board>(defaultBoard);
   const [selectedSquare, setSelectedSquare] = useState<number | null>(null);
-  const [selectedPieceLegalMoves, setSelectedPieceLegalMoves] = useState<
-    number[]
-  >([]);
+  const [selectedPieceLegalMoves, setSelectedPieceLegalMoves] = useState<number[]>([]);
   const [showQueenPopup, setShowQueenPopup] = useState(false);
   const [isWhiteTurn, setIsWhiteTurn] = useState(true);
   const [upgradingPawn, setUpgradingPawn] = useState<number | null>(null);
@@ -151,7 +148,7 @@ export const BoardContextProvider = ({
       right: false,
     },
   });
-  const [getIsAimingAtKing, setIsAimingAtKing] = useRefState<number[]>([]);
+  const [getPinData, setPinData] = useRefState([]);
 
   return (
     <BoardContext.Provider
@@ -170,8 +167,8 @@ export const BoardContextProvider = ({
         setShowQueenPopup,
         setIsWhiteTurn,
         setUpgradingPawn,
-        getIsAimingAtKing,
-        setIsAimingAtKing,
+        getPinData,
+        setPinData,
       }}
     >
       {children}

@@ -1,13 +1,7 @@
-poner logica de knight en evalSquare y correrla condicionalmente
-
-que tipos de ocdigo tenemos en eval?
-para validar squares
-para detectar extras (isAttacked, isCheck, aimingAtKing, )
-
-infos que ocupo 100% del tiempo:
-INFO 1
-
-
+excepciones en pines:
+si pineo a un pawn, y ponen un pawn diagonalmente al frente del primer pawn (2 piezas no es pin)
+si me comen el pinning attacker
+si atacante se bloquea a si mismo
 
 
 
@@ -31,3 +25,46 @@ como check si es check:
       I. si en checkIsCheck evaluo que estoy apuntando al rey, agregar un array conteniendo el origen del atacante y origen de la pieza pineada
       II. cuando este en calcMoves, reviso que el origen de mi pieza != pinned[1] 
 )
+
+
+utilizar eval y encapsularlo en checkIsCheck, 
+esta func va hacer lo que ya estaba haciendo, 
+pero ademas, va a limpiar el array de pieza apuntando y las va a recalcular
+
+
+
+
+
+  3. si mover una pieza (w/b) seria check
+    a. tener una lista de piezas apuntando al rey
+      I. si en checkIsCheck evaluo que estoy apuntando al rey, agregar un array conteniendo el origen del atacante y origen de la pieza pineada
+      II. cuando este en calcMoves, reviso que el origen de mi pieza != pinned[1] 
+    b. simular el move y evaluar
+
+
+
+    
+
+
+
+
+
+cuando este calcuando POSSIBLE_MOVES de x pieza, ver si en alguno de los squares, square.piece.charAt(1) == K
+
+QUien puede pin?
+Rook, bishop, queen
+No horse, pawn, king, 
+
+entonces solo pueden pinearme diagonal o perpendicularmente. 
+en ese caso, veo si el ataque es diagonal o perpendicular y por logica, decidir donde me podria mover y aun bloquear, y donde expondria al ray
+
+usar direction para determinar que caso aplicar (los casos siendo si me puedo mover horizontal, vertical o diagonalmente)
+
+si un bishop me esta pineando y su linea de ataque es br, yo solo me puedo mover tl o br (pq tr por ejemplo abriria la diagonal)
+
+[
+  33: {
+    pinning: 51,
+    direction: "bl",
+    
+}]

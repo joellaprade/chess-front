@@ -6,13 +6,12 @@ import useRefState from "../useRefState";
 
 export const useCheckQueen = () => {
   const { calculatePossibleMoves, getSquareById } = useBoardUtils();
-  const { selectedPieceLegalMoves, setSelectedPieceLegalMoves } =
-    useBoardContext();
+  const { selectedPieceLegalMoves, setSelectedPieceLegalMoves } = useBoardContext();
   const [getOrigin, setOrigin] = useRefState(null);
 
   const calculateQueen = (origin: number) => {
     const piece = getSquareById(origin).piece;
-    const [possibleMoves] = calculatePossibleMoves(origin, piece);
+    const [possibleMoves] = calculatePossibleMoves(origin, piece, true);
     setOrigin(origin);
 
     return possibleMoves;
@@ -22,7 +21,7 @@ export const useCheckQueen = () => {
     if (!isValid) return false;
 
     const piece = getSquareById(getOrigin()).piece;
-    const [_, isCheck] = calculatePossibleMoves(destination, piece);
+    const [_, isCheck] = calculatePossibleMoves(destination, piece, false);
 
     setSelectedPieceLegalMoves([]);
     return true;

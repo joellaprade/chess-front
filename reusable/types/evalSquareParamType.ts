@@ -9,6 +9,8 @@ export type EvalSquareParam = {
   piece: string;
   isCheck: boolean;
   isAttacked: boolean;
+  isPin: boolean;
+  isCalcMoves: boolean;
   possibleMoves: number[];
   recursionLayer: number;
   extras?: Record<string, any>;

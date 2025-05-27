@@ -14,11 +14,7 @@ export const useCheckKing = () => {
     getPerpendiculars,
     getMoveByDirection,
   } = useBoardUtils();
-  const {
-    selectedPieceLegalMoves,
-    setSelectedPieceLegalMoves,
-    getHasRookMove,
-  } = useBoardContext();
+  const { selectedPieceLegalMoves, setSelectedPieceLegalMoves, getHasRookMove } = useBoardContext();
   const [getOrigin, setOrigin] = useRefState(null);
   const [getHasKingMoved, setHasKingMoved] = useRefState({
     white: false,
@@ -74,7 +70,7 @@ export const useCheckKing = () => {
   };
   const calculateKing = (origin: number) => {
     const piece = getSquareById(origin).piece;
-    let [possibleMoves] = calculatePossibleMoves(origin, piece);
+    let [possibleMoves] = calculatePossibleMoves(origin, piece, true);
     setOrigin(origin);
     const castleMoves = calculateCastle();
     possibleMoves.push(...castleMoves);

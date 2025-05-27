@@ -7,12 +7,8 @@ import useRefState from "../useRefState";
 
 export const useCheckRook = () => {
   const { getSquareById, calculatePossibleMoves } = useBoardUtils();
-  const {
-    selectedPieceLegalMoves,
-    setSelectedPieceLegalMoves,
-    getHasRookMove,
-    setHasRookMove,
-  } = useBoardContext();
+  const { selectedPieceLegalMoves, setSelectedPieceLegalMoves, getHasRookMove, setHasRookMove } =
+    useBoardContext();
 
   const [getOrigin, setOrigin] = useRefState(NaN);
 
@@ -42,7 +38,7 @@ export const useCheckRook = () => {
   };
   const calculateRook = (origin: number) => {
     const piece = getSquareById(origin).piece;
-    const [possibleMoves] = calculatePossibleMoves(origin, piece);
+    const [possibleMoves] = calculatePossibleMoves(origin, piece, true);
     setOrigin(origin);
 
     return possibleMoves;
@@ -52,7 +48,7 @@ export const useCheckRook = () => {
     if (!isValid) return false;
 
     const piece = getSquareById(getOrigin()).piece;
-    const [_, isCheck] = calculatePossibleMoves(destination, piece);
+    const [_, isCheck] = calculatePossibleMoves(destination, piece, false);
 
     setSelectedPieceLegalMoves([]);
     checkHasMoved(piece);

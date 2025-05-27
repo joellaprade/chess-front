@@ -1,80 +1,9 @@
-revisar desde
- else if (recursionLayer == 1) 
-para ver que enciende isAttacked
+en evaluateIsBeingAttacked, para determinar si rey A puede moverse a x square, reviso si pieza (rey) B comparte diagonal
+esto resulta en el rey A siendo calculado como una reina (por que erroneamente se asume que rey A y B no pueden compartir diagonal)
+
+pawn aun no sirve en evaluateIsBeingAttacked
+
 
 
 no sirve  castle
 white knght en square 0 sirve pero sus indicadores no
-
-
-
-
-
-
-
-
-utilizar eval y encapsularlo en checkIsCheck, esta func va hacer lo que ya estaba haciendo, pero ademas, va a limpiar el array de pieza apuntando y las va a recalcular
-
-
-
-
-
-
-
-
-
-cuando este calcuando POSSIBLE_MOVES de x pieza, ver si en alguno de los squares, square.piece.charAt(1) == K
-
-QUien puede pin?
-Rook, bishop, queen
-No horse, pawn, king, 
-
-entonces solo pueden pinearme diagonal o perpendicularmente. 
-en ese caso, veo si el ataque es diagonal o perpendicular y por logica, decidir donde me podria mover y aun bloquear, y donde expondria al ray
-
-usar direction para determinar que caso aplicar (los casos siendo si me puedo mover horizontal, vertical o diagonalmente)
-
-si un bishop me esta pineando y su linea de ataque es br, yo solo me puedo mover tl o br (pq tr por ejemplo abriria la diagonal)
-
-[
-  33: {
-    pinning: 51,
-    direction: "bl",
-    
-}]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-(
-  1. enemigo me hace check
-    a. revisar en validateMove de enemigo
-      I. una ves que se haya validado, realizar otro calcAllOrientations pero sin agregar squares a possibleSquares
-    b. revisar desde pov del rey tras validateMove del enemigo
-      I. en cada move, evaluar isCheck para ambos reyes
-      II. reviso infinitamente en diagonal, perpendicular y Ls (caballo)
-      III. evaluo si hay piezas apuntando pero sin atacar
-  2. si el square al que me voy a mover seria check
-    a. tener lista de squares bajo ataque
-      I. obj de array. El obj contiene key/values donde el key es
-       el index del square del atacante y sus values son los squares atacados
-      II. cuando voy a mover el rey, revisar que destination NO este entre esos squares
-    b. escanear squares en validateMove del rey
-      I. ya tendriamos la func y ponemos destination en checkIsCheck
-  3. si mover una pieza (w/b) seria check
-    a. tener una lista de piezas apuntando al rey
-      I. si en checkIsCheck evaluo que estoy apuntando al rey, agregar un array conteniendo el origen del atacante y origen de la pieza pineada
-      II. cuando este en calcMoves, reviso que el origen de mi pieza != pinned[1] 
-    b. simular el move y evaluar
-)

@@ -6,14 +6,13 @@ import useRefState from "../useRefState";
 
 export const useCheckBishop = () => {
   const { calculatePossibleMoves, getSquareById } = useBoardUtils();
-  const { selectedPieceLegalMoves, setSelectedPieceLegalMoves } =
-    useBoardContext();
+  const { selectedPieceLegalMoves, setSelectedPieceLegalMoves } = useBoardContext();
 
   const [getOrigin, setOrigin] = useRefState(null);
 
   const calculateBishop = (origin: number) => {
     const piece = getSquareById(origin).piece;
-    const [possibleMoves] = calculatePossibleMoves(origin, piece);
+    const [possibleMoves] = calculatePossibleMoves(origin, piece, true);
     setOrigin(origin);
 
     return possibleMoves;
@@ -23,7 +22,7 @@ export const useCheckBishop = () => {
     if (!isValid) return false;
 
     const piece = getSquareById(getOrigin()).piece;
-    const [_, isCheck] = calculatePossibleMoves(destination, piece);
+    const [_, isCheck] = calculatePossibleMoves(destination, piece, false);
 
     setSelectedPieceLegalMoves([]);
     return true;
