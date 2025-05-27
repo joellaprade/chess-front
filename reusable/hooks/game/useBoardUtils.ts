@@ -8,6 +8,7 @@ import { EvalSquareParam } from "@/reusable/types/evalSquareParamType";
 export const useBoardUtils = () => {
   const { board, setSelectedPieceLegalMoves, getPinData, setPinData } = useBoardContext();
 
+  // GETTERS & UTILS
   const getSquareById = (index: number) => {
     const row = Math.floor(index / 8);
     const rowSquare = index - row * 8;
@@ -229,6 +230,15 @@ export const useBoardUtils = () => {
 
     return isAttacked;
   };
+  const validateMoveUnderPin = (pinDirection: string, direction: string) => {
+    let directions: string[] = [];
+    if (["top", "bottom"].includes(pinDirection)) directions = ["top", "bottom"];
+    else if (["left", "right"].includes(pinDirection)) directions = ["left", "right"];
+    else if (["tr", "bl"].includes(pinDirection)) directions = ["tr", "bl"];
+    else if (["tl", "br"].includes(pinDirection)) directions = ["tl", "br"];
+    if (!directions.includes(direction)) return false;
+    return true;
+  };
   const runChecks = (
     destSquare: {
       id: number;
@@ -276,7 +286,6 @@ export const useBoardUtils = () => {
     isAttacked: boolean,
     origin: number,
     extras: any,
-    isBlocked: Record<Direction, boolean>,
     direction: Direction,
   ): boolean => {
     // Si la pieza bloqueando es del mismo color, retorna para NO agregarla a possible moves
@@ -297,8 +306,14 @@ export const useBoardUtils = () => {
     // Reglas de rey
     if (piece.charAt(1) === "K" && isAttacked) return false;
 
-    const pinnedOrigins = getPinData().map((pinData) => pinData.pinned);
-    if (pinnedOrigins.includes(origin)) return false;
+    const pinData = getPinData();
+
+    for (let i = 0; i < pinData.length; i++) {
+      if (pinData[i].pinned == origin)
+        if (!validateMoveUnderPin(pinData[i].direction, direction)) {
+          return false;
+        }
+    }
 
     return true;
   };
@@ -312,6 +327,10 @@ export const useBoardUtils = () => {
     let i = 0;
     while (!reachedLimit) {
       const destination = getMoveByDirection(origin, i, coinsidingLimit.direction);
+      if (destination < 0 || destination > 63) {
+        reachedLimit = true;
+        continue;
+      }
       const destSquare = getSquareById(destination);
       if (destSquare.piece != "" && destSquare.piece.charAt(1) != "K") {
         blockingPieceSquare = destSquare.id;
@@ -328,11 +347,16 @@ export const useBoardUtils = () => {
   };
   const cleanPinnedPieces = (isCalcMoves: boolean) => {
     isCalcMoves &&
-      getPinData().forEach((pinData, i) => {
+      getPinData().map((pinData, i) => {
+        const coinsidingLimit = { direction: pinData.direction, limit: pinData.limit };
+        const [blockingPiecesCount] = countBlockingPieces(coinsidingLimit, pinData.attacker);
         const attackerOldSquare = getSquareById(pinData.attacker);
 
+        if (blockingPiecesCount > 1) {
+          pinData.pinned = undefined;
+        }
+
         if (attackerOldSquare.piece == "") {
-          console.log(attackerOldSquare);
           let pinnedPieces = getPinData();
           pinnedPieces.splice(i, 1);
           setPinData(pinnedPieces);
@@ -367,15 +391,18 @@ export const useBoardUtils = () => {
     const aDLimits = getDiagonals(origin, aRow, aCol);
     const aLimits: Record<string, number> = { ...aPLimits, ...aDLimits };
 
+    const descendingDirections = ["top", "left", "tr", "tl"];
+    const ascendingDirections = ["bottom", "right", "br", "bl"];
+    let directions = origin > destSquare.id ? descendingDirections : ascendingDirections;
     let pinData:
       | { direction: Direction; limit: number; attacker: number; pinned: number | undefined }
       | undefined;
 
     // Reviso si rey y atacante comparten row, col o diag
-    (["top", "left", "tr", "tl"] as Direction[]).forEach((direction) => {
+    directions.forEach((direction) => {
       if (kLimits[direction] == aLimits[direction]) {
         pinData = {
-          direction,
+          direction: direction as Direction,
           limit: kLimits[direction],
           attacker: origin,
           pinned: undefined,
@@ -391,14 +418,11 @@ export const useBoardUtils = () => {
           if (pinData) isAttackerRepeated = compareObjects(piece, pinData);
         });
 
-        // Reviso todos los attackingSquares y veo si hay uno invalido
-
         // Decide si incluir coinsidingLimit
         if (blockingPiecesCount == 1 && !isAttackerRepeated) {
           const pinnedPieces = getPinData();
           pinnedPieces.push(pinData);
           setPinData(pinnedPieces);
-          console.log(origin, getPinData());
 
           return pinData;
         }
@@ -453,15 +477,7 @@ export const useBoardUtils = () => {
       isBlocked,
       direction,
     );
-    const isValid = runValidations(
-      destSquare,
-      piece,
-      isAttacked,
-      origin,
-      extras,
-      isBlocked,
-      direction,
-    );
+    const isValid = runValidations(destSquare, piece, isAttacked, origin, extras, direction);
 
     if (!isValid) return [possibleMoves, isCheck, isAttacked, isPin];
 
@@ -548,8 +564,6 @@ export const useBoardUtils = () => {
         possibleMoves.splice(invI, 1);
       if (destSquare.piece.includes("K")) isCheck = true;
     }
-
-    console.log(isCalcMoves);
 
     cleanPinnedPieces(isCalcMoves);
 

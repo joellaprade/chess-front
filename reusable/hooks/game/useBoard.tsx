@@ -15,14 +15,14 @@ const useBoard = () => {
     setBoard,
     setSelectedSquare,
     setSelectedPieceLegalMoves,
-
   } = useBoardContext();
   const { calculateLegalMoves, validateMove, handleWrongMove } = useCheckMove();
   const { getSquareById } = useBoardUtils();
 
   const colorLegalSquares = (id: number) => {
-    if (!selectedSquare) return "";
+    if (selectedSquare != 0 && !selectedSquare) return "";
     if (selectedPieceLegalMoves.includes(id)) return "valid-square-indicator";
+    return "";
   };
   const handleMove = (movingPiece: string, destination: number) => {
     setBoard((prevBoard) =>
@@ -51,8 +51,7 @@ const useBoard = () => {
   };
   const getColor = (id: number) => {
     let row = Math.floor(id / 8);
-    let [evenColor, oddColor] =
-      row % 2 == 0 ? ["white", "green"] : ["green", "white"];
+    let [evenColor, oddColor] = row % 2 == 0 ? ["white", "green"] : ["green", "white"];
     let color = id % 2 == 0 ? evenColor : oddColor;
 
     color = selectedSquare == id ? "yellow" : color;
@@ -74,12 +73,7 @@ const useBoard = () => {
   };
   const renderQueenPopup = () => {
     return (
-      showQueenPopup && (
-        <QueenPopup
-          color={isWhiteTurn ? "w" : "b"}
-          destination={upgradingPawn!}
-        />
-      )
+      showQueenPopup && <QueenPopup color={isWhiteTurn ? "w" : "b"} destination={upgradingPawn!} />
     );
   };
 

@@ -15,8 +15,7 @@ export const useCheckMove = () => {
   const { calculateKnight, validateKnight } = useCheckKnight();
   const { calculateQueen, validateQueen } = useCheckQueen();
   const { calculateKing, validateKing } = useCheckKing();
-  const { calculatePawn, validatePawn, getEnPessant, setDoubleSquarePawn } =
-    useCheckPawn();
+  const { calculatePawn, validatePawn, getEnPessant, setDoubleSquarePawn } = useCheckPawn();
 
   const calculateLegalMoves = (origin: number) => {
     const piece = getSquareById(origin).piece.charAt(1);

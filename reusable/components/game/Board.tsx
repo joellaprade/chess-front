@@ -6,8 +6,7 @@ import Image from "next/image";
 
 const Board = ({ isBlack }: { isBlack: boolean }) => {
   const { board } = useBoardContext();
-  const { getColor, handlePieceClick, colorLegalSquares, renderQueenPopup } =
-    useBoard();
+  const { getColor, handlePieceClick, colorLegalSquares, renderQueenPopup } = useBoard();
 
   const renderBoard = () => {
     const finalBoard = !isBlack
@@ -27,12 +26,7 @@ const Board = ({ isBlack }: { isBlack: boolean }) => {
           >
             <span className="absolute">{square.id}</span>
             {square.piece && (
-              <Image
-                src={`/assets/pieces/${square.piece}.png`}
-                width={100}
-                height={100}
-                alt=""
-              />
+              <Image src={`/assets/pieces/${square.piece}.png`} width={100} height={100} alt="" />
             )}
           </div>
         ))}
