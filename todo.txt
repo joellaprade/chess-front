@@ -1,12 +1,2 @@
 
-tengo funcion que calcula si atacante esta pineando 
-(por ejemplo, si muevo mi reina para pinear un peon)
-
-ahora, hacer func para ver si defendiente esta pineado
-(si la reina le hace check a mi rey y defiendo con un caballo)
-
-
-
-
-
-no sirve  castle
+implementar isDefendantPinned

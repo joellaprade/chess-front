@@ -10,7 +10,6 @@ export const useCheckPawn = () => {
   const { evaluateSquare, calculatePossibleMoves, getSquareById, getRowCol, getLimits } =
     useBoardUtils();
   const {
-    selectedSquare,
     selectedPieceLegalMoves,
     setBoard,
     setShowQueenPopup,

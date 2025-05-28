@@ -137,6 +137,7 @@ export const useBoardUtils = () => {
   const compareObjects = (a: Record<any, any>, b: Record<any, any>) => {
     return JSON.stringify(a) == JSON.stringify(b);
   };
+  // Calcs
   const calculateIsSquareBeingAttacked = (destination: number, piece: string) => {
     const directions = getDirectionByPiece(piece);
     const isLimit = getLimits(destination, piece);
@@ -308,10 +309,9 @@ export const useBoardUtils = () => {
     if (piece.charAt(1) === "K" && isAttacked) return false;
 
     const pinData = getPinData();
-
     for (let i = 0; i < pinData.length; i++) {
       const pd = pinData[i];
-      if (!pd.isPinBlocked && pd.pinned == origin)
+      if (!pd.isPinBlocked && pd.defendant == origin)
         if (!validateMoveUnderPin(pd.direction, direction)) {
           return false;
         }
@@ -353,10 +353,14 @@ export const useBoardUtils = () => {
         const coinsidingLimit = { direction: pinData.direction, limit: pinData.limit };
         const [blockingPiecesCount] = countBlockingPieces(coinsidingLimit, pinData.attacker);
         const attackerOldSquare = getSquareById(pinData.attacker);
+        const attackerColorInitial = attackerOldSquare.piece.charAt(0);
+        const defendantColorInitial = pinData.defendant
+          ? getSquareById(pinData.defendant).piece.charAt(0)
+          : null;
 
         pinData.isPinBlocked = blockingPiecesCount > 1;
 
-        if (attackerOldSquare.piece == "") {
+        if (attackerOldSquare.piece == "" || attackerColorInitial == defendantColorInitial) {
           let pinnedPieces = getPinData();
           pinnedPieces.splice(i, 1);
           setPinData(pinnedPieces);
@@ -364,6 +368,7 @@ export const useBoardUtils = () => {
       });
   };
   const checkIsAttackerPinning = (
+    // origin de attacker, dest es del rey
     origin: number,
     destSquare: {
       id: number;
@@ -375,8 +380,8 @@ export const useBoardUtils = () => {
   ) => {
     if (
       !destSquare.piece.includes("K") ||
-      destSquare.piece.charAt(0) == piece.charAt(0) ||
-      !isBlocked
+      destSquare.piece.charAt(0) == piece.charAt(0)
+      // !isBlocked
     )
       return undefined;
     // contar cantidad de piezas para ver si efectivamente esta pineando
@@ -403,13 +408,15 @@ export const useBoardUtils = () => {
           direction: direction as Direction,
           limit: kLimits[direction],
           attacker: origin,
-          pinned: undefined,
+          defendant: undefined,
+          king: destSquare.id,
           isPinBlocked: false,
+          isCheck: !isBlocked,
         };
 
         // Se cuentan piezas bloqueando
         let [blockingPiecesCount, blockingPieceSquare] = countBlockingPieces(pinData, origin);
-        pinData.pinned = blockingPieceSquare;
+        pinData.defendant = blockingPieceSquare;
 
         // Se asegura que no se dupliquen los registros cuando selecciono una pieza
         let isAttackerRepeated = false;
@@ -418,7 +425,7 @@ export const useBoardUtils = () => {
         });
 
         // Decide si incluir coinsidingLimit
-        if (blockingPiecesCount == 1 && !isAttackerRepeated) {
+        if (blockingPiecesCount < 2 && !isAttackerRepeated) {
           const pinnedPieces = getPinData();
           pinnedPieces.push(pinData);
           setPinData(pinnedPieces);
@@ -429,6 +436,18 @@ export const useBoardUtils = () => {
     });
 
     return pinData;
+  };
+  const checkIsDefendantPinned = (
+    // origin de attacker, dest es del rey
+    isBlocked: boolean,
+  ) => {
+    getPinData().forEach((pinData) => {
+      if (pinData.isCheck) {
+        const attackerSquare = getSquareById(pinData.attacker);
+        const kingSquare = getSquareById(pinData.king);
+        checkIsAttackerPinning(pinData.attacker, kingSquare, attackerSquare.piece, isBlocked);
+      }
+    });
   };
   const evaluateSquare = ({
     isBlocked,
@@ -445,8 +464,6 @@ export const useBoardUtils = () => {
     recursionLayer,
     extras,
   }: EvalSquareParam): [number[], boolean, boolean, boolean] => {
-    // Revisar si no se comporta raro si me como a la pieza pinneando (atacante)
-
     const isIndexDecreacing = ["tr", "tl", "top", "left"].includes(direction);
     let move = getMoveByDirection(origin, i, direction);
     let limit = isLimit[direction] as number;
@@ -456,6 +473,7 @@ export const useBoardUtils = () => {
     // Evalua si el atacante esta viendo al rey
     const destSquare = getSquareById(move);
 
+    checkIsDefendantPinned(isBlocked[direction]);
     cleanPinnedPieces(isCalcMoves);
     checkIsAttackerPinning(origin, destSquare, piece, isBlocked[direction]);
 
@@ -566,7 +584,7 @@ export const useBoardUtils = () => {
 
     cleanPinnedPieces(isCalcMoves);
 
-    const pinnedOrigins = getPinData().map((pinData) => pinData.pinned);
+    const pinnedOrigins = getPinData().map((pinData) => pinData.defendant);
     if (pinnedOrigins.includes(origin)) possibleMoves = [];
 
     return [possibleMoves, isCheck];

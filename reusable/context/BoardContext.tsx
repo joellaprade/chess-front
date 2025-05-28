@@ -1,9 +1,8 @@
 "use client";
 
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { Board } from "../types/board";
 import useRefState from "../hooks/useRefState";
-import { Direction } from "../types/directions";
 import { PinData } from "@/reusable/types/pinData";
 
 type BoardContextProviderProps = {

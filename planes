@@ -1,72 +1,14 @@
 
-
-excepciones en pines:
-si pineo a un pawn, y ponen un pawn diagonalmente al frente del primer pawn (2 piezas no es pin)
-si me comen el pinning attacker
-si atacante se bloquea a si mismo
-
-
-
-
 KING PUEDE HACER DISCOVERED CHECK
 
-como check si es check:
-(
-  1. enemigo me hace check
-    a. revisar en validateMove de enemigo
-      I. validar move de enemigo
-      II. revisar si algun square.piece.contains("K")
-      III. revisar que el path no este bloqueado
-      IV. declarar check o agregar el nuevo square del enemigo + square de la pieza pineada
-  2. si el square al que me voy a mover seria check
-    a. escanear squares en validateMove del rey
-      I. con destination + checkIsCheck (que tomaria un square index y evaluaria row, col y diagonals)
-      II. seteamos isValid
-  3. si mover una pieza (w/b) seria check
-    a. tener una lista de piezas apuntando al rey
-      I. si en checkIsCheck evaluo que estoy apuntando al rey, agregar un array conteniendo el origen del atacante y origen de la pieza pineada
-      II. cuando este en calcMoves, reviso que el origen de mi pieza != pinned[1] 
-)
-
-
-utilizar eval y encapsularlo en checkIsCheck, 
-esta func va hacer lo que ya estaba haciendo, 
-pero ademas, va a limpiar el array de pieza apuntando y las va a recalcular
 
 
 
+excepciones en pines:
+si el defensor bloquea con su propia pieza
 
+tengo funcion que calcula si atacante esta pineando 
+(por ejemplo, si muevo mi reina para pinear un peon)
 
-  3. si mover una pieza (w/b) seria check
-    a. tener una lista de piezas apuntando al rey
-      I. si en checkIsCheck evaluo que estoy apuntando al rey, agregar un array conteniendo el origen del atacante y origen de la pieza pineada
-      II. cuando este en calcMoves, reviso que el origen de mi pieza != pinned[1] 
-    b. simular el move y evaluar
-
-
-
-    
-
-
-
-
-
-cuando este calcuando POSSIBLE_MOVES de x pieza, ver si en alguno de los squares, square.piece.charAt(1) == K
-
-QUien puede pin?
-Rook, bishop, queen
-No horse, pawn, king, 
-
-entonces solo pueden pinearme diagonal o perpendicularmente. 
-en ese caso, veo si el ataque es diagonal o perpendicular y por logica, decidir donde me podria mover y aun bloquear, y donde expondria al ray
-
-usar direction para determinar que caso aplicar (los casos siendo si me puedo mover horizontal, vertical o diagonalmente)
-
-si un bishop me esta pineando y su linea de ataque es br, yo solo me puedo mover tl o br (pq tr por ejemplo abriria la diagonal)
-
-[
-  33: {
-    pinning: 51,
-    direction: "bl",
-    
-}]
+ahora, hacer func para ver si defendiente esta pineado
+(si la reina le hace check a mi rey y defiendo con un caballo)

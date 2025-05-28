@@ -3,6 +3,8 @@ export type PinData = {
   direction: Direction;
   limit: number;
   attacker: number;
-  pinned: number | undefined;
+  defendant: number | undefined;
+  king: number;
   isPinBlocked: boolean;
+  isCheck: boolean;
 };

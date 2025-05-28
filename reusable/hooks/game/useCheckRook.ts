@@ -2,7 +2,6 @@
 
 import { useBoardContext } from "@/reusable/context/BoardContext";
 import { useBoardUtils } from "./useBoardUtils";
-import { PerpendicularDirection } from "@/reusable/types/directions";
 import useRefState from "../useRefState";
 
 export const useCheckRook = () => {
