@@ -384,6 +384,7 @@ export const useBoardUtils = () => {
       // !isBlocked
     )
       return undefined;
+
     // contar cantidad de piezas para ver si efectivamente esta pineando
     const kOrigin = destSquare.id;
     const [kRow, kCol] = getRowCol(kOrigin);
@@ -421,7 +422,9 @@ export const useBoardUtils = () => {
         // Se asegura que no se dupliquen los registros cuando selecciono una pieza
         let isAttackerRepeated = false;
         getPinData().forEach((piece) => {
-          if (pinData) isAttackerRepeated = compareObjects(piece, pinData);
+          if (pinData) {
+            isAttackerRepeated = compareObjects(piece, pinData);
+          }
         });
 
         // Decide si incluir coinsidingLimit
@@ -441,14 +444,16 @@ export const useBoardUtils = () => {
     // origin de attacker, dest es del rey
     isBlocked: boolean,
   ) => {
-    getPinData().forEach((pinData) => {
-      if (pinData.isCheck) {
-        const attackerSquare = getSquareById(pinData.attacker);
-        const kingSquare = getSquareById(pinData.king);
-        checkIsAttackerPinning(pinData.attacker, kingSquare, attackerSquare.piece, isBlocked);
+    const pinData = getPinData();
+    pinData.forEach((pin) => {
+      if (pin.isCheck) {
+        const attackerSquare = getSquareById(pin.attacker);
+        const kingSquare = getSquareById(pin.king);
+        checkIsAttackerPinning(pin.attacker, kingSquare, attackerSquare.piece, isBlocked);
       }
     });
   };
+  // como agrego un pinData en checkIsAttacker, siempre hay un bro mas para agregar
   const evaluateSquare = ({
     isBlocked,
     direction,
@@ -473,9 +478,11 @@ export const useBoardUtils = () => {
     // Evalua si el atacante esta viendo al rey
     const destSquare = getSquareById(move);
 
-    checkIsDefendantPinned(isBlocked[direction]);
-    cleanPinnedPieces(isCalcMoves);
-    checkIsAttackerPinning(origin, destSquare, piece, isBlocked[direction]);
+    if (piece.charAt(1) != "K") {
+      cleanPinnedPieces(isCalcMoves);
+      checkIsDefendantPinned(isBlocked[direction]);
+      checkIsAttackerPinning(origin, destSquare, piece, isBlocked[direction]);
+    }
 
     if (isPin) {
       return [possibleMoves, isCheck, isAttacked, isPin];

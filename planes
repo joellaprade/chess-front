@@ -1,14 +1,8 @@
 
 KING PUEDE HACER DISCOVERED CHECK
 
+de momento, evalMove corre como 100+ veces por calcPiece
+getPinnedData me devuelve un gran y repetido numero de registros, e incrementa cada evaluacion
+en la linea 312 puedo ver este fenomeno
 
-
-
-excepciones en pines:
-si el defensor bloquea con su propia pieza
-
-tengo funcion que calcula si atacante esta pineando 
-(por ejemplo, si muevo mi reina para pinear un peon)
-
-ahora, hacer func para ver si defendiente esta pineado
-(si la reina le hace check a mi rey y defiendo con un caballo)
+revisar en checkIsAttackerPinning por que me da falso la comparacon entre dos objs iguales
