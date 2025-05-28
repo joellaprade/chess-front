@@ -75,8 +75,8 @@ export const useCheckKing = () => {
     const kingSquare = getSquareById(origin);
     const pieceColorInitial = kingSquare.piece.charAt(0);
     const isWhite = pieceColorInitial == "w";
-    let rookDestination: number;
-    let kingDestination: number;
+    let rookDestination: number | undefined;
+    let kingDestination: number | undefined;
 
     if (isWhite) {
       if (getHasKingMoved().white) return false;
@@ -99,6 +99,8 @@ export const useCheckKing = () => {
         kingDestination = 6;
       }
     }
+
+    if (kingDestination == undefined) return false;
 
     setBoard((prevBoard) =>
       prevBoard.map((row) =>
@@ -123,6 +125,7 @@ export const useCheckKing = () => {
   };
   const validateKing = (destination: number) => {
     let isValid = selectedPieceLegalMoves.includes(destination);
+    if (!isValid) return false;
     isValid = !handleCastle(destination);
     if (!isValid) return false;
 

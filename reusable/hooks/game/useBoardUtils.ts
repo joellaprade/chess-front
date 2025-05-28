@@ -320,27 +320,31 @@ export const useBoardUtils = () => {
     return true;
   };
   const countBlockingPieces = (
-    coinsidingLimit: { direction: Direction; limit: number },
+    pinData: PinData,
     origin: number,
+    piece: string,
   ): [number, number | undefined] => {
     let blockingPiecesCount = 0;
     let blockingPieceSquare: number | undefined;
     let reachedLimit = false;
     let i = 0;
     while (!reachedLimit) {
-      const destination = getMoveByDirection(origin, i, coinsidingLimit.direction);
+      const destination = getMoveByDirection(origin, i, pinData.direction);
       if (destination < 0 || destination > 63) {
         reachedLimit = true;
         continue;
       }
       const destSquare = getSquareById(destination);
-      if (destSquare.piece != "" && destSquare.piece.charAt(1) != "K") {
+      if (
+        (origin != pinData.attacker || destSquare.piece != piece) &&
+        destSquare.piece != "" &&
+        destSquare.piece.charAt(1) != "K"
+      ) {
         blockingPieceSquare = destSquare.id;
         blockingPiecesCount++;
       }
 
-      if (destination == coinsidingLimit.limit || destSquare.piece.charAt(1) == "K")
-        reachedLimit = true;
+      if (destination == pinData.limit || destSquare.piece.charAt(1) == "K") reachedLimit = true;
 
       i++;
     }
@@ -351,7 +355,11 @@ export const useBoardUtils = () => {
     isCalcMoves &&
       getPinData().map((pinData, i) => {
         const coinsidingLimit = { direction: pinData.direction, limit: pinData.limit };
-        const [blockingPiecesCount] = countBlockingPieces(coinsidingLimit, pinData.attacker);
+        const [blockingPiecesCount] = countBlockingPieces(
+          coinsidingLimit as PinData,
+          pinData.attacker,
+          "",
+        );
         const attackerOldSquare = getSquareById(pinData.attacker);
         const attackerColorInitial = attackerOldSquare.piece.charAt(0);
         const defendantColorInitial = pinData.defendant
@@ -416,7 +424,11 @@ export const useBoardUtils = () => {
         };
 
         // Se cuentan piezas bloqueando
-        let [blockingPiecesCount, blockingPieceSquare] = countBlockingPieces(pinData, origin);
+        let [blockingPiecesCount, blockingPieceSquare] = countBlockingPieces(
+          pinData,
+          origin,
+          piece,
+        );
         pinData.defendant = blockingPieceSquare;
 
         // Se asegura que no se dupliquen los registros cuando selecciono una pieza

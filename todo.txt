@@ -1,2 +1,4 @@
 
+KING PUEDE HACER DISCOVERED CHECK
+
 implementar check y checkmate

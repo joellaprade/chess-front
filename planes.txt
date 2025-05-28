@@ -1,0 +1,12 @@
+
+
+cuando atacante logra un check
+tengo que revisar {
+  cual es la pieza atacante
+  cual diagonal / row / col esta atacando
+  (como evalIsBeingAttacked) reviso cada uno de los squares in between 
+    y veo si hay una pieza que pueda bloquear el ataque
+  agrego a pieza defensora a una lista global
+  cuando defensor seleccione piezas
+    revisar en evalSquare si isCheck && defensors.contains(square) ELSE return false
+}

@@ -1,8 +1,0 @@
-
-KING PUEDE HACER DISCOVERED CHECK
-
-de momento, evalMove corre como 100+ veces por calcPiece
-getPinnedData me devuelve un gran y repetido numero de registros, e incrementa cada evaluacion
-en la linea 312 puedo ver este fenomeno
-
-revisar en checkIsAttackerPinning por que me da falso la comparacon entre dos objs iguales
