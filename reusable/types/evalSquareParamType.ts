@@ -12,6 +12,7 @@ export type EvalSquareParam = {
   isPin: boolean;
   isCalcMoves: boolean;
   isEvaluatingDefense: boolean;
+  isEvaluatingCheck: boolean;
   possibleMoves: number[];
   recursionLayer: number;
   extras?: Record<string, any>;

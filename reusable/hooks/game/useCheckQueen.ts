@@ -5,7 +5,7 @@ import { useBoardContext } from "@/reusable/context/BoardContext";
 import useRefState from "../useRefState";
 
 export const useCheckQueen = () => {
-  const { calculatePossibleMoves, getSquareById } = useBoardUtils();
+  const { calculatePossibleMoves, getSquareById, checkIsCheckMate } = useBoardUtils();
   const { selectedPieceLegalMoves, setSelectedPieceLegalMoves } = useBoardContext();
   const [getOrigin, setOrigin] = useRefState(null);
 
@@ -23,6 +23,7 @@ export const useCheckQueen = () => {
     const piece = getSquareById(getOrigin()).piece;
     // hacer debug desde aqui y ver donde ocurre el recur de mier
     const [_, isCheck] = calculatePossibleMoves(destination, piece, false, false);
+    if (isCheck) checkIsCheckMate(piece);
 
     setSelectedPieceLegalMoves([]);
     return true;
