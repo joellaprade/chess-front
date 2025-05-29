@@ -11,7 +11,7 @@ export const useCheckQueen = () => {
 
   const calculateQueen = (origin: number) => {
     const piece = getSquareById(origin).piece;
-    const [possibleMoves] = calculatePossibleMoves(origin, piece, true, false);
+    const [possibleMoves] = calculatePossibleMoves(origin, piece, true, false, false);
     setOrigin(origin);
 
     return possibleMoves;
@@ -22,7 +22,7 @@ export const useCheckQueen = () => {
 
     const piece = getSquareById(getOrigin()).piece;
     // hacer debug desde aqui y ver donde ocurre el recur de mier
-    const [_, isCheck] = calculatePossibleMoves(destination, piece, false, false);
+    const [_, isCheck] = calculatePossibleMoves(destination, piece, false, false, false);
     if (isCheck) checkIsCheckMate(piece);
 
     setSelectedPieceLegalMoves([]);
