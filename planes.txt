@@ -1,4 +1,9 @@
 
+checkPossibleDefenses - 14
+for - 98
+
+
+
 
 cuando atacante logra un check
 tengo que revisar {

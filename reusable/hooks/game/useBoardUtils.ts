@@ -363,7 +363,6 @@ export const useBoardUtils = () => {
       isCheck: !isBlocked,
       isPin: undefined,
     };
-
     // Se cuentan piezas bloqueando
     let [blockingPiecesCount, blockingPieceSquare] = countBlockingPieces(attackData, origin, piece);
     attackData.defendant = blockingPieceSquare;
@@ -590,7 +589,6 @@ export const useBoardUtils = () => {
 
     // Revisar estados de ataques
     const attackData = getAttackData();
-    console.log("ran");
     for (let i = 0; i < attackData.length; i++) {
       const pd = attackData[i];
 
@@ -602,9 +600,9 @@ export const useBoardUtils = () => {
       }
 
       // Revisar si el color de esta pieza esta en check
-      const defenseData = getDefenseData();
 
-      if (pd.isCheck && pd.attackerColor != piece.charAt(0)) {
+      if (pd.isCheck && pd.attackerColor != piece.charAt(0) && piece.charAt(1) !== "K") {
+        const defenseData = getDefenseData();
         let canDefend = false;
 
         for (let i = 0; i < defenseData.length; i++) {
@@ -638,6 +636,7 @@ export const useBoardUtils = () => {
   }: EvalSquareParam): [number[], boolean, boolean, boolean] => {
     const isIndexDecreacing = ["tr", "tl", "top", "left"].includes(direction);
     let move = getMoveByDirection(origin, i, direction);
+
     let limit = isLimit[direction] as number;
     // Calcula que el move siendo calculado este dentro del tablero
     if (isIndexDecreacing && move < limit) return [possibleMoves, isCheck, isAttacked, isPin];
@@ -648,7 +647,6 @@ export const useBoardUtils = () => {
     if (piece.charAt(1) != "K" && !isEvaluatingDefense && !isEvaluatingCheck) {
       isCalcMoves && cleanPinnedPieces();
       isCalcMoves && checkIsDefendantPinned(isBlocked[direction]);
-      isCalcMoves && checkCanDefend(piece);
       checkIsAttackerPinning(origin, destSquare, piece, isBlocked[direction]);
     }
 
@@ -684,6 +682,7 @@ export const useBoardUtils = () => {
     piece: string,
     isCalcMoves: boolean,
     isEvaluatingDefense: boolean,
+    isEvaluatingCheck: boolean,
   ): [number[], boolean, boolean] => {
     const directions = getDirectionByPiece(piece);
     const isLimit = getLimits(origin, piece);
@@ -703,6 +702,11 @@ export const useBoardUtils = () => {
       bl: false,
     };
     let temp;
+
+    if (piece.charAt(1) != "K" && !isEvaluatingDefense && !isEvaluatingCheck) {
+      isCalcMoves && checkCanDefend(piece);
+    }
+
     for (let i = 0; i < loops; i++) {
       directions.forEach((direction) => {
         [possibleMoves, isCheck, temp] = evaluateSquare({
@@ -717,6 +721,7 @@ export const useBoardUtils = () => {
           isPin,
           isCalcMoves,
           isEvaluatingDefense,
+          isEvaluatingCheck,
           recursionLayer: 0,
           possibleMoves,
         });
@@ -753,6 +758,16 @@ export const useBoardUtils = () => {
     if (col <= 6 && row <= 5) possibleMoves.push(origin + 17);
 
     cleanPinnedPieces();
+    canDefend = isCalcMoves && checkCanDefend(piece);
+    let isInCheck = false;
+    getAttackData().forEach((attackData) => {
+      if (
+        attackData.isCheck &&
+        piece.charAt(0) != getSquareById(attackData.attacker).piece.charAt(0)
+      )
+        isInCheck = true;
+    });
+
     const movesLength = possibleMoves.length;
     for (let i = 0; i < movesLength; i++) {
       const invI = movesLength - 1 - i;
@@ -773,14 +788,15 @@ export const useBoardUtils = () => {
         possibleMoves.splice(invI, 1);
       if (destSquare.piece.includes("K")) isCheck = true;
 
-      canDefend = !isEvaluatingDefense && isCalcMoves && checkCanDefend(piece);
-      if (canDefend) {
+      if (!canDefend && isInCheck) {
         const defenseData = getDefenseData().map((def) => def.id);
         if (!defenseData.includes(possibleMoves[invI])) {
           possibleMoves.splice(invI, 1);
         }
       }
     }
+
+    if (isCalcMoves) console.log(getAttackData());
 
     const pinnedOrigins = getAttackData().map((attackData) => attackData.defendant);
     if (pinnedOrigins.includes(origin)) possibleMoves = [];
@@ -792,6 +808,7 @@ export const useBoardUtils = () => {
     piece: string,
     isCalcMoves: boolean,
     isEvaluatingDefense: boolean,
+    isEvaluatingCheck: boolean,
   ): [number[], boolean] => {
     let possibleMoves: number[] = [];
     let isCheck: boolean = false;
@@ -804,6 +821,7 @@ export const useBoardUtils = () => {
           piece,
           isCalcMoves,
           isEvaluatingDefense,
+          isEvaluatingCheck,
         );
         break;
       case "R":
@@ -812,6 +830,7 @@ export const useBoardUtils = () => {
           piece,
           isCalcMoves,
           isEvaluatingDefense,
+          isEvaluatingCheck,
         );
         break;
       case "Q":
@@ -820,6 +839,7 @@ export const useBoardUtils = () => {
           piece,
           isCalcMoves,
           isEvaluatingDefense,
+          isEvaluatingCheck,
         );
         break;
       case "K":
@@ -828,10 +848,17 @@ export const useBoardUtils = () => {
           piece,
           isCalcMoves,
           isEvaluatingDefense,
+          isEvaluatingCheck,
         );
         break;
       case "N":
-        [possibleMoves, isCheck] = calculateKnight(origin, piece, isCalcMoves, isEvaluatingDefense);
+        [possibleMoves, isCheck] = calculateKnight(
+          origin,
+          piece,
+          isCalcMoves,
+          isEvaluatingDefense,
+          isEvaluatingCheck,
+        );
         break;
       case "P":
         [possibleMoves, isCheck] = calculateLinearMoves(
@@ -839,6 +866,7 @@ export const useBoardUtils = () => {
           piece,
           isCalcMoves,
           isEvaluatingDefense,
+          isEvaluatingCheck,
         );
         break;
     }
@@ -856,7 +884,6 @@ export const useBoardUtils = () => {
       }
     });
 
-    // console.log(canDefend);
     return canDefend;
   };
 
