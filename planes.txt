@@ -10,3 +10,6 @@ tengo que revisar {
   cuando defensor seleccione piezas
     revisar en evalSquare si isCheck && defensors.contains(square) ELSE return false
 }
+
+
+en evalIsBeingAttacked, cuando verifico la pieza y si esta atacando, agregar destSquare (q contiene piece y origin) 

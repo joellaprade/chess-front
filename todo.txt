@@ -1,4 +1,12 @@
 
 KING PUEDE HACER DISCOVERED CHECK
 
+agregar pawn special moves a engine para calcular defenses
+
+gestionar duplicados al correr calcHorse y agregar defendants
+
 implementar check y checkmate
+
+
+si siempre fuese necesario verificar check con calcPossibleMoves, esa llamada termina en un loop recursivo
+poner indicador para evitar llamados a recursion como canDefend

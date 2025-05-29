@@ -11,7 +11,7 @@ export const useCheckQueen = () => {
 
   const calculateQueen = (origin: number) => {
     const piece = getSquareById(origin).piece;
-    const [possibleMoves] = calculatePossibleMoves(origin, piece, true);
+    const [possibleMoves] = calculatePossibleMoves(origin, piece, true, false);
     setOrigin(origin);
 
     return possibleMoves;
@@ -21,7 +21,8 @@ export const useCheckQueen = () => {
     if (!isValid) return false;
 
     const piece = getSquareById(getOrigin()).piece;
-    const [_, isCheck] = calculatePossibleMoves(destination, piece, false);
+    // hacer debug desde aqui y ver donde ocurre el recur de mier
+    const [_, isCheck] = calculatePossibleMoves(destination, piece, false, false);
 
     setSelectedPieceLegalMoves([]);
     return true;

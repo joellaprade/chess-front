@@ -4,10 +4,17 @@ import { useBoardContext } from "../../context/BoardContext";
 import { DiagonalDirection, Direction } from "@/reusable/types/directions";
 import { PerpendicularDirection } from "@/reusable/types/directions";
 import { EvalSquareParam } from "@/reusable/types/evalSquareParamType";
-import { PinData } from "@/reusable/types/pinData";
+import { AttackData } from "@/reusable/types/attackData";
 
 export const useBoardUtils = () => {
-  const { board, setSelectedPieceLegalMoves, getPinData, setPinData } = useBoardContext();
+  const {
+    board,
+    setSelectedPieceLegalMoves,
+    getAttackData,
+    setAttackData,
+    getDefenseData,
+    setDefenseData,
+  } = useBoardContext();
 
   // GETTERS & UTILS
   const getSquareById = (index: number) => {
@@ -134,11 +141,12 @@ export const useBoardUtils = () => {
 
     return directions;
   };
-  const compareObjects = (a: Record<any, any>, b: Record<any, any>) => {
-    return JSON.stringify(a) == JSON.stringify(b);
-  };
-  // Calcs
-  const calculateIsSquareBeingAttacked = (destination: number, piece: string) => {
+  // Specific Calcs
+  const calculateIsSquareBeingAttacked = (
+    destination: number,
+    piece: string,
+    isEvaluatingDefense: boolean,
+  ) => {
     const directions = getDirectionByPiece(piece);
     const isLimit = getLimits(destination, piece);
     let possibleMoves: number[] = [];
@@ -170,6 +178,7 @@ export const useBoardUtils = () => {
           isAttacked,
           isPin,
           isCalcMoves,
+          isEvaluatingDefense,
           recursionLayer: 1,
           possibleMoves,
         });
@@ -177,7 +186,13 @@ export const useBoardUtils = () => {
     }
 
     const opponentColor = piece.charAt(0) == "w" ? "b" : "w";
-    const [knightPossibleMoves] = calculateKnight(destination, `${opponentColor}N`, false, 1);
+    const [knightPossibleMoves] = calculateKnight(
+      destination,
+      `${opponentColor}N`,
+      false,
+      isEvaluatingDefense,
+      1,
+    );
     knightPossibleMoves.forEach((move) => {
       const oppPiece = getSquareById(move).piece;
       if (oppPiece == `${opponentColor}N`) isAttacked = true;
@@ -192,12 +207,25 @@ export const useBoardUtils = () => {
       code: string;
       piece: string;
     },
+    isEvaluatingDefense: boolean,
+    piece: string,
   ): boolean => {
+    // Origin es del square siendo evaluado (evaluando si esta bajo ataque)
+    // Dest square es todos los squares que podrian atacar a origin
     const [oRow, oCol] = getRowCol(origin);
     const [dRow, dCol] = getRowCol(destSquare.id);
     const oDiagonal = getDiagonals(origin, oRow, oCol);
     const dDiagonal = getDiagonals(destSquare.id, dRow, dCol);
     let isAttacked = false;
+    let defenseData = getDefenseData();
+    let defendedSquare = getSquareById(origin);
+    const oppColor = piece.charAt(0) == "w" ? "b" : "w";
+    const [possibleKnightMoves] = calculateKnight(
+      origin,
+      `${oppColor}N`,
+      false,
+      isEvaluatingDefense,
+    );
 
     switch (destSquare.piece.charAt(1)) {
       case "Q":
@@ -206,6 +234,7 @@ export const useBoardUtils = () => {
           oCol == dCol ||
           oDiagonal.tl == dDiagonal.tl ||
           oDiagonal.tr == dDiagonal.tr;
+        isAttacked && defenseData.push(defendedSquare);
         break;
       case "K":
         isAttacked =
@@ -215,20 +244,32 @@ export const useBoardUtils = () => {
             oDiagonal.tr == dDiagonal.tr) &&
           Math.abs(oRow - dRow) <= 1 &&
           Math.abs(oCol - dCol) <= 1;
+        isAttacked && defenseData.push(defendedSquare);
         break;
       case "R":
         isAttacked = oRow == dRow || oCol == dCol;
+        isAttacked && defenseData.push(defendedSquare);
         break;
       case "B":
         isAttacked = oDiagonal.tl == dDiagonal.tl || oDiagonal.tr == dDiagonal.tr;
+        isAttacked && defenseData.push(defendedSquare);
         break;
       case "P":
         isAttacked =
           (oDiagonal.tl == dDiagonal.tl || oDiagonal.tr == dDiagonal.tr) &&
           Math.abs(oRow - dRow) <= 1 &&
           Math.abs(oCol - dCol) <= 1;
+        isAttacked && defenseData.push(defendedSquare);
         break;
+      default:
+        possibleKnightMoves.forEach((move) => {
+          const piece = getSquareById(move).piece;
+          if (piece.includes("N")) isAttacked = true;
+        });
+        isAttacked && defenseData.push(defendedSquare);
     }
+
+    isEvaluatingDefense && setDefenseData(defenseData);
 
     return isAttacked;
   };
@@ -241,6 +282,232 @@ export const useBoardUtils = () => {
     if (!directions.includes(direction)) return false;
     return true;
   };
+  const countBlockingPieces = (
+    attackData: AttackData,
+    origin: number,
+    piece: string,
+  ): [number, number | undefined] => {
+    let blockingPiecesCount = 0;
+    let blockingPieceSquare: number | undefined;
+    let reachedLimit = false;
+    let i = 0;
+    while (!reachedLimit) {
+      const destination = getMoveByDirection(origin, i, attackData.direction);
+      if (destination < 0 || destination > 63) {
+        reachedLimit = true;
+        continue;
+      }
+      const destSquare = getSquareById(destination);
+      if (
+        (origin != attackData.attacker || destSquare.piece != piece) &&
+        destSquare.piece != "" &&
+        destSquare.piece.charAt(1) != "K"
+      ) {
+        blockingPieceSquare = destSquare.id;
+        blockingPiecesCount++;
+      }
+
+      if (destination == attackData.limit || destSquare.piece.charAt(1) == "K") reachedLimit = true;
+
+      i++;
+    }
+
+    return [blockingPiecesCount, blockingPieceSquare];
+  };
+  const cleanPinnedPieces = () => {
+    let data = getAttackData() as AttackData[];
+
+    data.forEach((attackData, i) => {
+      const coinsidingLimit = { direction: attackData.direction, limit: attackData.limit };
+      const [blockingPiecesCount] = countBlockingPieces(
+        coinsidingLimit as AttackData,
+        attackData.attacker,
+        "",
+      );
+      const attackerOldSquare = getSquareById(attackData.attacker);
+      const attackerColorInitial = attackerOldSquare.piece.charAt(0);
+      const defendantColorInitial = attackData.defendant
+        ? getSquareById(attackData.defendant).piece.charAt(0)
+        : null;
+
+      attackData.isPinBlocked = blockingPiecesCount > 1;
+      if (attackerOldSquare.piece == "" || attackerColorInitial == defendantColorInitial) {
+        let pinnedPieces = getAttackData();
+        pinnedPieces.splice(i, 1);
+        setAttackData(pinnedPieces);
+      }
+    });
+  };
+  const addAtacker = (
+    attackData: AttackData | undefined,
+    direction: Direction,
+    limit: number,
+    piece: string,
+    destSquare: Record<string, any>,
+    isBlocked: boolean,
+    origin: number,
+  ) => {
+    attackData = {
+      direction: direction as Direction,
+      limit,
+      attacker: origin,
+      attackerColor: piece.charAt(0),
+      defendant: undefined,
+      king: destSquare.id,
+      isPinBlocked: false,
+      isCheck: !isBlocked,
+      isPin: undefined,
+    };
+
+    // Se cuentan piezas bloqueando
+    let [blockingPiecesCount, blockingPieceSquare] = countBlockingPieces(attackData, origin, piece);
+    attackData.defendant = blockingPieceSquare;
+    attackData.isPin = blockingPiecesCount == 1;
+
+    // Se asegura que no se dupliquen los registros cuando selecciono una pieza
+    let isAttackerRepeated = false;
+
+    getAttackData().forEach((aD) => {
+      if (!attackData) return;
+      isAttackerRepeated =
+        aD.attacker == attackData.attacker && aD.direction == attackData.direction;
+    });
+
+    // let data = getAttackData() as AttackData[];
+    // data = data.filter(
+    //   (item, index, self) =>
+    //     index === self.findIndex((t) => JSON.stringify(t) === JSON.stringify(item)),
+    // );
+
+    // Decide si incluir coinsidingLimit
+    if (blockingPiecesCount < 2 && !isAttackerRepeated) {
+      const pinnedPieces = getAttackData();
+      pinnedPieces.push(attackData);
+      setAttackData(pinnedPieces);
+    }
+
+    let cleanAttackData = getAttackData() as AttackData[];
+    const seen = new Map();
+    cleanAttackData.forEach((item) => {
+      const key = `${item.attacker}-${item.direction}`;
+      seen.set(key, item);
+    });
+    const uniqueArray = Array.from(seen.values());
+    console.log(uniqueArray);
+    setAttackData(uniqueArray as [AttackData]);
+
+    // cleanAttackData = cleanAttackData.filter(
+    //   (item, index, self) =>
+    //     index === self.findIndex((t) => JSON.stringify(t) === JSON.stringify(item)),
+    // );
+    // setAttackData(cleanAttackData as [AttackData]);
+
+    return attackData;
+  };
+  const checkIsAttackerPinning = (
+    // origin de attacker, dest es del rey
+    origin: number,
+    destSquare: {
+      id: number;
+      code: string;
+      piece: string;
+    },
+    piece: string,
+    isBlocked: boolean,
+  ) => {
+    if (
+      !destSquare.piece.includes("K") ||
+      destSquare.piece.charAt(0) == piece.charAt(0)
+      // !isBlocked
+    )
+      return undefined;
+
+    // contar cantidad de piezas para ver si efectivamente esta pineando
+    const kOrigin = destSquare.id;
+    const [kRow, kCol] = getRowCol(kOrigin);
+    const kPLimits = getPerpendiculars(kOrigin, kRow, kCol);
+    const kDLimits = getDiagonals(kOrigin, kRow, kCol);
+    const kLimits: Record<string, number> = { ...kPLimits, ...kDLimits };
+
+    const [aRow, aCol] = getRowCol(origin);
+    const aPLimits = getPerpendiculars(origin, aRow, aCol);
+    const aDLimits = getDiagonals(origin, aRow, aCol);
+    const aLimits: Record<string, number> = { ...aPLimits, ...aDLimits };
+
+    const descendingDirections: Direction[] = ["top", "left", "tr", "tl"];
+    const ascendingDirections: Direction[] = ["bottom", "right", "br", "bl"];
+    let directions = origin > destSquare.id ? descendingDirections : ascendingDirections;
+    let attackData: AttackData | undefined;
+
+    // Reviso si rey y atacante comparten row, col o diag
+    directions.forEach((direction) => {
+      if (kLimits[direction] == aLimits[direction]) {
+        attackData = addAtacker(
+          attackData,
+          direction,
+          kLimits[direction],
+          piece,
+          destSquare,
+          isBlocked,
+          origin,
+        );
+      }
+    });
+
+    return attackData;
+  };
+  const checkIsDefendantPinned = (
+    //
+    isBlocked: boolean,
+  ) => {
+    const attackData = getAttackData();
+    for (let i = 0; i < attackData.length; i++) {
+      const attack = attackData[i];
+      if (attack.isCheck) {
+        const attackerSquare = getSquareById(attack.attacker);
+        const kingSquare = getSquareById(attack.king);
+        const pinRes = checkIsAttackerPinning(
+          attack.attacker,
+          kingSquare,
+          attackerSquare.piece,
+          isBlocked,
+        );
+        if (pinRes?.isPin) break;
+      }
+    }
+    attackData.forEach((attack) => {});
+  };
+  const checkCanDefend = (piece: string) => {
+    // Si oponente esta en check, reviso si la pieza seleccionada puede bloquear el check
+    let canDefend = false;
+    const attackData = getAttackData();
+    attackData.forEach((attack) => {
+      // Reviso todos los attackData, veo si estan registrando un check
+      // Reviso si la pieza evaluada es oponente del atacante
+      if (attack.isCheck && attack.attackerColor != piece.charAt(0)) {
+        canDefend = checkPossibleDefenses(attack);
+      }
+    });
+
+    return canDefend;
+  };
+  const checkPossibleDefenses = (attack: AttackData) => {
+    // Reviso la linea de ataque del atacante
+    // Reviso si alguna pieza del defensor esta atacando ese square
+    // Paro cuando alcanzo al rey defensor
+    let canDefend = false;
+    for (let i = 0; i < 7; i++) {
+      const move = getMoveByDirection(attack.attacker, i, attack.direction);
+      const square = getSquareById(move);
+      if (square.piece.includes("K")) break;
+
+      const kingColor = getSquareById(attack.king).piece.charAt(0);
+      const kingPiece = kingColor == "w" ? "bK" : "wK";
+      canDefend = calculateIsSquareBeingAttacked(move, kingPiece, true);
+    }
+    return canDefend;
+  };
+  // Global Cals
   const runChecks = (
     destSquare: {
       id: number;
@@ -252,6 +519,7 @@ export const useBoardUtils = () => {
     recursionLayer: number,
     isAttacked: boolean,
     origin: number,
+    isEvaluatingDefense: boolean,
     isBlocked?: Record<Direction, boolean> | undefined,
     direction?: Direction,
   ): [boolean, boolean, Record<Direction, boolean>] => {
@@ -262,7 +530,10 @@ export const useBoardUtils = () => {
     if (destSquare.piece.charAt(1) === "K" && destSquare.piece != piece) isCheck = true;
     if (recursionLayer == 0) {
       // Decide si debe interpretar este square como possibleMove de rey
-      if (piece.charAt(1) == "K" && calculateIsSquareBeingAttacked(destSquare.id, piece))
+      if (
+        piece.charAt(1) == "K" &&
+        calculateIsSquareBeingAttacked(destSquare.id, piece, isEvaluatingDefense)
+      )
         isAttacked = true;
       // Decide si debe interpretar este square como isBeingAttacked
     } else if (recursionLayer == 1) {
@@ -270,7 +541,7 @@ export const useBoardUtils = () => {
       if (
         piece.charAt(1) == "K" &&
         piece.charAt(0) != destSquare.piece.charAt(0) &&
-        evaluateIsBeingAttacked(origin, destSquare)
+        evaluateIsBeingAttacked(origin, destSquare, isEvaluatingDefense || false, piece)
       ) {
         isAttacked = true;
       }
@@ -308,164 +579,35 @@ export const useBoardUtils = () => {
     // Reglas de rey
     if (piece.charAt(1) === "K" && isAttacked) return false;
 
-    const pinData = getPinData();
-    for (let i = 0; i < pinData.length; i++) {
-      const pd = pinData[i];
-      if (!pd.isPinBlocked && pd.defendant == origin)
+    // Revisar estados de ataques
+    const attackData = getAttackData();
+    for (let i = 0; i < attackData.length; i++) {
+      const pd = attackData[i];
+
+      // Revisar que moves puede hacer un defensor pinned
+      if (!pd.isPinBlocked && pd.defendant == origin) {
         if (!validateMoveUnderPin(pd.direction, direction)) {
           return false;
         }
+      }
+
+      // Revisar si el color de esta pieza esta en check
+      const defenseData = getDefenseData();
+
+      if (pd.isCheck && pd.attackerColor != piece.charAt(0)) {
+        let canDefend = false;
+
+        for (let i = 0; i < defenseData.length; i++) {
+          const defense = defenseData[i];
+          if (defense.id == destSquare.id) canDefend = true;
+        }
+        if (!canDefend) return false;
+      }
     }
+    // si el color de la pieza que se movera es esta bajo check, verificar si puede defender y si no retornar false
 
     return true;
   };
-  const countBlockingPieces = (
-    pinData: PinData,
-    origin: number,
-    piece: string,
-  ): [number, number | undefined] => {
-    let blockingPiecesCount = 0;
-    let blockingPieceSquare: number | undefined;
-    let reachedLimit = false;
-    let i = 0;
-    while (!reachedLimit) {
-      const destination = getMoveByDirection(origin, i, pinData.direction);
-      if (destination < 0 || destination > 63) {
-        reachedLimit = true;
-        continue;
-      }
-      const destSquare = getSquareById(destination);
-      if (
-        (origin != pinData.attacker || destSquare.piece != piece) &&
-        destSquare.piece != "" &&
-        destSquare.piece.charAt(1) != "K"
-      ) {
-        blockingPieceSquare = destSquare.id;
-        blockingPiecesCount++;
-      }
-
-      if (destination == pinData.limit || destSquare.piece.charAt(1) == "K") reachedLimit = true;
-
-      i++;
-    }
-
-    return [blockingPiecesCount, blockingPieceSquare];
-  };
-  const cleanPinnedPieces = (isCalcMoves: boolean) => {
-    isCalcMoves &&
-      getPinData().map((pinData, i) => {
-        const coinsidingLimit = { direction: pinData.direction, limit: pinData.limit };
-        const [blockingPiecesCount] = countBlockingPieces(
-          coinsidingLimit as PinData,
-          pinData.attacker,
-          "",
-        );
-        const attackerOldSquare = getSquareById(pinData.attacker);
-        const attackerColorInitial = attackerOldSquare.piece.charAt(0);
-        const defendantColorInitial = pinData.defendant
-          ? getSquareById(pinData.defendant).piece.charAt(0)
-          : null;
-
-        pinData.isPinBlocked = blockingPiecesCount > 1;
-
-        if (attackerOldSquare.piece == "" || attackerColorInitial == defendantColorInitial) {
-          let pinnedPieces = getPinData();
-          pinnedPieces.splice(i, 1);
-          setPinData(pinnedPieces);
-        }
-      });
-  };
-  const checkIsAttackerPinning = (
-    // origin de attacker, dest es del rey
-    origin: number,
-    destSquare: {
-      id: number;
-      code: string;
-      piece: string;
-    },
-    piece: string,
-    isBlocked: boolean,
-  ) => {
-    if (
-      !destSquare.piece.includes("K") ||
-      destSquare.piece.charAt(0) == piece.charAt(0)
-      // !isBlocked
-    )
-      return undefined;
-
-    // contar cantidad de piezas para ver si efectivamente esta pineando
-    const kOrigin = destSquare.id;
-    const [kRow, kCol] = getRowCol(kOrigin);
-    const kPLimits = getPerpendiculars(kOrigin, kRow, kCol);
-    const kDLimits = getDiagonals(kOrigin, kRow, kCol);
-    const kLimits: Record<string, number> = { ...kPLimits, ...kDLimits };
-
-    const [aRow, aCol] = getRowCol(origin);
-    const aPLimits = getPerpendiculars(origin, aRow, aCol);
-    const aDLimits = getDiagonals(origin, aRow, aCol);
-    const aLimits: Record<string, number> = { ...aPLimits, ...aDLimits };
-
-    const descendingDirections = ["top", "left", "tr", "tl"];
-    const ascendingDirections = ["bottom", "right", "br", "bl"];
-    let directions = origin > destSquare.id ? descendingDirections : ascendingDirections;
-    let pinData: PinData | undefined;
-
-    // Reviso si rey y atacante comparten row, col o diag
-    directions.forEach((direction) => {
-      if (kLimits[direction] == aLimits[direction]) {
-        pinData = {
-          direction: direction as Direction,
-          limit: kLimits[direction],
-          attacker: origin,
-          defendant: undefined,
-          king: destSquare.id,
-          isPinBlocked: false,
-          isCheck: !isBlocked,
-        };
-
-        // Se cuentan piezas bloqueando
-        let [blockingPiecesCount, blockingPieceSquare] = countBlockingPieces(
-          pinData,
-          origin,
-          piece,
-        );
-        pinData.defendant = blockingPieceSquare;
-
-        // Se asegura que no se dupliquen los registros cuando selecciono una pieza
-        let isAttackerRepeated = false;
-        getPinData().forEach((piece) => {
-          if (pinData) {
-            isAttackerRepeated = compareObjects(piece, pinData);
-          }
-        });
-
-        // Decide si incluir coinsidingLimit
-        if (blockingPiecesCount < 2 && !isAttackerRepeated) {
-          const pinnedPieces = getPinData();
-          pinnedPieces.push(pinData);
-          setPinData(pinnedPieces);
-
-          return pinData;
-        }
-      }
-    });
-
-    return pinData;
-  };
-  const checkIsDefendantPinned = (
-    // origin de attacker, dest es del rey
-    isBlocked: boolean,
-  ) => {
-    const pinData = getPinData();
-    pinData.forEach((pin) => {
-      if (pin.isCheck) {
-        const attackerSquare = getSquareById(pin.attacker);
-        const kingSquare = getSquareById(pin.king);
-        checkIsAttackerPinning(pin.attacker, kingSquare, attackerSquare.piece, isBlocked);
-      }
-    });
-  };
-  // como agrego un pinData en checkIsAttacker, siempre hay un bro mas para agregar
   const evaluateSquare = ({
     isBlocked,
     direction,
@@ -477,6 +619,7 @@ export const useBoardUtils = () => {
     isAttacked,
     isPin,
     isCalcMoves,
+    isEvaluatingDefense,
     possibleMoves,
     recursionLayer,
     extras,
@@ -490,9 +633,10 @@ export const useBoardUtils = () => {
     // Evalua si el atacante esta viendo al rey
     const destSquare = getSquareById(move);
 
-    if (piece.charAt(1) != "K") {
-      cleanPinnedPieces(isCalcMoves);
-      checkIsDefendantPinned(isBlocked[direction]);
+    if (piece.charAt(1) != "K" && !isEvaluatingDefense) {
+      isCalcMoves && cleanPinnedPieces();
+      isCalcMoves && checkIsDefendantPinned(isBlocked[direction]);
+      isCalcMoves && checkCanDefend(piece);
       checkIsAttackerPinning(origin, destSquare, piece, isBlocked[direction]);
     }
 
@@ -510,9 +654,11 @@ export const useBoardUtils = () => {
       recursionLayer,
       isAttacked,
       origin,
+      isEvaluatingDefense,
       isBlocked,
       direction,
     );
+
     const isValid = runValidations(destSquare, piece, isAttacked, origin, extras, direction);
 
     if (!isValid) return [possibleMoves, isCheck, isAttacked, isPin];
@@ -524,6 +670,7 @@ export const useBoardUtils = () => {
     origin: number,
     piece: string,
     isCalcMoves: boolean,
+    isEvaluatingDefense: boolean,
   ): [number[], boolean, boolean] => {
     const directions = getDirectionByPiece(piece);
     const isLimit = getLimits(origin, piece);
@@ -543,7 +690,6 @@ export const useBoardUtils = () => {
       bl: false,
     };
     let temp;
-
     for (let i = 0; i < loops; i++) {
       directions.forEach((direction) => {
         [possibleMoves, isCheck, temp] = evaluateSquare({
@@ -557,6 +703,7 @@ export const useBoardUtils = () => {
           isAttacked,
           isPin,
           isCalcMoves,
+          isEvaluatingDefense,
           recursionLayer: 0,
           possibleMoves,
         });
@@ -569,6 +716,7 @@ export const useBoardUtils = () => {
     origin: number,
     piece: string,
     isCalcMoves: boolean,
+    isEvaluatingDefense: boolean,
     recursionLayer?: number,
   ): [number[], boolean] => {
     recursionLayer = recursionLayer || 0;
@@ -576,6 +724,7 @@ export const useBoardUtils = () => {
     let possibleMoves: number[] = [];
     let isCheck = false;
     let isAttacked = false;
+    let canDefend = false;
 
     if (col >= 1 && row >= 2) possibleMoves.push(origin - 17);
     if (col <= 6 && row >= 2) possibleMoves.push(origin - 15);
@@ -589,21 +738,36 @@ export const useBoardUtils = () => {
     if (col >= 1 && row <= 5) possibleMoves.push(origin + 15);
     if (col <= 6 && row <= 5) possibleMoves.push(origin + 17);
 
+    cleanPinnedPieces(isCalcMoves);
     const movesLength = possibleMoves.length;
     for (let i = 0; i < movesLength; i++) {
       const invI = movesLength - 1 - i;
       let destSquare = getSquareById(possibleMoves[invI]);
 
-      [isCheck, isAttacked] = runChecks(destSquare, piece, isCheck, 0, isAttacked, origin);
+      [isCheck, isAttacked] = runChecks(
+        destSquare,
+        piece,
+        isCheck,
+        0,
+        isAttacked,
+        origin,
+        isEvaluatingDefense,
+      );
 
-      if (destSquare.piece.includes(piece.charAt(0)) && recursionLayer != 1)
+      if (destSquare.piece.includes(piece.charAt(0)) && recursionLayer != 1 && isCalcMoves)
         possibleMoves.splice(invI, 1);
       if (destSquare.piece.includes("K")) isCheck = true;
+
+      canDefend = !isEvaluatingDefense && isCalcMoves && checkCanDefend(piece);
+      if (canDefend) {
+        const defenseData = getDefenseData().map((def) => def.id);
+        if (!defenseData.includes(possibleMoves[invI])) {
+          possibleMoves.splice(invI, 1);
+        }
+      }
     }
 
-    cleanPinnedPieces(isCalcMoves);
-
-    const pinnedOrigins = getPinData().map((pinData) => pinData.defendant);
+    const pinnedOrigins = getAttackData().map((attackData) => attackData.defendant);
     if (pinnedOrigins.includes(origin)) possibleMoves = [];
 
     return [possibleMoves, isCheck];
@@ -612,30 +776,59 @@ export const useBoardUtils = () => {
     origin: number,
     piece: string,
     isCalcMoves: boolean,
+    isEvaluatingDefense: boolean,
   ): [number[], boolean] => {
     let possibleMoves: number[] = [];
     let isCheck: boolean = false;
     const pieceInitial = piece.charAt(1);
+
     switch (pieceInitial) {
       case "B":
-        [possibleMoves, isCheck] = calculateLinearMoves(origin, piece, isCalcMoves);
+        [possibleMoves, isCheck] = calculateLinearMoves(
+          origin,
+          piece,
+          isCalcMoves,
+          isEvaluatingDefense,
+        );
         break;
       case "R":
-        [possibleMoves, isCheck] = calculateLinearMoves(origin, piece, isCalcMoves);
+        [possibleMoves, isCheck] = calculateLinearMoves(
+          origin,
+          piece,
+          isCalcMoves,
+          isEvaluatingDefense,
+        );
         break;
       case "Q":
-        [possibleMoves, isCheck] = calculateLinearMoves(origin, piece, isCalcMoves);
+        [possibleMoves, isCheck] = calculateLinearMoves(
+          origin,
+          piece,
+          isCalcMoves,
+          isEvaluatingDefense,
+        );
         break;
       case "K":
-        [possibleMoves, isCheck] = calculateLinearMoves(origin, piece, isCalcMoves);
+        [possibleMoves, isCheck] = calculateLinearMoves(
+          origin,
+          piece,
+          isCalcMoves,
+          isEvaluatingDefense,
+        );
         break;
       case "N":
-        [possibleMoves, isCheck] = calculateKnight(origin, piece, isCalcMoves);
+        [possibleMoves, isCheck] = calculateKnight(origin, piece, isCalcMoves, isEvaluatingDefense);
         break;
       case "P":
-        [possibleMoves, isCheck] = calculateLinearMoves(origin, piece, isCalcMoves);
+        [possibleMoves, isCheck] = calculateLinearMoves(
+          origin,
+          piece,
+          isCalcMoves,
+          isEvaluatingDefense,
+        );
         break;
     }
+
+    isCalcMoves && setDefenseData([]);
 
     return [possibleMoves, isCheck];
   };
