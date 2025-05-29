@@ -7,6 +7,8 @@ gestionar duplicados al correr calcHorse y agregar defendants
 
 implementar check y checkmate
 
+si mi reina ataca al rey, y una torre puede comerse a mi reina, el engine no lo permite
+
 
 
 revisar si todos los useCheckPiece tienen el validate igual al de la reina

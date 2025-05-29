@@ -63,7 +63,7 @@ export const useCheckKing = () => {
   };
   const calculateKing = (origin: number) => {
     const piece = getSquareById(origin).piece;
-    let [possibleMoves] = calculatePossibleMoves(origin, piece, true);
+    const [possibleMoves] = calculatePossibleMoves(origin, piece, true, false, false);
     setOrigin(origin);
     const castleMoves = calculateCastle();
     possibleMoves.push(...castleMoves);

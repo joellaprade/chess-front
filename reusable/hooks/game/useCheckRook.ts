@@ -37,7 +37,7 @@ export const useCheckRook = () => {
   };
   const calculateRook = (origin: number) => {
     const piece = getSquareById(origin).piece;
-    const [possibleMoves] = calculatePossibleMoves(origin, piece, true);
+    const [possibleMoves] = calculatePossibleMoves(origin, piece, true, false, false);
     setOrigin(origin);
 
     return possibleMoves;
@@ -47,7 +47,7 @@ export const useCheckRook = () => {
     if (!isValid) return false;
 
     const piece = getSquareById(getOrigin()).piece;
-    const [_, isCheck] = calculatePossibleMoves(destination, piece, false);
+    const [_, isCheck] = calculatePossibleMoves(destination, piece, false, false, true);
 
     setSelectedPieceLegalMoves([]);
     checkHasMoved(piece);

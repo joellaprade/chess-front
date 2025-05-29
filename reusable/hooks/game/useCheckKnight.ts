@@ -11,7 +11,7 @@ export const useCheckKnight = () => {
 
   const calculateKnight = (origin: number) => {
     const piece = getSquareById(origin).piece;
-    const [possibleMoves] = calculatePossibleMoves(origin, piece, true, false);
+    const [possibleMoves] = calculatePossibleMoves(origin, piece, true, false, false);
     setOrigin(origin);
     return possibleMoves;
   };
@@ -20,7 +20,7 @@ export const useCheckKnight = () => {
     if (!isValid) return false;
 
     const piece = getSquareById(getOrigin()).piece;
-    const [_, isCheck] = calculatePossibleMoves(destination, piece, false, false);
+    const [_, isCheck] = calculatePossibleMoves(destination, piece, false, false, true);
 
     setSelectedPieceLegalMoves([]);
     return true;

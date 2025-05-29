@@ -22,7 +22,7 @@ export const useCheckQueen = () => {
 
     const piece = getSquareById(getOrigin()).piece;
     // hacer debug desde aqui y ver donde ocurre el recur de mier
-    const [_, isCheck] = calculatePossibleMoves(destination, piece, false, false, false);
+    const [_, isCheck] = calculatePossibleMoves(destination, piece, false, false, true);
     if (isCheck) checkIsCheckMate(piece);
 
     setSelectedPieceLegalMoves([]);

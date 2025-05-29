@@ -468,10 +468,22 @@ export const useBoardUtils = () => {
     }
     attackData.forEach((attack) => {});
   };
+  const checkHasKingMoved = (attackData: AttackData[]): AttackData[] => {
+    return attackData.filter((attack) => {
+      if (!attack.isCheck) return true;
+
+      const kingSquare = getSquareById(attack.king);
+      return kingSquare.piece.charAt(1) === "K";
+    });
+  };
   const checkCanDefend = (piece: string) => {
     // Si oponente esta en check, reviso si la pieza seleccionada puede bloquear el check
     let canDefend = false;
-    const attackData = getAttackData();
+    let attackData = getAttackData() as AttackData[];
+
+    attackData = checkHasKingMoved(attackData);
+    setAttackData(attackData as [AttackData]);
+
     attackData.forEach((attack) => {
       // Reviso todos los attackData, veo si estan registrando un check
       // Reviso si la pieza evaluada es oponente del atacante
@@ -569,6 +581,9 @@ export const useBoardUtils = () => {
     extras: any,
     direction: Direction,
   ): boolean => {
+    if (destSquare.id == 32 && origin == 0) {
+      console.log();
+    }
     // Si la pieza bloqueando es del mismo color, retorna para NO agregarla a possible moves
     if (destSquare.piece.charAt(0) == piece.charAt(0)) return false;
     // Reglas de peon
@@ -601,7 +616,15 @@ export const useBoardUtils = () => {
 
       // Revisar si el color de esta pieza esta en check
 
-      if (pd.isCheck && pd.attackerColor != piece.charAt(0) && piece.charAt(1) !== "K") {
+      let canEatAttacker = false;
+      if (pd.attacker == destSquare.id) canEatAttacker = true;
+
+      if (
+        pd.isCheck &&
+        pd.attackerColor != piece.charAt(0) &&
+        piece.charAt(1) !== "K" &&
+        !canEatAttacker
+      ) {
         const defenseData = getDefenseData();
         let canDefend = false;
 
@@ -644,7 +667,7 @@ export const useBoardUtils = () => {
     // Evalua si el atacante esta viendo al rey
     const destSquare = getSquareById(move);
 
-    if (piece.charAt(1) != "K" && !isEvaluatingDefense && !isEvaluatingCheck) {
+    if (piece.charAt(1) != "K" && !isEvaluatingDefense) {
       isCalcMoves && cleanPinnedPieces();
       isCalcMoves && checkIsDefendantPinned(isBlocked[direction]);
       checkIsAttackerPinning(origin, destSquare, piece, isBlocked[direction]);
@@ -795,8 +818,6 @@ export const useBoardUtils = () => {
         }
       }
     }
-
-    if (isCalcMoves) console.log(getAttackData());
 
     const pinnedOrigins = getAttackData().map((attackData) => attackData.defendant);
     if (pinnedOrigins.includes(origin)) possibleMoves = [];
