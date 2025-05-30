@@ -1,7 +1,6 @@
 "use client";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useRef, useState } from "react";
 import { Instruction } from "@/reusable/types/instruction";
-import WsController from "./WsController";
 
 type setOMsgOptions =
   | { action: "add-friend"; payload: any }
@@ -13,19 +12,17 @@ type WsContextProviderProps = {
 };
 
 type WsContextType = {
-  connected: boolean;
+  connected: React.RefObject<boolean>;
   iMsg: Instruction | null;
   oMsg: Instruction | null;
-  setConnected: (connected: boolean) => void;
   setIMsg: (instruction: Instruction) => void;
   setOMsg: (instruction: setOMsgOptions) => void;
 };
 
 const WsDefaultValues: WsContextType = {
-  connected: false,
+  connected: { current: false },
   iMsg: null,
   oMsg: null,
-  setConnected: (connected: boolean) => {},
   setIMsg: (instruction: Instruction) => {},
   setOMsg: (instruction: setOMsgOptions) => {},
 };
@@ -42,14 +39,12 @@ export const useWsContext = () => {
 };
 
 export const WsContextProvider = ({ children }: WsContextProviderProps) => {
-  const [connected, setConnected] = useState(false);
   const [iMsg, setIMsg] = useState<Instruction | null>(null);
   const [oMsg, setOMsg] = useState<setOMsgOptions | null>(null);
+  const connected = useRef(false);
 
   return (
-    <WsContext.Provider
-      value={{ connected, iMsg, oMsg, setConnected, setIMsg, setOMsg }}
-    >
+    <WsContext.Provider value={{ connected, iMsg, oMsg, setIMsg, setOMsg }}>
       {children}
     </WsContext.Provider>
   );

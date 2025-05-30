@@ -24,7 +24,7 @@ const Board = ({ isBlack }: { isBlack: boolean }) => {
             onClick={() => handlePieceClick(square.id)}
             key={cI}
           >
-            <span className="absolute">{square.id}</span>
+            {/* <span className="absolute">{square.id}</span> */}
             {square.piece && (
               <Image src={`/assets/pieces/${square.piece}.png`} width={100} height={100} alt="" />
             )}

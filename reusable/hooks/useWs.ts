@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useWsContext } from "../context/WsContext";
 import { useAuth } from "../context/AuthContext";
 import { Instruction } from "../types/instruction";
@@ -7,12 +7,14 @@ import { usePathname } from "next/navigation";
 const useWs = () => {
   const userId = useAuth().session?.userId;
   const wssUrl = process.env.NEXT_PUBLIC_WS_BACKEND_URL;
-  const { oMsg, connected, setIMsg, setOMsg, setConnected } = useWsContext();
+  const { oMsg, connected, setIMsg, setOMsg } = useWsContext();
   const [ws, setWs] = useState<WebSocket | null>(null);
   const pathname = usePathname();
 
   const connect = () => {
-    if (!userId || !wssUrl || pathname == "/login") return;
+    if (!userId || !wssUrl || pathname == "/login" || connected.current) return;
+    console.log(connected.current);
+    connected.current = true;
 
     try {
       const wsRes = new WebSocket(wssUrl);
@@ -23,11 +25,11 @@ const useWs = () => {
     }
   };
   const close = () => {
-    if (!connected) ws?.close();
+    if (!connected.current) ws?.close();
   };
   const initWs = (ws: WebSocket) => {
-    ws.onopen = () => setConnected(true);
-    ws.onclose = () => setConnected(false);
+    ws.onopen = () => (connected.current = true);
+    ws.onclose = () => (connected.current = false);
     ws.onmessage = ({ data }: { data: string }) => {
       const message = JSON.parse(data);
       setIMsg(message);
@@ -67,7 +69,7 @@ const useWs = () => {
 
   useEffect(sendMsg, [oMsg]);
   useEffect(connect, [userId]);
-  useEffect(close, [connected]);
+  useEffect(close, [connected.current]);
 
   return { sendAddRequest, addFriend, handleRemoveFriend, runReplyAction };
 };
