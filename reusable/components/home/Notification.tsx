@@ -37,6 +37,9 @@ const Notification = () => {
       case "notify-only-removed-friend":
         setMessage("Se ha terminado la amistad con:");
         break;
+      case "notify-game-request":
+        setMessage("Solicitud de juego de:");
+        break;
     }
   };
 
@@ -83,10 +86,7 @@ const Notification = () => {
         >
           <Check />
         </button>
-        <button
-          onClick={() => setShowNotif(false)}
-          className="small-btn bg-red-400"
-        >
+        <button onClick={() => setShowNotif(false)} className="small-btn bg-red-400">
           <X />
         </button>
       </div>

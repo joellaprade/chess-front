@@ -9,8 +9,8 @@ type Props = {
 };
 
 const Friend = ({ player }: Props) => {
-  const { username, image, isOnline } = player;
-  const { handleRemoveFriend } = useWs();
+  const { username, image, isOnline, _id } = player;
+  const { handleRemoveFriend, requestGameToFriend } = useWs();
 
   return (
     <div className="flex items-center justify-between">
@@ -28,7 +28,7 @@ const Friend = ({ player }: Props) => {
         <h3>{username}</h3>
       </div>
       <div className="flex gap-5">
-        <button className="small-btn bg-green">
+        <button onClick={() => requestGameToFriend(_id.toString())} className="small-btn bg-green">
           <Image
             src={"/assets/pawn-icon.png"}
             alt="small pawn"
@@ -37,10 +37,7 @@ const Friend = ({ player }: Props) => {
             className="object-contains"
           />
         </button>
-        <button
-          onClick={() => handleRemoveFriend(username)}
-          className="small-btn bg-red-400"
-        >
+        <button onClick={() => handleRemoveFriend(username)} className="small-btn bg-red-400">
           <X className="h-[20px] w-[20px]" />
         </button>
       </div>

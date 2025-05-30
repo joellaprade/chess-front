@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 const useWs = () => {
   const userId = useAuth().session?.userId;
   const wssUrl = process.env.NEXT_PUBLIC_WS_BACKEND_URL;
-  const { oMsg, connected, setIMsg, setOMsg } = useWsContext();
+  const { iMsg, oMsg, connected, setIMsg, setOMsg } = useWsContext();
   const [ws, setWs] = useState<WebSocket | null>(null);
   const pathname = usePathname();
 
@@ -60,6 +60,12 @@ const useWs = () => {
       payload: { username },
     });
   };
+  const requestGameToFriend = (playerId: string) => {
+    setOMsg({
+      action: "game-request",
+      payload: { playerId },
+    });
+  };
   const runReplyAction = (notif: Instruction) => {
     const reply = notif.replyAction;
     if (!reply) return;
@@ -67,11 +73,12 @@ const useWs = () => {
     setOMsg({ ...reply });
   };
 
+  useEffect(() => console.log(iMsg), [iMsg]);
   useEffect(sendMsg, [oMsg]);
   useEffect(connect, [userId]);
   useEffect(close, [connected.current]);
 
-  return { sendAddRequest, addFriend, handleRemoveFriend, runReplyAction };
+  return { sendAddRequest, addFriend, handleRemoveFriend, requestGameToFriend, runReplyAction };
 };
 
 export default useWs;
