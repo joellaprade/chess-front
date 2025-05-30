@@ -194,6 +194,7 @@ export const useBoardUtils = () => {
       false,
       isEvaluatingDefense,
       isEvaluatingCheck,
+      false,
       1,
     );
     knightPossibleMoves.forEach((move) => {
@@ -230,6 +231,7 @@ export const useBoardUtils = () => {
       false,
       isEvaluatingDefense,
       isEvaluatingCheck,
+      false,
     );
 
     switch (destSquare.piece.charAt(1)) {
@@ -242,6 +244,7 @@ export const useBoardUtils = () => {
         isAttacked && defenseData.push(defendedSquare);
         break;
       case "K":
+        if (isEvaluatingCheck && isEvaluatingDefense) break;
         isAttacked =
           (oRow == dRow ||
             oCol == dCol ||
@@ -266,12 +269,22 @@ export const useBoardUtils = () => {
           Math.abs(oCol - dCol) <= 1;
         isAttacked && defenseData.push(defendedSquare);
         break;
+      case "":
+        // PROBLEMA colores son iguales
+        getAttackData().forEach((attackData) => {
+          if (attackData.attacker == destSquare.id && attackData.attackerColor == oppColor)
+            isAttacked = true;
+        });
+        break;
       default:
         possibleKnightMoves.forEach((move) => {
           const piece = getSquareById(move).piece;
-          if (piece.includes("N")) isAttacked = true;
+          if (piece.includes("N")) {
+            isAttacked = true;
+          }
         });
         isAttacked && defenseData.push(defendedSquare);
+        break;
     }
 
     isEvaluatingDefense && setDefenseData(defenseData);
@@ -390,8 +403,8 @@ export const useBoardUtils = () => {
       const key = `${item.attacker}-${item.direction}`;
       seen.set(key, item);
     });
-    const uniqueArray = Array.from(seen.values());
-    setAttackData(uniqueArray as [AttackData]);
+    cleanAttackData = Array.from(seen.values());
+    setAttackData(cleanAttackData as [AttackData]);
 
     return attackData;
   };
@@ -489,6 +502,7 @@ export const useBoardUtils = () => {
       // Reviso si la pieza evaluada es oponente del atacante
       if (attack.isCheck && attack.attackerColor != piece.charAt(0)) {
         canDefend = checkPossibleDefenses(attack, true);
+        console.log(getDefenseData());
       }
     });
 
@@ -548,7 +562,8 @@ export const useBoardUtils = () => {
         piece.charAt(1) == "K" &&
         calculateIsSquareBeingAttacked(destSquare.id, piece, isEvaluatingDefense, isEvaluatingCheck)
       )
-        isAttacked = true;
+        if (destSquare.piece.charAt(1) != "K") isAttacked = true;
+      // if (!isEvaluatingCheck && destSquare.piece.charAt(1) != "K") isAttacked = true;
       // Decide si debe interpretar este square como isBeingAttacked
     } else if (recursionLayer == 1) {
       // Evalua si el cuadro esta siendo atacado
@@ -563,7 +578,8 @@ export const useBoardUtils = () => {
           piece,
         )
       ) {
-        if (!isEvaluatingCheck && destSquare.piece.charAt(1) != "K") isAttacked = true;
+        if (destSquare.piece.charAt(1) != "K") isAttacked = true;
+        // if (!isEvaluatingCheck && destSquare.piece.charAt(1) != "K") isAttacked = true;
       }
     }
 
@@ -581,9 +597,6 @@ export const useBoardUtils = () => {
     extras: any,
     direction: Direction,
   ): boolean => {
-    if (destSquare.id == 32 && origin == 0) {
-      console.log();
-    }
     // Si la pieza bloqueando es del mismo color, retorna para NO agregarla a possible moves
     if (destSquare.piece.charAt(0) == piece.charAt(0)) return false;
     // Reglas de peon
@@ -659,7 +672,6 @@ export const useBoardUtils = () => {
   }: EvalSquareParam): [number[], boolean, boolean, boolean] => {
     const isIndexDecreacing = ["tr", "tl", "top", "left"].includes(direction);
     let move = getMoveByDirection(origin, i, direction);
-
     let limit = isLimit[direction] as number;
     // Calcula que el move siendo calculado este dentro del tablero
     if (isIndexDecreacing && move < limit) return [possibleMoves, isCheck, isAttacked, isPin];
@@ -759,6 +771,7 @@ export const useBoardUtils = () => {
     isCalcMoves: boolean,
     isEvaluatingDefense: boolean,
     isEvaluatingCheck: boolean,
+    needDefense: boolean,
     recursionLayer?: number,
   ): [number[], boolean] => {
     recursionLayer = recursionLayer || 0;
@@ -780,8 +793,8 @@ export const useBoardUtils = () => {
     if (col >= 1 && row <= 5) possibleMoves.push(origin + 15);
     if (col <= 6 && row <= 5) possibleMoves.push(origin + 17);
 
-    cleanPinnedPieces();
-    canDefend = isCalcMoves && checkCanDefend(piece);
+    !isEvaluatingCheck && cleanPinnedPieces();
+    canDefend = needDefense && isCalcMoves && checkCanDefend(piece);
     let isInCheck = false;
     getAttackData().forEach((attackData) => {
       if (
@@ -790,6 +803,7 @@ export const useBoardUtils = () => {
       )
         isInCheck = true;
     });
+    console.log(!canDefend, !isEvaluatingCheck);
 
     const movesLength = possibleMoves.length;
     for (let i = 0; i < movesLength; i++) {
@@ -807,11 +821,22 @@ export const useBoardUtils = () => {
         isEvaluatingCheck,
       );
 
+      let canEatAttacker = false;
+      const attackData = getAttackData();
+      for (let i = 0; i < attackData.length; i++) {
+        const pd = attackData[i];
+
+        if (pd.attacker == destSquare.id) {
+          canEatAttacker = true;
+          break;
+        }
+      }
+
       if (destSquare.piece.includes(piece.charAt(0)) && recursionLayer != 1 && isCalcMoves)
         possibleMoves.splice(invI, 1);
       if (destSquare.piece.includes("K")) isCheck = true;
 
-      if (!canDefend && isInCheck) {
+      if (isInCheck && !isEvaluatingCheck && !canEatAttacker) {
         const defenseData = getDefenseData().map((def) => def.id);
         if (!defenseData.includes(possibleMoves[invI])) {
           possibleMoves.splice(invI, 1);
@@ -879,6 +904,7 @@ export const useBoardUtils = () => {
           isCalcMoves,
           isEvaluatingDefense,
           isEvaluatingCheck,
+          true,
         );
         break;
       case "P":
@@ -897,15 +923,20 @@ export const useBoardUtils = () => {
     return [possibleMoves, isCheck];
   };
   const checkIsCheckMate = (piece: string) => {
-    let canDefend = false;
+    let isMate = false;
+    let canDefend;
+    let hasMoves;
     const attacks = getAttackData();
     attacks.forEach((attack) => {
+      const kingSquare = getSquareById(attack.king);
       if (attack.isCheck && attack.attackerColor == piece.charAt(0)) {
-        // canDefend = checkPossibleDefenses(attack, true, true);
+        canDefend = checkPossibleDefenses(attack, true, true);
+        [hasMoves] = calculatePossibleMoves(attack.king, kingSquare.piece, true, false, true);
+        isMate = !canDefend && hasMoves.length == 0;
       }
     });
 
-    return canDefend;
+    return isMate;
   };
 
   return {
