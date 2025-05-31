@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext } from "react";
 import { Session } from "../models/Session";
 
 type AuthContextProviderProps = {
@@ -26,12 +26,7 @@ export function useAuth() {
   return context as AuthContextType;
 }
 
-export const AuthContextProvider = ({
-  children,
-  initialSession,
-}: AuthContextProviderProps) => {
+export const AuthContextProvider = ({ children, initialSession }: AuthContextProviderProps) => {
   const session = initialSession ? JSON.parse(initialSession) : null;
-  return (
-    <AuthContext.Provider value={{ session }}>{children}</AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={{ session }}>{children}</AuthContext.Provider>;
 };

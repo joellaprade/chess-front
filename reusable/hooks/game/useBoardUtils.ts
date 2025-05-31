@@ -502,7 +502,6 @@ export const useBoardUtils = () => {
       // Reviso si la pieza evaluada es oponente del atacante
       if (attack.isCheck && attack.attackerColor != piece.charAt(0)) {
         canDefend = checkPossibleDefenses(attack, true);
-        console.log(getDefenseData());
       }
     });
 
@@ -803,7 +802,6 @@ export const useBoardUtils = () => {
       )
         isInCheck = true;
     });
-    console.log(!canDefend, !isEvaluatingCheck);
 
     const movesLength = possibleMoves.length;
     for (let i = 0; i < movesLength; i++) {

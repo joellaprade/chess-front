@@ -15,16 +15,16 @@ type WsContextType = {
   connected: React.RefObject<boolean>;
   iMsg: Instruction | null;
   oMsg: Instruction | null;
-  setIMsg: (instruction: Instruction) => void;
-  setOMsg: (instruction: setOMsgOptions) => void;
+  setIMsg: (instruction: Instruction | null) => void;
+  setOMsg: (instruction: setOMsgOptions | null) => void;
 };
 
 const WsDefaultValues: WsContextType = {
   connected: { current: false },
   iMsg: null,
   oMsg: null,
-  setIMsg: (instruction: Instruction) => {},
-  setOMsg: (instruction: setOMsgOptions) => {},
+  setIMsg: (instruction: Instruction | null) => {},
+  setOMsg: (instruction: setOMsgOptions | null) => {},
 };
 
 export const WsContext = createContext<WsContextType>(WsDefaultValues);

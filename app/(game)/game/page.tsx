@@ -1,28 +1,18 @@
+"use client";
 import Board from "@/reusable/components/game/Board";
 import User from "@/reusable/components/game/User";
+import { useGameContext } from "@/reusable/context/GameContext";
 
 const Game = () => {
-  const gameData: gameDataType = {
-    players: [
-      {
-        username: "Joel",
-        isBlack: false,
-      },
-      {
-        username: "Miguel",
-        isBlack: true,
-      },
-    ],
-    time: 60 * 10,
-  };
+  const { playersData, isThisPlayerWhite } = useGameContext();
 
-  const thisPlayer = gameData.players[0];
-  const oponent = gameData.players[1];
+  const thisPlayer = playersData.current[isThisPlayerWhite.current ? 0 : 1];
+  const oponent = playersData.current[isThisPlayerWhite.current ? 1 : 0];
 
   return (
     <div className="game">
       <User user={oponent} />
-      <Board isBlack={thisPlayer.isBlack} />
+      <Board isWhite={isThisPlayerWhite.current} />
       <User user={thisPlayer} />
     </div>
   );

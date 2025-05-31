@@ -4,12 +4,12 @@ import { useBoardContext } from "@/reusable/context/BoardContext";
 import useBoard from "@/reusable/hooks/game/useBoard";
 import Image from "next/image";
 
-const Board = ({ isBlack }: { isBlack: boolean }) => {
+const Board = ({ isWhite }: { isWhite: boolean }) => {
   const { board } = useBoardContext();
   const { getColor, handlePieceClick, colorLegalSquares, renderQueenPopup } = useBoard();
 
   const renderBoard = () => {
-    const finalBoard = !isBlack
+    const finalBoard = isWhite
       ? board
       : [...board]
           .slice()

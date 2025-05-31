@@ -13,7 +13,6 @@ const useWs = () => {
 
   const connect = () => {
     if (!userId || !wssUrl || pathname == "/login" || connected.current) return;
-    console.log(connected.current);
     connected.current = true;
 
     try {
@@ -40,6 +39,12 @@ const useWs = () => {
 
     ws.send(JSON.stringify(oMsg));
   };
+  const runReplyAction = (notif: Instruction) => {
+    const reply = notif.replyAction;
+    if (!reply) return;
+
+    setOMsg({ ...reply });
+  };
 
   // Messages
   const sendAddRequest = (username: string) => {
@@ -60,25 +65,13 @@ const useWs = () => {
       payload: { username },
     });
   };
-  const requestGameToFriend = (playerId: string) => {
-    setOMsg({
-      action: "game-request",
-      payload: { playerId },
-    });
-  };
-  const runReplyAction = (notif: Instruction) => {
-    const reply = notif.replyAction;
-    if (!reply) return;
-
-    setOMsg({ ...reply });
-  };
 
   useEffect(() => console.log(iMsg), [iMsg]);
   useEffect(sendMsg, [oMsg]);
   useEffect(connect, [userId]);
   useEffect(close, [connected.current]);
 
-  return { sendAddRequest, addFriend, handleRemoveFriend, requestGameToFriend, runReplyAction };
+  return { sendAddRequest, addFriend, handleRemoveFriend, runReplyAction };
 };
 
 export default useWs;

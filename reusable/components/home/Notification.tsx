@@ -47,7 +47,7 @@ const Notification = () => {
     if (notif) {
       getMessage();
       setNotification(notif);
-      setShowNotif(true);
+      setShowNotif(notif.action.includes("notify"));
       setShowProfilePic(!notif.action.includes("error"));
       setShowReplyActionBtn(!notif.action.includes("notify-only"));
       setTimeout(() => setShowNotif(false), 8000);
