@@ -12,6 +12,7 @@ type WsContextProviderProps = {
 };
 
 type WsContextType = {
+  ws: React.RefObject<WebSocket | null>;
   connected: React.RefObject<boolean>;
   iMsg: Instruction | null;
   oMsg: Instruction | null;
@@ -20,6 +21,7 @@ type WsContextType = {
 };
 
 const WsDefaultValues: WsContextType = {
+  ws: { current: null },
   connected: { current: false },
   iMsg: null,
   oMsg: null,
@@ -39,12 +41,13 @@ export const useWsContext = () => {
 };
 
 export const WsContextProvider = ({ children }: WsContextProviderProps) => {
+  const ws = useRef<WebSocket | null>(null);
   const [iMsg, setIMsg] = useState<Instruction | null>(null);
   const [oMsg, setOMsg] = useState<setOMsgOptions | null>(null);
   const connected = useRef(false);
 
   return (
-    <WsContext.Provider value={{ connected, iMsg, oMsg, setIMsg, setOMsg }}>
+    <WsContext.Provider value={{ ws, connected, iMsg, oMsg, setIMsg, setOMsg }}>
       {children}
     </WsContext.Provider>
   );

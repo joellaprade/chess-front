@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useWsContext } from "../context/WsContext";
 import { useAuth } from "../context/AuthContext";
 import { Instruction } from "../types/instruction";
@@ -7,28 +7,29 @@ import { usePathname, useRouter } from "next/navigation";
 import { useGameContext } from "../context/GameContext";
 
 const useWs = () => {
-  const { iMsg, oMsg, connected, setIMsg, setOMsg } = useWsContext();
+  const { iMsg, oMsg, connected, setIMsg, setOMsg, ws } = useWsContext();
   const { playersData, isThisPlayerWhite, gameId } = useGameContext();
   const userId = useAuth().session?.userId;
   const wssUrl = process.env.NEXT_PUBLIC_WS_BACKEND_URL;
-  const [ws, setWs] = useState<WebSocket | null>(null);
   const pathname = usePathname();
   const router = useRouter();
 
-  const connect = (isReconnect: boolean) => {
+  const connect = () => {
+    const isReconnect = localStorage.getItem("gameId") != undefined && pathname == "/game";
+
     if (!userId || !wssUrl || ["/login"].includes(pathname) || connected.current) return;
     connected.current = true;
 
     try {
       const wsRes = new WebSocket(wssUrl);
-      setWs(wsRes);
-      initWs(wsRes, isReconnect);
+      ws.current = wsRes;
+      initWs(ws.current, isReconnect);
     } catch (e) {
       console.error(e);
     }
   };
   const close = () => {
-    if (!connected.current) ws?.close();
+    if (!connected.current) ws.current?.close();
   };
   const initWs = (ws: WebSocket, isReconnect: boolean) => {
     ws.onopen = () => {
@@ -53,7 +54,7 @@ const useWs = () => {
   const sendMsg = () => {
     if (!ws || !oMsg || !connected.current) return;
 
-    ws.send(JSON.stringify(oMsg));
+    ws.current?.send(JSON.stringify(oMsg));
   };
   const runReplyAction = (notif: Instruction) => {
     const reply = notif.replyAction;
@@ -109,13 +110,10 @@ const useWs = () => {
     });
   };
 
-  useEffect(() => console.log(iMsg), [iMsg]);
+  // useEffect(() => console.log(iMsg), [iMsg]);
   useEffect(handleMessage, [iMsg]);
   useEffect(sendMsg, [oMsg]);
-  useEffect(() => {
-    const wasInGame = localStorage.getItem("gameId") != undefined && pathname == "/game";
-    connect(wasInGame);
-  }, [userId]);
+  useEffect(connect, [userId]);
   useEffect(close, [connected.current]);
 
   return {
