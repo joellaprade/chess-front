@@ -4,8 +4,10 @@ import QueenPopup from "@/reusable/components/game/QueenPopup";
 import { useBoardContext } from "../../context/BoardContext";
 import { useBoardUtils } from "./useBoardUtils";
 import { useCheckMove } from "./useCheckMove";
+import useGame from "./useGameWs";
 
 const useBoard = () => {
+  const { sendMove } = useGame();
   const {
     selectedSquare,
     selectedPieceLegalMoves,
@@ -47,6 +49,7 @@ const useBoard = () => {
     const isMoveValid = validateMove(selectedSquare!, destination);
     if (!isMoveValid) return handleWrongMove();
 
+    sendMove(selectedSquare!, destination);
     handleMove(movingPiece, destination);
   };
   const getColor = (id: number) => {

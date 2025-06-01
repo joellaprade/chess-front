@@ -2,8 +2,10 @@
 import Board from "@/reusable/components/game/Board";
 import User from "@/reusable/components/game/User";
 import { useGameContext } from "@/reusable/context/GameContext";
+import useWs from "@/reusable/hooks/useWs";
 
 const Game = () => {
+  useWs();
   const { playersData, isThisPlayerWhite } = useGameContext();
 
   const thisPlayer = playersData.current[isThisPlayerWhite.current ? 0 : 1];

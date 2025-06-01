@@ -7,6 +7,7 @@ import { WsContextProvider } from "@/reusable/context/WsContext";
 import { NotificationContextProvider } from "@/reusable/context/NotificationContext";
 import { PlayerContextProvider } from "@/reusable/context/PlayerContext";
 import { headers } from "next/headers";
+import { GameContextProvider } from "@/reusable/context/GameContext";
 
 const raleway = localFont({
   src: "../public/fonts/Raleway-VariableFont_wght.ttf",
@@ -33,9 +34,11 @@ export default async function RootLayout({
         <AuthContextProvider initialSession={JSON.stringify(session)}>
           <WsContextProvider>
             <NotificationContextProvider>
-              <PlayerContextProvider playerData={JSON.stringify(player)}>
-                {children}
-              </PlayerContextProvider>
+              <GameContextProvider>
+                <PlayerContextProvider playerData={JSON.stringify(player)}>
+                  {children}
+                </PlayerContextProvider>
+              </GameContextProvider>
             </NotificationContextProvider>
           </WsContextProvider>
         </AuthContextProvider>

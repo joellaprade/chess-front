@@ -5,6 +5,7 @@ import crypto from "crypto";
 import { Player } from "../models/Player";
 import { cache } from "react";
 import db from "./db";
+import mongoose from "mongoose";
 
 export const createSession = async ({
   name,
@@ -70,13 +71,14 @@ export const getPlayer = cache(async (): Promise<Player | null> => {
     let userId = cookieStore.get("userId")?.value;
 
     if (userId) {
-      const player = await Player.findOne({ userId })
-        .populate([
-          { path: "friends", select: "username image userid isOnline" },
-          { path: "friendReqs", select: "username image userid" },
-          { path: "gameReqs", select: "username image userid" },
-        ])
-        .lean<Player | null>();
+      const player: Player | null = await Player.findOne({ userId }).populate([
+        { path: "friends", select: "username image userid isOnline" },
+        { path: "friendReqs", select: "username image userid" },
+        { path: "gameReqs", select: "username image userid" },
+      ])
+      .lean<Player | null>();
+      if(!player) return null;
+      
       return player;
     } else return null;
   } catch (e) {
