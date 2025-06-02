@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useRef, useState } from "react";
 import { Board } from "../types/board";
 import useRefState from "../hooks/useRefState";
 import { AttackData } from "@/reusable/types/attackData";
@@ -12,10 +12,11 @@ type BoardContextProviderProps = {
 type BoardContextType = {
   board: Board;
   selectedSquare: number | null;
-  selectedPieceLegalMoves: number[];
   showQueenPopup: boolean;
   isWhiteTurn: boolean;
   upgradingPawn: number | null;
+
+  selectedPieceLegalMoves: React.RefObject<number[]>;
 
   getAttackData: () => [AttackData];
   setAttackData: (newValue: [AttackData], path?: string) => void;
@@ -25,7 +26,6 @@ type BoardContextType = {
   setHasRookMove: (newValue: any, path?: string) => void;
   setBoard: React.Dispatch<React.SetStateAction<Board>>;
   setSelectedSquare: React.Dispatch<React.SetStateAction<number | null>>;
-  setSelectedPieceLegalMoves: React.Dispatch<React.SetStateAction<number[]>>;
   setShowQueenPopup: React.Dispatch<React.SetStateAction<boolean>>;
   setIsWhiteTurn: React.Dispatch<React.SetStateAction<boolean>>;
   setUpgradingPawn: React.Dispatch<React.SetStateAction<number | null>>;
@@ -133,9 +133,9 @@ export const BoardContextProvider = ({ children }: BoardContextProviderProps) =>
       { id: 63, code: "h1", piece: "wR" },
     ],
   ];
-  const [board, setBoard] = useState<Board>(defaultBoard);
+  const LSBoard = JSON.parse(localStorage.getItem("board") || "null");
+  const [board, setBoard] = useState<Board>(LSBoard || defaultBoard);
   const [selectedSquare, setSelectedSquare] = useState<number | null>(null);
-  const [selectedPieceLegalMoves, setSelectedPieceLegalMoves] = useState<number[]>([]);
   const [showQueenPopup, setShowQueenPopup] = useState(false);
   const [isWhiteTurn, setIsWhiteTurn] = useState(true);
   const [upgradingPawn, setUpgradingPawn] = useState<number | null>(null);
@@ -153,6 +153,7 @@ export const BoardContextProvider = ({ children }: BoardContextProviderProps) =>
   });
   const [getAttackData, setAttackData] = useRefState([]);
   const [getDefenseData, setDefenseData] = useRefState([]);
+  const selectedPieceLegalMoves = useRef<number[]>([]);
 
   return (
     <BoardContext.Provider
@@ -167,7 +168,6 @@ export const BoardContextProvider = ({ children }: BoardContextProviderProps) =>
         setHasRookMove,
         setBoard,
         setSelectedSquare,
-        setSelectedPieceLegalMoves,
         setShowQueenPopup,
         setIsWhiteTurn,
         setUpgradingPawn,

@@ -21,7 +21,7 @@ const Board = ({ isWhite }: { isWhite: boolean }) => {
         {row.map((square, cI) => (
           <div
             className={`square ${getColor(square.id)} ${colorLegalSquares(square.id)}`}
-            onClick={() => handlePieceClick(square.id)}
+            onClick={() => handlePieceClick(square)}
             key={cI}
           >
             {/* <span className="absolute">{square.id}</span> */}

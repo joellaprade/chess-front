@@ -42,7 +42,7 @@ export const useCheckRook = () => {
     return possibleMoves;
   };
   const validateRook = (destination: number) => {
-    const isValid = selectedPieceLegalMoves.includes(destination);
+    const isValid = selectedPieceLegalMoves.current.includes(destination);
     if (!isValid) return false;
 
     const piece = getSquareById(getOrigin()).piece;

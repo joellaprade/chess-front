@@ -7,10 +7,12 @@ import { useCheckMove } from "./useCheckMove";
 import useGameWs from "./useGameWs";
 import { useEffect } from "react";
 import { Instruction } from "@/reusable/types/instruction";
+import { useGameContext } from "@/reusable/context/GameContext";
 
 const useBoard = () => {
   const { incommingMove, sendMove } = useGameWs();
   const {
+    board,
     selectedSquare,
     selectedPieceLegalMoves,
     isWhiteTurn,
@@ -18,32 +20,34 @@ const useBoard = () => {
     upgradingPawn,
     setBoard,
     setSelectedSquare,
-    setSelectedPieceLegalMoves,
   } = useBoardContext();
   const { calculateLegalMoves, validateMove, handleWrongMove } = useCheckMove();
   const { getSquareById } = useBoardUtils();
+  const { isThisPlayerWhite } = useGameContext();
 
   const handleOppMove = (instruction: Instruction | null) => {
     if (!instruction) return;
     const { origin, destination } = instruction.payload;
     const movingPiece = getSquareById(origin).piece;
-    const moves = calculateLegalMoves(origin);
+    selectedPieceLegalMoves.current = calculateLegalMoves(origin);
+
     const isValid = validateMove(origin, destination);
     if (isValid) {
-      handleMove(movingPiece, destination);
+      handleMove(movingPiece, destination, origin);
     }
   };
 
   const colorLegalSquares = (id: number) => {
     if (selectedSquare != 0 && !selectedSquare) return "";
-    if (selectedPieceLegalMoves.includes(id)) return "valid-square-indicator";
+    if (selectedPieceLegalMoves.current.includes(id)) return "valid-square-indicator";
     return "";
   };
-  const handleMove = (movingPiece: string, destination: number) => {
+  const handleMove = (movingPiece: string, destination: number, origin?: number) => {
+    if (!origin) origin = selectedSquare!;
     setBoard((prevBoard) =>
       prevBoard.map((row) =>
         row.map((square) => {
-          if (square.id === selectedSquare) {
+          if (square.id === origin) {
             // remove selected piece
             return { ...square, piece: "" };
           } else if (square.id === destination) {
@@ -74,19 +78,24 @@ const useBoard = () => {
 
     return color;
   };
-  const handlePieceClick = (index: number) => {
+  const handlePieceClick = ({ id: index, piece }: { id: number; code: string; piece: string }) => {
+    const allowedColor = isThisPlayerWhite.current ? "w" : "b";
+    const targetSquareColor = piece.charAt(0);
+    console.log(piece.charAt(0));
+    console.log(allowedColor);
+    if (targetSquareColor !== "" && targetSquareColor !== allowedColor) return;
     if (selectedSquare === null) {
       setSelectedSquare(index);
-      setSelectedPieceLegalMoves(calculateLegalMoves(index));
+      selectedPieceLegalMoves.current = calculateLegalMoves(index);
     } else if (index === selectedSquare) {
       setSelectedSquare(null);
-      setSelectedPieceLegalMoves([]);
+      selectedPieceLegalMoves.current = [];
     } else if (getSquareById(selectedSquare).piece !== "") {
       movePiece(index);
-      setSelectedPieceLegalMoves([]);
+      selectedPieceLegalMoves.current = [];
       setSelectedSquare(null);
     } else {
-      setSelectedPieceLegalMoves([]);
+      selectedPieceLegalMoves.current = [];
       setSelectedSquare(null);
     }
   };
@@ -96,6 +105,9 @@ const useBoard = () => {
     );
   };
 
+  useEffect(() => {
+    localStorage.setItem("board", JSON.stringify(board));
+  }, [board]);
   useEffect(() => {
     handleOppMove(incommingMove);
   }, [incommingMove]);

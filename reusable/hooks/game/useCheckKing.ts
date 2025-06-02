@@ -123,7 +123,7 @@ export const useCheckKing = () => {
     return true;
   };
   const validateKing = (destination: number) => {
-    let isValid = selectedPieceLegalMoves.includes(destination);
+    let isValid = selectedPieceLegalMoves.current.includes(destination);
     if (!isValid) return false;
     isValid = !handleCastle(destination);
     if (!isValid) return false;

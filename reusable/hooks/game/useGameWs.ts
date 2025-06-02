@@ -22,7 +22,7 @@ const useGameWs = () => {
   const handleMessage = (instruction: Instruction) => {
     switch (instruction.action) {
       case "move":
-        setIncommingMove(instruction.payload);
+        setIncommingMove(instruction as Instruction);
         break;
     }
   };

@@ -18,7 +18,7 @@ export const useCheckBishop = () => {
     return possibleMoves;
   };
   const validateBishop = (destination: number) => {
-    const isValid = selectedPieceLegalMoves.includes(destination);
+    const isValid = selectedPieceLegalMoves.current.includes(destination);
     if (!isValid) return false;
 
     const piece = getSquareById(getOrigin()).piece;

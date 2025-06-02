@@ -38,7 +38,7 @@ export const useCheckPawn = () => {
   const checkIsTwoSquareMove = (destination: number) => {
     const isWhite = getPieceColor() === "w";
     const destinationOffset = isWhite ? destination + 8 : destination - 8;
-    if (selectedPieceLegalMoves.includes(destinationOffset)) {
+    if (selectedPieceLegalMoves.current.includes(destinationOffset)) {
       setDoubleSquarePawn(destination);
     } else {
       setDoubleSquarePawn(null);
@@ -131,7 +131,7 @@ export const useCheckPawn = () => {
     return possibleMoves;
   };
   const validatePawn = (destination: number) => {
-    const isValid = selectedPieceLegalMoves.includes(destination);
+    const isValid = selectedPieceLegalMoves.current.includes(destination);
     if (!isValid) return false;
 
     checkIsTwoSquareMove(destination);

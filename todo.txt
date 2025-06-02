@@ -1,6 +1,4 @@
 
-arreglar call loop entre useGameWs y useBoard
-cambiar selectedPieceLegalMoves a useRef (y revisar que otros vars innecesariamente son useStae)
 averiguar como poner handleOppMove en useBoard y llamarlo desde useGameWs
 
 
