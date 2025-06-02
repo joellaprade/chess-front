@@ -6,8 +6,7 @@ import useRefState from "../useRefState";
 
 export const useCheckRook = () => {
   const { getSquareById, calculatePossibleMoves } = useBoardUtils();
-  const { selectedPieceLegalMoves, setSelectedPieceLegalMoves, getHasRookMove, setHasRookMove } =
-    useBoardContext();
+  const { selectedPieceLegalMoves, getHasRookMove, setHasRookMove } = useBoardContext();
 
   const [getOrigin, setOrigin] = useRefState(NaN);
 
@@ -49,7 +48,6 @@ export const useCheckRook = () => {
     const piece = getSquareById(getOrigin()).piece;
     const [_, isCheck] = calculatePossibleMoves(destination, piece, false, false, true);
 
-    setSelectedPieceLegalMoves([]);
     checkHasMoved(piece);
     return true;
   };

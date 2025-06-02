@@ -7,14 +7,7 @@ import { EvalSquareParam } from "@/reusable/types/evalSquareParamType";
 import { AttackData } from "@/reusable/types/attackData";
 
 export const useBoardUtils = () => {
-  const {
-    board,
-    setSelectedPieceLegalMoves,
-    getAttackData,
-    setAttackData,
-    getDefenseData,
-    setDefenseData,
-  } = useBoardContext();
+  const { board, getAttackData, setAttackData, getDefenseData, setDefenseData } = useBoardContext();
 
   // GETTERS & UTILS
   const getSquareById = (index: number) => {
@@ -761,7 +754,6 @@ export const useBoardUtils = () => {
         });
       });
     }
-    setSelectedPieceLegalMoves(possibleMoves);
     return [possibleMoves, isCheck, isAttacked];
   };
   const calculateKnight = (

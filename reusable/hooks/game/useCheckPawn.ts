@@ -9,13 +9,8 @@ import { EvalSquareParam } from "@/reusable/types/evalSquareParamType";
 export const useCheckPawn = () => {
   const { evaluateSquare, calculatePossibleMoves, getSquareById, getRowCol, getLimits } =
     useBoardUtils();
-  const {
-    selectedPieceLegalMoves,
-    setBoard,
-    setShowQueenPopup,
-    setSelectedPieceLegalMoves,
-    setUpgradingPawn,
-  } = useBoardContext();
+  const { selectedPieceLegalMoves, setBoard, setShowQueenPopup, setUpgradingPawn } =
+    useBoardContext();
 
   const [getOrigin, setOrigin] = useRefState(null);
   const [getPieceColor, setPieceColor] = useRefState(null);
@@ -146,7 +141,6 @@ export const useCheckPawn = () => {
     const piece = getSquareById(getOrigin()).piece;
     const [_, isCheck] = calculatePossibleMoves(destination, piece, false, false, true);
 
-    setSelectedPieceLegalMoves([]);
     return true;
   };
 

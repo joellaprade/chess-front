@@ -6,7 +6,7 @@ import { useBoardContext } from "@/reusable/context/BoardContext";
 
 export const useCheckKnight = () => {
   const { getSquareById, calculatePossibleMoves } = useBoardUtils();
-  const { selectedPieceLegalMoves, setSelectedPieceLegalMoves } = useBoardContext();
+  const { selectedPieceLegalMoves } = useBoardContext();
   const [getOrigin, setOrigin] = useRefState(null);
 
   const calculateKnight = (origin: number) => {
@@ -22,7 +22,6 @@ export const useCheckKnight = () => {
     const piece = getSquareById(getOrigin()).piece;
     const [_, isCheck] = calculatePossibleMoves(destination, piece, false, false, true);
 
-    setSelectedPieceLegalMoves([]);
     return true;
   };
 

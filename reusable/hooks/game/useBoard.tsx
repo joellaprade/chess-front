@@ -5,9 +5,11 @@ import { useBoardContext } from "../../context/BoardContext";
 import { useBoardUtils } from "./useBoardUtils";
 import { useCheckMove } from "./useCheckMove";
 import useGameWs from "./useGameWs";
+import { useEffect } from "react";
+import { Instruction } from "@/reusable/types/instruction";
 
 const useBoard = () => {
-  const { sendMove } = useGameWs();
+  const { incommingMove, sendMove } = useGameWs();
   const {
     selectedSquare,
     selectedPieceLegalMoves,
@@ -20,6 +22,17 @@ const useBoard = () => {
   } = useBoardContext();
   const { calculateLegalMoves, validateMove, handleWrongMove } = useCheckMove();
   const { getSquareById } = useBoardUtils();
+
+  const handleOppMove = (instruction: Instruction | null) => {
+    if (!instruction) return;
+    const { origin, destination } = instruction.payload;
+    const movingPiece = getSquareById(origin).piece;
+    const moves = calculateLegalMoves(origin);
+    const isValid = validateMove(origin, destination);
+    if (isValid) {
+      handleMove(movingPiece, destination);
+    }
+  };
 
   const colorLegalSquares = (id: number) => {
     if (selectedSquare != 0 && !selectedSquare) return "";
@@ -67,10 +80,13 @@ const useBoard = () => {
       setSelectedPieceLegalMoves(calculateLegalMoves(index));
     } else if (index === selectedSquare) {
       setSelectedSquare(null);
+      setSelectedPieceLegalMoves([]);
     } else if (getSquareById(selectedSquare).piece !== "") {
       movePiece(index);
+      setSelectedPieceLegalMoves([]);
       setSelectedSquare(null);
     } else {
+      setSelectedPieceLegalMoves([]);
       setSelectedSquare(null);
     }
   };
@@ -79,6 +95,10 @@ const useBoard = () => {
       showQueenPopup && <QueenPopup color={isWhiteTurn ? "w" : "b"} destination={upgradingPawn!} />
     );
   };
+
+  useEffect(() => {
+    handleOppMove(incommingMove);
+  }, [incommingMove]);
 
   return {
     getSquareById,

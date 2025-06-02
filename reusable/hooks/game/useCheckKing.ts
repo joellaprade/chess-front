@@ -6,8 +6,7 @@ import useRefState from "../useRefState";
 
 export const useCheckKing = () => {
   const { calculatePossibleMoves, getSquareById } = useBoardUtils();
-  const { selectedPieceLegalMoves, setBoard, setSelectedPieceLegalMoves, getHasRookMove } =
-    useBoardContext();
+  const { selectedPieceLegalMoves, setBoard, getHasRookMove } = useBoardContext();
   const [getOrigin, setOrigin] = useRefState(null);
   const [getHasKingMoved, setHasKingMoved] = useRefState({
     white: false,
@@ -130,7 +129,6 @@ export const useCheckKing = () => {
     if (!isValid) return false;
 
     checkHasMoved();
-    setSelectedPieceLegalMoves([]);
 
     return true;
   };
