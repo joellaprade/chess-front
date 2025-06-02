@@ -1,11 +1,5 @@
 "use client";
 import { createContext, useContext, useRef, useState } from "react";
-import { Instruction } from "@/reusable/types/instruction";
-
-type setOMsgOptions =
-  | { action: "add-friend"; payload: any }
-  | { action: "notify-only"; payload: any }
-  | { action: string; payload: any };
 
 type WsContextProviderProps = {
   children: React.ReactNode;
@@ -14,19 +8,13 @@ type WsContextProviderProps = {
 type WsContextType = {
   ws: React.RefObject<WebSocket | null>;
   connected: React.RefObject<boolean>;
-  iMsg: Instruction | null;
-  oMsg: Instruction | null;
-  setIMsg: (instruction: Instruction | null) => void;
-  setOMsg: (instruction: setOMsgOptions | null) => void;
+  handleFunctionsPool: React.RefObject<Map<string, Function>>;
 };
 
 const WsDefaultValues: WsContextType = {
   ws: { current: null },
   connected: { current: false },
-  iMsg: null,
-  oMsg: null,
-  setIMsg: (instruction: Instruction | null) => {},
-  setOMsg: (instruction: setOMsgOptions | null) => {},
+  handleFunctionsPool: { current: new Map() },
 };
 
 export const WsContext = createContext<WsContextType>(WsDefaultValues);
@@ -42,12 +30,11 @@ export const useWsContext = () => {
 
 export const WsContextProvider = ({ children }: WsContextProviderProps) => {
   const ws = useRef<WebSocket | null>(null);
-  const [iMsg, setIMsg] = useState<Instruction | null>(null);
-  const [oMsg, setOMsg] = useState<setOMsgOptions | null>(null);
   const connected = useRef(false);
+  const handleFunctionsPool = useRef(new Map());
 
   return (
-    <WsContext.Provider value={{ ws, connected, iMsg, oMsg, setIMsg, setOMsg }}>
+    <WsContext.Provider value={{ ws, connected, handleFunctionsPool }}>
       {children}
     </WsContext.Provider>
   );

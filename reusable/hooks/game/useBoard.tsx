@@ -4,10 +4,10 @@ import QueenPopup from "@/reusable/components/game/QueenPopup";
 import { useBoardContext } from "../../context/BoardContext";
 import { useBoardUtils } from "./useBoardUtils";
 import { useCheckMove } from "./useCheckMove";
-import useGame from "./useGameWs";
+import useGameWs from "./useGameWs";
 
 const useBoard = () => {
-  const { sendMove } = useGame();
+  const { sendMove } = useGameWs();
   const {
     selectedSquare,
     selectedPieceLegalMoves,

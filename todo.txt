@@ -1,22 +1,10 @@
 
+arreglar call loop entre useGameWs y useBoard
+cambiar selectedPieceLegalMoves a useRef (y revisar que otros vars innecesariamente son useStae)
+averiguar como poner handleOppMove en useBoard y llamarlo desde useGameWs
+
+
+
+
 KING PUEDE HACER DISCOVERED CHECK
-
 agregar pawn special moves a engine para calcular defenses
-
-gestionar duplicados al correr calcHorse y agregar defendants
-
-implementar check y checkmate
-
-si mi reina ataca al rey, y una torre puede comerse a mi reina, el engine no lo permite
-
-
-
-
-
-evaluar         if (destSquare.piece.charAt(1) != "K") isAttacked = true;
-
-
-
-
-revisar si todos los useCheckPiece tienen el validate igual al de la reina
-

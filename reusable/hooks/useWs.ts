@@ -7,12 +7,11 @@ import { usePathname, useRouter } from "next/navigation";
 import { useGameContext } from "../context/GameContext";
 
 const useWs = () => {
-  const { iMsg, oMsg, connected, setIMsg, setOMsg, ws } = useWsContext();
-  const { playersData, isThisPlayerWhite, gameId } = useGameContext();
+  const { connected, ws, handleFunctionsPool } = useWsContext();
+  const { gameId } = useGameContext();
   const userId = useAuth().session?.userId;
   const wssUrl = process.env.NEXT_PUBLIC_WS_BACKEND_URL;
   const pathname = usePathname();
-  const router = useRouter();
 
   const connect = () => {
     const isReconnect = localStorage.getItem("gameId") != undefined && pathname == "/game";
@@ -36,91 +35,72 @@ const useWs = () => {
       connected.current = true;
       if (isReconnect) {
         setTimeout(() => {
-          ws.send(
-            JSON.stringify({
-              action: "reconnect",
-              payload: { gameId: gameId.current, userId },
-            }),
-          );
+          sendMsg({
+            route: "game",
+            action: "reconnect",
+            payload: { gameId: gameId.current, userId },
+          });
         }, 1000);
       }
     };
-    ws.onclose = () => (connected.current = false);
+    ws.onclose = close;
     ws.onmessage = ({ data }: { data: string }) => {
-      const message = JSON.parse(data);
-      setIMsg(message);
+      const message: Instruction = JSON.parse(data);
+      handleMessage(message);
     };
   };
-  const sendMsg = () => {
-    if (!ws || !oMsg || !connected.current) return;
+  const sendMsg = (msg: Instruction) => {
+    if (!ws || !connected.current) return;
 
-    ws.current?.send(JSON.stringify(oMsg));
+    ws.current?.send(JSON.stringify(msg));
   };
-  const runReplyAction = (notif: Instruction) => {
-    const reply = notif.replyAction;
+  const runReplyAction = (instruction: Instruction) => {
+    const reply = instruction.replyAction;
     if (!reply) return;
 
-    setOMsg({ ...reply });
+    sendMsg(reply);
   };
-  const handleMessage = () => {
-    switch (iMsg?.action) {
-      case "start-game":
-        redirectToGame(iMsg.payload);
-        break;
-    }
-  };
-
-  // Logic
-  const redirectToGame = (payload: any[]) => {
-    const [p1, p2, gameId_, isWhite] = payload;
-    playersData.current = [p1, p2];
-    isThisPlayerWhite.current = isWhite;
-    gameId.current = gameId_;
-
-    localStorage.setItem("playerData", JSON.stringify([p1, p2]));
-    localStorage.setItem("isThisPlayerWhite", JSON.stringify(isWhite));
-    localStorage.setItem("gameId", JSON.stringify(gameId_));
-
-    router.push("/game");
+  const handleMessage = (message: Instruction) => {
+    const targetFunction = handleFunctionsPool.current.get(message.route);
+    if (targetFunction) targetFunction(message);
   };
 
   // Messages
   const requestGameToFriend = (playerId: string) => {
-    setOMsg({
+    sendMsg({
+      route: "homepage",
       action: "game-request",
       payload: { playerId },
     });
   };
   const sendAddRequest = (username: string) => {
-    setOMsg({
+    sendMsg({
+      route: "homepage",
       action: "add-friend",
       payload: { username },
     });
   };
   const addFriend = (username: string) => {
-    setOMsg({
+    sendMsg({
+      route: "homepage",
       action: "add-friend",
       payload: { username },
     });
   };
   const handleRemoveFriend = (username: string) => {
-    setOMsg({
+    sendMsg({
+      route: "homepage",
       action: "remove-friend",
       payload: { username },
     });
   };
 
-  useEffect(handleMessage, [iMsg]);
-  useEffect(() => {
-    sendMsg();
-    console.log(oMsg);
-  }, [oMsg]);
   useEffect(connect, [userId]);
   useEffect(close, [connected.current]);
 
   return {
+    sendMsg,
     connect,
-    redirectToGame,
     requestGameToFriend,
     sendAddRequest,
     addFriend,

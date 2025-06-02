@@ -2,11 +2,10 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { Player } from "../models/Player";
-import PlayerController from "./PlayerController";
 
-type PlayerContextProviderProps = {
+type HomePageContextProviderProps = {
   children: React.ReactNode;
-  playerData: string | null;
+  homePageData: string | null;
 };
 
 type player = {
@@ -15,7 +14,7 @@ type player = {
   gameReqs: Array<Player>;
 };
 
-type PlayerContextType = {
+type HomePageContextType = {
   friends: Array<Player>;
   friendReqs: Array<Player>;
   gameReqs: Array<Player>;
@@ -24,7 +23,7 @@ type PlayerContextType = {
   setGameReqs: React.Dispatch<React.SetStateAction<Player[]>>;
 };
 
-const defaultPlayer: PlayerContextType = {
+const defaultPlayer: HomePageContextType = {
   friends: [],
   friendReqs: [],
   gameReqs: [],
@@ -33,10 +32,10 @@ const defaultPlayer: PlayerContextType = {
   setGameReqs: () => {},
 };
 
-export const PlayerContext = createContext(defaultPlayer);
+export const HomePageContext = createContext(defaultPlayer);
 
-export const usePlayer = () => {
-  const context = useContext(PlayerContext);
+export const useHomePageContext = () => {
+  const context = useContext(HomePageContext);
 
   if (context) {
     return context;
@@ -45,21 +44,17 @@ export const usePlayer = () => {
   }
 };
 
-export const PlayerContextProvider = ({
+export const HomePageContextProvider = ({
   children,
-  playerData,
-}: PlayerContextProviderProps) => {
-  let parsedPlayer: player = playerData ? JSON.parse(playerData) : null;
-  const [friends, setFriends] = useState<Player[]>(parsedPlayer?.friends || []);
-  const [friendReqs, setFriendReqs] = useState<Player[]>(
-    parsedPlayer?.friendReqs || [],
-  );
-  const [gameReqs, setGameReqs] = useState<Player[]>(
-    parsedPlayer?.gameReqs || [],
-  );
+  homePageData,
+}: HomePageContextProviderProps) => {
+  let parsedHomePage: player = homePageData ? JSON.parse(homePageData) : null;
+  const [friends, setFriends] = useState<Player[]>(parsedHomePage?.friends || []);
+  const [friendReqs, setFriendReqs] = useState<Player[]>(parsedHomePage?.friendReqs || []);
+  const [gameReqs, setGameReqs] = useState<Player[]>(parsedHomePage?.gameReqs || []);
 
   return (
-    <PlayerContext.Provider
+    <HomePageContext.Provider
       value={{
         friends,
         friendReqs,
@@ -70,7 +65,6 @@ export const PlayerContextProvider = ({
       }}
     >
       {children}
-      <PlayerController />
-    </PlayerContext.Provider>
+    </HomePageContext.Provider>
   );
 };

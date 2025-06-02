@@ -1,12 +1,12 @@
 "use client";
 
 import Friend from "@/reusable/components/home/Friend";
-import { usePlayer } from "@/reusable/context/PlayerContext";
+import { useHomePageContext } from "@/reusable/context/HomePageContext";
 import { Mail } from "lucide-react";
 import Link from "next/link";
 
 export default function Page() {
-  const { friends, gameReqs, friendReqs } = usePlayer();
+  const { friends, gameReqs, friendReqs } = useHomePageContext();
   const hasInvitations = gameReqs.length > 0 || friendReqs.length > 0;
 
   return (

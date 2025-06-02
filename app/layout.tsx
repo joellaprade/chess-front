@@ -4,8 +4,7 @@ import localFont from "next/font/local";
 import { AuthContextProvider } from "@/reusable/context/AuthContext";
 import { getPlayer, getSession } from "@/reusable/lib/auth";
 import { WsContextProvider } from "@/reusable/context/WsContext";
-import { NotificationContextProvider } from "@/reusable/context/NotificationContext";
-import { PlayerContextProvider } from "@/reusable/context/PlayerContext";
+import { HomePageContextProvider } from "@/reusable/context/HomePageContext";
 import { headers } from "next/headers";
 import { GameContextProvider } from "@/reusable/context/GameContext";
 
@@ -33,13 +32,11 @@ export default async function RootLayout({
       <body className={`${raleway.variable} flex h-full flex-col antialiased`}>
         <AuthContextProvider initialSession={JSON.stringify(session)}>
           <WsContextProvider>
-            <NotificationContextProvider>
-              <GameContextProvider>
-                <PlayerContextProvider playerData={JSON.stringify(player)}>
-                  {children}
-                </PlayerContextProvider>
-              </GameContextProvider>
-            </NotificationContextProvider>
+            <GameContextProvider>
+              <HomePageContextProvider homePageData={JSON.stringify(player)}>
+                {children}
+              </HomePageContextProvider>
+            </GameContextProvider>
           </WsContextProvider>
         </AuthContextProvider>
       </body>

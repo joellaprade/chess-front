@@ -3,24 +3,26 @@
 import { Check } from "lucide-react";
 import { X } from "lucide-react";
 import Image from "next/image";
-import { useNotifications } from "@/reusable/context/NotificationContext";
 import { useEffect, useState } from "react";
 import { Instruction } from "@/reusable/types/instruction";
 import useWs from "@/reusable/hooks/useWs";
+import { useWsContext } from "@/reusable/context/WsContext";
+import useHomePage from "@/reusable/hooks/useHomePage";
 
 const Notification = () => {
+  const { notificationHandler } = useHomePage();
+  const { handleFunctionsPool } = useWsContext();
   const { runReplyAction } = useWs();
-  const notif = useNotifications().notif as Instruction;
-  const [notification, setNotification] = useState<Instruction | null>(notif);
+  const [notification, setNotification] = useState<Instruction | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [showNotif, setShowNotif] = useState(false);
   const [showProfilePic, setShowProfilePic] = useState(false);
   const [showReplyActionBtn, setShowReplyActionBtn] = useState(false);
 
-  const getMessage = () => {
-    switch (notif.action) {
+  const setInstructionMessage = (instruction: Instruction) => {
+    switch (instruction.action) {
       case "error":
-        setMessage(notif.payload.message);
+        setMessage(instruction.payload.message);
         break;
       case "notify-friend-request":
         setMessage("Solicitud de amistad de:");
@@ -43,13 +45,13 @@ const Notification = () => {
     }
   };
 
-  const handleNotif = () => {
-    if (notif) {
-      getMessage();
-      setNotification(notif);
-      setShowNotif(notif.action.includes("notify"));
-      setShowProfilePic(!notif.action.includes("error"));
-      setShowReplyActionBtn(!notif.action.includes("notify-only"));
+  const handleNotification = (instruction: Instruction) => {
+    if (instruction) {
+      setInstructionMessage(instruction);
+      setNotification(instruction);
+      setShowNotif(instruction.action.includes("notify"));
+      setShowProfilePic(!instruction.action.includes("error"));
+      setShowReplyActionBtn(!instruction.action.includes("notify-only"));
       setTimeout(() => setShowNotif(false), 8000);
     } else {
       setNotification(null);
@@ -59,7 +61,9 @@ const Notification = () => {
     }
   };
 
-  useEffect(handleNotif, [notif]);
+  useEffect(() => {
+    notificationHandler.current = handleNotification;
+  }, []);
 
   return (
     <div className={`notification ${showNotif ? "translate-y-0" : ""} `}>
@@ -79,7 +83,7 @@ const Notification = () => {
       <div className={`flex items-center gap-3`}>
         <button
           onClick={() => {
-            runReplyAction(notif);
+            runReplyAction(notification || ({} as Instruction));
             setShowNotif(false);
           }}
           className={`${showReplyActionBtn ? "" : "hidden"} bg-green small-btn`}
