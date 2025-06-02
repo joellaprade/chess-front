@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useRef, useState } from "react";
+import React, { createContext, useContext, useRef, useState } from "react";
 import { Board } from "../types/board";
 import useRefState from "../hooks/useRefState";
 import { AttackData } from "@/reusable/types/attackData";
@@ -13,10 +13,10 @@ type BoardContextType = {
   board: Board;
   selectedSquare: number | null;
   showQueenPopup: boolean;
-  isWhiteTurn: boolean;
   upgradingPawn: number | null;
 
   selectedPieceLegalMoves: React.RefObject<number[]>;
+  isWhiteTurn: React.RefObject<boolean>;
 
   getAttackData: () => [AttackData];
   setAttackData: (newValue: [AttackData], path?: string) => void;
@@ -27,7 +27,6 @@ type BoardContextType = {
   setBoard: React.Dispatch<React.SetStateAction<Board>>;
   setSelectedSquare: React.Dispatch<React.SetStateAction<number | null>>;
   setShowQueenPopup: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsWhiteTurn: React.Dispatch<React.SetStateAction<boolean>>;
   setUpgradingPawn: React.Dispatch<React.SetStateAction<number | null>>;
 };
 
@@ -137,7 +136,6 @@ export const BoardContextProvider = ({ children }: BoardContextProviderProps) =>
   const [board, setBoard] = useState<Board>(LSBoard || defaultBoard);
   const [selectedSquare, setSelectedSquare] = useState<number | null>(null);
   const [showQueenPopup, setShowQueenPopup] = useState(false);
-  const [isWhiteTurn, setIsWhiteTurn] = useState(true);
   const [upgradingPawn, setUpgradingPawn] = useState<number | null>(null);
   const [getHasRookMove, setHasRookMove] = useRefState({
     hasWhiteMoved: false,
@@ -154,6 +152,7 @@ export const BoardContextProvider = ({ children }: BoardContextProviderProps) =>
   const [getAttackData, setAttackData] = useRefState([]);
   const [getDefenseData, setDefenseData] = useRefState([]);
   const selectedPieceLegalMoves = useRef<number[]>([]);
+  const isWhiteTurn = useRef(true);
 
   return (
     <BoardContext.Provider
@@ -169,7 +168,6 @@ export const BoardContextProvider = ({ children }: BoardContextProviderProps) =>
         setBoard,
         setSelectedSquare,
         setShowQueenPopup,
-        setIsWhiteTurn,
         setUpgradingPawn,
         getAttackData,
         setAttackData,

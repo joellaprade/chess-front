@@ -33,6 +33,7 @@ const useBoard = () => {
 
     const isValid = validateMove(origin, destination);
     if (isValid) {
+      isWhiteTurn.current = !isWhiteTurn.current;
       handleMove(movingPiece, destination, origin);
     }
   };
@@ -66,8 +67,9 @@ const useBoard = () => {
     const isMoveValid = validateMove(selectedSquare!, destination);
     if (!isMoveValid) return handleWrongMove();
 
-    sendMove(selectedSquare!, destination);
+    isWhiteTurn.current = !isWhiteTurn.current;
     handleMove(movingPiece, destination);
+    sendMove(selectedSquare!, destination);
   };
   const getColor = (id: number) => {
     let row = Math.floor(id / 8);
@@ -79,11 +81,13 @@ const useBoard = () => {
     return color;
   };
   const handlePieceClick = ({ id: index, piece }: { id: number; code: string; piece: string }) => {
-    const allowedColor = isThisPlayerWhite.current ? "w" : "b";
-    const targetSquareColor = piece.charAt(0);
-    console.log(piece.charAt(0));
-    console.log(allowedColor);
-    if (targetSquareColor !== "" && targetSquareColor !== allowedColor) return;
+    const isThisPlayersTurn = isThisPlayerWhite.current === isWhiteTurn.current;
+    const originSquareColor = getSquareById(selectedSquare || index).piece.charAt(0);
+    const thisPlayerColor = isThisPlayerWhite.current ? "w" : "b";
+    const isThisPlayersPiece = originSquareColor == thisPlayerColor;
+
+    if (!isThisPlayersTurn || !isThisPlayersPiece) return;
+
     if (selectedSquare === null) {
       setSelectedSquare(index);
       selectedPieceLegalMoves.current = calculateLegalMoves(index);
@@ -101,7 +105,9 @@ const useBoard = () => {
   };
   const renderQueenPopup = () => {
     return (
-      showQueenPopup && <QueenPopup color={isWhiteTurn ? "w" : "b"} destination={upgradingPawn!} />
+      showQueenPopup && (
+        <QueenPopup color={isWhiteTurn.current ? "w" : "b"} destination={upgradingPawn!} />
+      )
     );
   };
 

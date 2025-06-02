@@ -38,6 +38,7 @@ const useHomePage = () => {
     isThisPlayerWhite.current = isWhite;
     gameId.current = gameId_;
 
+    localStorage.setItem("board", "");
     localStorage.setItem("playerData", JSON.stringify([p1, p2]));
     localStorage.setItem("isThisPlayerWhite", JSON.stringify(isWhite));
     localStorage.setItem("gameId", JSON.stringify(gameId_));
