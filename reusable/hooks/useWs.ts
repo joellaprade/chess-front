@@ -110,9 +110,11 @@ const useWs = () => {
     });
   };
 
-  // useEffect(() => console.log(iMsg), [iMsg]);
   useEffect(handleMessage, [iMsg]);
-  useEffect(sendMsg, [oMsg]);
+  useEffect(() => {
+    sendMsg();
+    console.log(oMsg);
+  }, [oMsg]);
   useEffect(connect, [userId]);
   useEffect(close, [connected.current]);
 

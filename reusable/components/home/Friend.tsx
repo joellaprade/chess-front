@@ -10,7 +10,7 @@ type Props = {
 
 const Friend = ({ player }: Props) => {
   const { username, image, isOnline, _id } = player;
-  const { handleRemoveFriend, redirectToGame, requestGameToFriend } = useWs();
+  const { handleRemoveFriend, requestGameToFriend } = useWs();
 
   return (
     <div className="flex items-center justify-between">

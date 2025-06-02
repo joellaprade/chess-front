@@ -7,10 +7,10 @@ const useGame = () => {
   const { setOMsg } = useWsContext();
 
   const sendMove = (origin: number, destination: number) => {
-    setOMsg({
-      action: "move",
-      payload: { gameId, origin, destination },
-    });
+    // setOMsg({
+    //   action: "move",
+    //   payload: { gameId, origin, destination },
+    // });
   };
 
   return { sendMove };
