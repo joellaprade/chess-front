@@ -1,10 +1,11 @@
+aplicar win/loose
+
+implementar tiempo
+implementar draw/resign
+
 implementar expire inactive/finished game
 implementar expire inactive ws
 
-aplicar win/loose
-implementar tiempo
-implementar draw/resign
-implementar random player matchup
 
 
 KING PUEDE HACER DISCOVERED CHECK

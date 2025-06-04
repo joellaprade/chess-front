@@ -1,11 +1,10 @@
 import Link from "next/link";
+import GameBtn from "./GameBtn";
 
 export default function Page() {
   return (
     <>
-      <Link className="w-full" href={"/game"}>
-        <button className="big-btn main-btn">Jugar</button>
-      </Link>
+      <GameBtn />
 
       <Link className="w-full" href={"/friends"}>
         <button className="big-btn secondary-btn">Amigos</button>

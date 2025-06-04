@@ -10,12 +10,15 @@ import useWs from "./useWs";
 
 const useHomePage = () => {
   const { sendMsg } = useWs();
-  const { playersData, isThisPlayerWhite, gameId } = useGameContext();
+  const { playersData, isThisPlayerWhite, gameId, isSearchingForGame } = useGameContext();
   const { handleFunctionsPool } = useWsContext();
   const { setFriends, setFriendReqs, setGameReqs, notificationHandler } = useHomePageContext();
   const router = useRouter();
 
   // RESPONDERS
+  const handlePlayerLeft = () => {
+    isSearchingForGame.current = false;
+  };
   const handleNewFriendReq = (player: Player) => {
     setFriendReqs((prevState) => [...prevState, player]);
   };
@@ -53,6 +56,8 @@ const useHomePage = () => {
   };
   const handleMessage = (instruction: Instruction) => {
     switch (instruction.action) {
+      case "notify-player-left":
+        handlePlayerLeft();
       case "notify-friend-request":
         handleNewFriendReq(instruction.payload);
         break;
@@ -82,6 +87,20 @@ const useHomePage = () => {
   };
 
   // MESSAGES
+  const requestRandomGame = () => {
+    sendMsg({
+      route: "homepage",
+      action: "random-game-request",
+      payload: { e: null },
+    });
+  };
+  const cancelRandomGame = () => {
+    sendMsg({
+      route: "homepage",
+      action: "random-game-cancel",
+      payload: { e: null },
+    });
+  };
   const requestGameToFriend = (playerId: string) => {
     sendMsg({
       route: "homepage",
@@ -125,7 +144,6 @@ const useHomePage = () => {
       payload: { username },
     });
   };
-
   const denyGameRequest = (gameId: string) => {
     setGameReqs((prevState) => prevState.filter((req) => req.gameId !== gameId));
     sendMsg({
@@ -148,6 +166,8 @@ const useHomePage = () => {
     removeFriend,
     denyFriendRequest,
     denyGameRequest,
+    requestRandomGame,
+    cancelRandomGame,
   };
 };
 
