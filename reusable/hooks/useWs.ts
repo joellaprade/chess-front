@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { useWsContext } from "../context/WsContext";
 import { useAuth } from "../context/AuthContext";
 import { Instruction } from "../types/instruction";
@@ -65,46 +65,12 @@ const useWs = () => {
     if (targetFunction) targetFunction(message);
   };
 
-  // Messages
-  const requestGameToFriend = (playerId: string) => {
-    sendMsg({
-      route: "homepage",
-      action: "game-request",
-      payload: { playerId },
-    });
-  };
-  const sendAddRequest = (username: string) => {
-    sendMsg({
-      route: "homepage",
-      action: "add-friend",
-      payload: { username },
-    });
-  };
-  const addFriend = (username: string) => {
-    sendMsg({
-      route: "homepage",
-      action: "add-friend",
-      payload: { username },
-    });
-  };
-  const handleRemoveFriend = (username: string) => {
-    sendMsg({
-      route: "homepage",
-      action: "remove-friend",
-      payload: { username },
-    });
-  };
-
   useEffect(connect, [userId]);
   useEffect(close, [connected.current]);
 
   return {
     sendMsg,
     connect,
-    requestGameToFriend,
-    sendAddRequest,
-    addFriend,
-    handleRemoveFriend,
     runReplyAction,
   };
 };

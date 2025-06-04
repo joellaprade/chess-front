@@ -113,6 +113,7 @@ const useBoard = () => {
 
   useEffect(() => {
     localStorage.setItem("board", JSON.stringify(board));
+    localStorage.setItem("isWhiteTurn", JSON.stringify(isWhiteTurn.current));
   }, [board]);
   useEffect(() => {
     handleOppMove(incommingMove);

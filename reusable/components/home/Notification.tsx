@@ -6,12 +6,12 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Instruction } from "@/reusable/types/instruction";
 import useWs from "@/reusable/hooks/useWs";
-import { useWsContext } from "@/reusable/context/WsContext";
 import useHomePage from "@/reusable/hooks/useHomePage";
+import { useHomePageContext } from "@/reusable/context/HomePageContext";
 
 const Notification = () => {
-  const { notificationHandler } = useHomePage();
-  const { handleFunctionsPool } = useWsContext();
+  useHomePage();
+  const { notificationHandler } = useHomePageContext();
   const { runReplyAction } = useWs();
   const [notification, setNotification] = useState<Instruction | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -21,7 +21,7 @@ const Notification = () => {
 
   const setInstructionMessage = (instruction: Instruction) => {
     switch (instruction.action) {
-      case "error":
+      case "notify-only-error":
         setMessage(instruction.payload.message);
         break;
       case "notify-friend-request":

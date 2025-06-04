@@ -133,6 +133,7 @@ export const BoardContextProvider = ({ children }: BoardContextProviderProps) =>
     ],
   ];
   const LSBoard = JSON.parse(localStorage.getItem("board") || "null");
+  const LSIsWhiteTurn = JSON.parse(localStorage.getItem("isWhiteTurn") || "null");
   const [board, setBoard] = useState<Board>(LSBoard || defaultBoard);
   const [selectedSquare, setSelectedSquare] = useState<number | null>(null);
   const [showQueenPopup, setShowQueenPopup] = useState(false);
@@ -152,7 +153,7 @@ export const BoardContextProvider = ({ children }: BoardContextProviderProps) =>
   const [getAttackData, setAttackData] = useRefState([]);
   const [getDefenseData, setDefenseData] = useRefState([]);
   const selectedPieceLegalMoves = useRef<number[]>([]);
-  const isWhiteTurn = useRef(true);
+  const isWhiteTurn = useRef(LSIsWhiteTurn === undefined ? true : LSIsWhiteTurn);
 
   return (
     <BoardContext.Provider

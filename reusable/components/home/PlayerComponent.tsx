@@ -1,16 +1,17 @@
 "use client";
 
 import { Player } from "@/reusable/models/Player";
+import { Check, X } from "lucide-react";
 import Image from "next/image";
 
 type Props = {
-  player: Player | string;
-  func?: (username: string) => void;
+  player: Record<string, any> | string;
+  acceptFunc: () => void;
+  denyFunc?: () => void;
 };
 
-const PlayerComponent = ({ player, func }: Props) => {
-  const parsedPlayer =
-    typeof player == "string" ? (JSON.parse(player) as Player) : player;
+const PlayerComponent = ({ player, acceptFunc, denyFunc }: Props) => {
+  const parsedPlayer = typeof player == "string" ? (JSON.parse(player) as Player) : player;
   const { username, image } = parsedPlayer;
   return (
     <div className="flex items-center justify-between">
@@ -24,15 +25,17 @@ const PlayerComponent = ({ player, func }: Props) => {
         />
         <h3>{username}</h3>
       </div>
-      <button onClick={() => func?.(username)} className="small-btn bg-green">
-        <Image
-          src={"/assets/pawn-icon.png"}
-          alt="small pawn"
-          width={20}
-          height={20}
-          className="object-contains"
-        />
-      </button>
+      <div className="flex gap-5">
+        <button onClick={acceptFunc} className="small-btn bg-green">
+          <Check className="h-5 w-5" />
+        </button>
+        <button
+          onClick={denyFunc}
+          className={`${denyFunc !== undefined ? "" : "hidden"} small-btn bg-red-400`}
+        >
+          <X className="h-5 w-5" />
+        </button>
+      </div>
     </div>
   );
 };

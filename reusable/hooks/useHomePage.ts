@@ -6,16 +6,21 @@ import { useEffect, useRef } from "react";
 import { useWsContext } from "../context/WsContext";
 import { useGameContext } from "../context/GameContext";
 import { useRouter } from "next/navigation";
+import useWs from "./useWs";
 
 const useHomePage = () => {
+  const { sendMsg } = useWs();
   const { playersData, isThisPlayerWhite, gameId } = useGameContext();
   const { handleFunctionsPool } = useWsContext();
-  const { setFriends, setFriendReqs } = useHomePageContext();
+  const { setFriends, setFriendReqs, setGameReqs, notificationHandler } = useHomePageContext();
   const router = useRouter();
-  const notificationHandler = useRef<Function | null>(null);
 
+  // RESPONDERS
   const handleNewFriendReq = (player: Player) => {
     setFriendReqs((prevState) => [...prevState, player]);
+  };
+  const handleGameRequest = (gameReq: Record<string, any>) => {
+    setGameReqs((prevState) => [...prevState, gameReq]);
   };
   const handleNewFriend = (player: Player) => {
     setFriendReqs((prevState) => prevState.filter((fReq) => fReq.username !== player.username));
@@ -42,6 +47,7 @@ const useHomePage = () => {
     localStorage.setItem("playerData", JSON.stringify([p1, p2]));
     localStorage.setItem("isThisPlayerWhite", JSON.stringify(isWhite));
     localStorage.setItem("gameId", JSON.stringify(gameId_));
+    localStorage.setItem("isWhiteTurn", JSON.stringify(true));
 
     router.push("/game");
   };
@@ -49,6 +55,9 @@ const useHomePage = () => {
     switch (instruction.action) {
       case "notify-friend-request":
         handleNewFriendReq(instruction.payload);
+        break;
+      case "notify-game-request":
+        handleGameRequest(instruction.payload);
         break;
       case "notify-only-new-friend":
         handleNewFriend(instruction.payload);
@@ -62,6 +71,9 @@ const useHomePage = () => {
       case "notify-only-removed-friend":
         handleRemoveFriend(instruction.payload.username);
         break;
+      case "notify-friend-request":
+        handleNewFriendReq(instruction.payload);
+        break;
       case "start-game":
         handleStartGame(instruction.payload);
         break;
@@ -69,11 +81,74 @@ const useHomePage = () => {
     notificationHandler.current!(instruction);
   };
 
+  // MESSAGES
+  const requestGameToFriend = (playerId: string) => {
+    sendMsg({
+      route: "homepage",
+      action: "game-request",
+      payload: { playerId },
+    });
+  };
+  const acceptGame = (gameId: string) => {
+    sendMsg({
+      route: "homepage",
+      action: "game-accept",
+      payload: { gameId },
+    });
+  };
+  const sendAddRequest = (username: string) => {
+    sendMsg({
+      route: "homepage",
+      action: "add-friend",
+      payload: { username },
+    });
+  };
+  const addFriend = (username: string) => {
+    sendMsg({
+      route: "homepage",
+      action: "add-friend",
+      payload: { username },
+    });
+  };
+  const removeFriend = (username: string) => {
+    sendMsg({
+      route: "homepage",
+      action: "remove-friend",
+      payload: { username },
+    });
+  };
+  const denyFriendRequest = (username: string) => {
+    setFriendReqs((prevState) => prevState.filter((req) => req.username !== username));
+    sendMsg({
+      route: "homepage",
+      action: "friend-denied",
+      payload: { username },
+    });
+  };
+
+  const denyGameRequest = (gameId: string) => {
+    setGameReqs((prevState) => prevState.filter((req) => req.gameId !== gameId));
+    sendMsg({
+      route: "homepage",
+      action: "game-denied",
+      payload: { gameId },
+    });
+  };
+
   useEffect(() => {
     handleFunctionsPool.current.set("homepage", handleMessage);
   }, []);
 
-  return { notificationHandler };
+  return {
+    notificationHandler,
+    requestGameToFriend,
+    acceptGame,
+    sendAddRequest,
+    addFriend,
+    removeFriend,
+    denyFriendRequest,
+    denyGameRequest,
+  };
 };
 
 export default useHomePage;

@@ -1,6 +1,6 @@
 "use client";
 
-import useWs from "@/reusable/hooks/useWs";
+import useHomePage from "@/reusable/hooks/useHomePage";
 import { Player } from "@/reusable/models/Player";
 import { X } from "lucide-react";
 import Image from "next/image";
@@ -10,7 +10,7 @@ type Props = {
 
 const Friend = ({ player }: Props) => {
   const { username, image, isOnline, _id } = player;
-  const { handleRemoveFriend, requestGameToFriend } = useWs();
+  const { removeFriend, requestGameToFriend } = useHomePage();
 
   return (
     <div className="flex items-center justify-between">
@@ -37,7 +37,7 @@ const Friend = ({ player }: Props) => {
             className="object-contains"
           />
         </button>
-        <button onClick={() => handleRemoveFriend(username)} className="small-btn bg-red-400">
+        <button onClick={() => removeFriend(username)} className="small-btn bg-red-400">
           <X className="h-[20px] w-[20px]" />
         </button>
       </div>

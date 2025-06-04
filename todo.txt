@@ -1,11 +1,9 @@
+implementar expire inactive/finished game
+implementar expire inactive ws
 
 aplicar win/loose
 implementar tiempo
 implementar draw/resign
-implementar expire inactive/finished game
-implementar expire inactive ws
-revisar si sender siempre es blanco
-implementar invitations completamente (que quede en inbox, almacene en db) 
 implementar random player matchup
 
 

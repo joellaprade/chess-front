@@ -2,14 +2,14 @@
 
 import { Player } from "@/reusable/models/Player";
 import PlayerComponent from "./PlayerComponent";
-import useWs from "@/reusable/hooks/useWs";
+import useHomePage from "@/reusable/hooks/useHomePage";
 
 type Props = {
   reqs: Player[];
 };
 
 const FriendReqList = ({ reqs }: Props) => {
-  const { sendAddRequest } = useWs();
+  const { sendAddRequest, denyFriendRequest } = useHomePage();
 
   return (
     <div className="friend-list">
@@ -17,7 +17,8 @@ const FriendReqList = ({ reqs }: Props) => {
         <PlayerComponent
           key={i}
           player={req}
-          func={() => sendAddRequest(req.username)}
+          acceptFunc={() => sendAddRequest(req.username)}
+          denyFunc={() => denyFriendRequest(req.username)}
         />
       ))}
     </div>

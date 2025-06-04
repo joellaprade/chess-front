@@ -19,7 +19,7 @@ const sessionSchema = new Schema({
   },
   expiresAfter: {
     type: Date,
-    index: { expires: 3600 },
+    index: { expires: 3600 * 24 },
     default: () => new Date(Date.now() + 3600 * 24),
   },
 });

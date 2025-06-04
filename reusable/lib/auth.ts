@@ -36,6 +36,7 @@ export const createSession = async ({
     secure: true,
     sameSite: "none",
     path: "/",
+    maxAge: 60 * 60 * 24,
   });
 
   cookieStore.set("userId", userId.toString(), {
@@ -43,6 +44,7 @@ export const createSession = async ({
     secure: true,
     sameSite: "none",
     path: "/",
+    maxAge: 60 * 60 * 24,
   });
 
   return session;
@@ -71,14 +73,15 @@ export const getPlayer = cache(async (): Promise<Player | null> => {
     let userId = cookieStore.get("userId")?.value;
 
     if (userId) {
-      const player: Player | null = await Player.findOne({ userId }).populate([
-        { path: "friends", select: "username image userid isOnline" },
-        { path: "friendReqs", select: "username image userid" },
-        { path: "gameReqs", select: "username image userid" },
-      ])
-      .lean<Player | null>();
-      if(!player) return null;
-      
+      const player: any = await Player.findOne({ userId })
+        .populate([
+          { path: "friends", select: "username image isOnline" },
+          { path: "friendReqs", select: "username image" },
+          { path: "gameReqs.sender", select: "username image" },
+        ])
+        .lean<Player | null>();
+        if (!player) return null;
+        player.gameReqs = player.gameReqs.map((req: any) => ({...req.sender, gameId: req.gameId,}))
       return player;
     } else return null;
   } catch (e) {

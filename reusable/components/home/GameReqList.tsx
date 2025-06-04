@@ -1,12 +1,27 @@
-import { Player } from "@/reusable/models/Player";
+"use client";
+
 import PlayerComponent from "./PlayerComponent";
+import useHomePage from "@/reusable/hooks/useHomePage";
 
 type Props = {
-  reqs: Player[];
+  reqs: Record<string, any>[];
 };
 
 const GameReqList = ({ reqs }: Props) => {
-  return <div className="friend-list">{/* <PlayerComponent /> */}</div>;
+  const { acceptGame, denyGameRequest } = useHomePage();
+
+  return (
+    <div className="friend-list">
+      {reqs.map((sender, i) => (
+        <PlayerComponent
+          key={i}
+          player={sender}
+          acceptFunc={() => acceptGame(sender.gameId)}
+          denyFunc={() => denyGameRequest(sender.gameId)}
+        />
+      ))}
+    </div>
+  );
 };
 
 export default GameReqList;
