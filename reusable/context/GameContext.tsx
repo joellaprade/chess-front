@@ -12,16 +12,18 @@ type GameContextType = {
   isThisPlayerWhite: React.RefObject<boolean>;
   gameId: React.RefObject<string | null>;
   isSearchingForGame: React.RefObject<boolean>;
+  setIsHydrated: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const defaultContext: GameContextType = {
-  playersData: { current: [] }, // manually create a ref-like object
-  isThisPlayerWhite: { current: false }, // manually create a ref-like object
+const defaultGameContext: GameContextType = {
+  playersData: { current: [] as PlayerData[] },
+  isThisPlayerWhite: { current: false },
   gameId: { current: null },
   isSearchingForGame: { current: false },
+  setIsHydrated: () => {},
 };
 
-export const GameContext = createContext(defaultContext);
+export const GameContext = createContext(defaultGameContext);
 
 export function useGameContext() {
   const context = useContext(GameContext);
@@ -37,7 +39,7 @@ export const GameContextProvider = ({ children }: GameContextProviderProps) => {
   const gameId = useRef<string | null>(null);
   const isSearchingForGame = useRef<boolean>(false);
 
-  const [isHydrated, setIsHydrated] = useState(false); // to delay rendering
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
     const LSPlayerData = JSON.parse(localStorage.getItem("playerData") || "null");
@@ -48,13 +50,14 @@ export const GameContextProvider = ({ children }: GameContextProviderProps) => {
     isThisPlayerWhite.current = LSIsThisPlayerWhite || false;
     gameId.current = LSGameId || null;
 
-    setIsHydrated(true); // we're safe to render now
+    setIsHydrated(true);
   }, []);
 
-  // Optional: delay rendering until data is loaded
   if (!isHydrated) return null;
   return (
-    <GameContext.Provider value={{ playersData, isThisPlayerWhite, gameId, isSearchingForGame }}>
+    <GameContext.Provider
+      value={{ playersData, isThisPlayerWhite, gameId, isSearchingForGame, setIsHydrated }}
+    >
       {children}
     </GameContext.Provider>
   );

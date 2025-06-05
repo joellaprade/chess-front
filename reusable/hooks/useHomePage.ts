@@ -7,8 +7,10 @@ import { useWsContext } from "../context/WsContext";
 import { useGameContext } from "../context/GameContext";
 import { useRouter } from "next/navigation";
 import useWs from "./useWs";
+import useResetGameBoard from "@/reusable/hooks/resetGameBoard";
 
 const useHomePage = () => {
+  const reset = useResetGameBoard();
   const { sendMsg } = useWs();
   const { playersData, isThisPlayerWhite, gameId, isSearchingForGame } = useGameContext();
   const { handleFunctionsPool } = useWsContext();
@@ -41,6 +43,7 @@ const useHomePage = () => {
     );
   };
   const handleStartGame = (payload: any[]) => {
+    reset();
     const [p1, p2, gameId_, isWhite] = payload;
     playersData.current = [p1, p2];
     isThisPlayerWhite.current = isWhite;
