@@ -135,6 +135,16 @@ export const useBoardUtils = () => {
     return directions;
   };
   // Specific Calcs
+  const cleanAttackData = () => {
+    let cleanAttackData = getAttackData() as AttackData[];
+    const seen = new Map();
+    cleanAttackData.forEach((item) => {
+      const key = `${item.attacker}-${item.direction}`;
+      seen.set(key, item);
+    });
+    cleanAttackData = Array.from(seen.values());
+    setAttackData(cleanAttackData as [AttackData]);
+  };
   const calculateIsSquareBeingAttacked = (
     destination: number,
     piece: string,
@@ -366,16 +376,16 @@ export const useBoardUtils = () => {
   };
   const addAtacker = (
     attackData: AttackData | undefined,
-    direction: Direction,
-    limit: number,
     piece: string,
     destSquare: Record<string, any>,
     isBlocked: boolean,
     origin: number,
+    direction?: Direction,
+    limit?: number,
   ) => {
     attackData = {
       direction: direction as Direction,
-      limit,
+      limit: limit,
       attacker: origin,
       attackerColor: piece.charAt(0),
       defendant: undefined,
@@ -384,6 +394,13 @@ export const useBoardUtils = () => {
       isCheck: !isBlocked,
       isPin: undefined,
     };
+    if (direction === undefined) {
+      const pinnedPieces = getAttackData();
+      pinnedPieces.push(attackData);
+      setAttackData(pinnedPieces);
+      cleanAttackData();
+      return attackData;
+    }
     // Se cuentan piezas bloqueando
     let [blockingPiecesCount, blockingPieceSquare] = countBlockingPieces(attackData, origin, piece);
     attackData.defendant = blockingPieceSquare;
@@ -405,14 +422,7 @@ export const useBoardUtils = () => {
       setAttackData(pinnedPieces);
     }
 
-    let cleanAttackData = getAttackData() as AttackData[];
-    const seen = new Map();
-    cleanAttackData.forEach((item) => {
-      const key = `${item.attacker}-${item.direction}`;
-      seen.set(key, item);
-    });
-    cleanAttackData = Array.from(seen.values());
-    setAttackData(cleanAttackData as [AttackData]);
+    cleanAttackData();
 
     return attackData;
   };
@@ -451,7 +461,7 @@ export const useBoardUtils = () => {
     let directions = origin > destSquare.id ? descendingDirections : ascendingDirections;
     let attackData: AttackData | undefined;
 
-    const [knightPossibleMoves] = calculateKnight(origin, piece, false, false, true, false);
+    const [knightPossibleMoves] = calculateKnight(origin, piece, false, true, true, false);
     console.log(knightPossibleMoves);
 
     // Reviso si rey y atacante comparten row, col o diag
@@ -459,13 +469,20 @@ export const useBoardUtils = () => {
       if (kLimits[direction] == aLimits[direction]) {
         attackData = addAtacker(
           attackData,
-          direction,
-          kLimits[direction],
           piece,
           destSquare,
           isBlocked,
           origin,
+          direction,
+          kLimits[direction],
         );
+      }
+    });
+
+    knightPossibleMoves.forEach((move) => {
+      const destPiece = getSquareById(move).piece;
+      if (destPiece.charAt(1) === "K" && destPiece.charAt(0) !== piece.charAt(0)) {
+        attackData = addAtacker(attackData, piece, destSquare, isBlocked, origin);
       }
     });
 
@@ -529,6 +546,7 @@ export const useBoardUtils = () => {
     let canDefend = false;
 
     for (let i = 0; i < 7; i++) {
+      if (!attack.direction || !attack.limit) return canDefend;
       const move = getMoveByDirection(attack.attacker, i, attack.direction);
       const square = getSquareById(move);
       if (square.piece.includes("K")) break;
@@ -689,7 +707,6 @@ export const useBoardUtils = () => {
     // Evalua si el atacante esta viendo al rey
     const destSquare = getSquareById(move);
 
-    console.log(!isEvaluatingDefense);
     if (piece.charAt(1) != "K" && !isEvaluatingDefense) {
       isCalcMoves && cleanPinnedPieces();
       isCalcMoves && checkIsDefendantPinned(isBlocked[direction]);
@@ -819,6 +836,8 @@ export const useBoardUtils = () => {
       const invI = movesLength - 1 - i;
       let destSquare = getSquareById(possibleMoves[invI]);
 
+      !isEvaluatingDefense && checkIsAttackerPinning(origin, destSquare, piece, false);
+
       [isCheck, isAttacked] = runChecks(
         destSquare,
         piece,
@@ -944,6 +963,8 @@ export const useBoardUtils = () => {
         isMate = !canDefend && hasMoves.length == 0;
       }
     });
+
+    console.log(!canDefend, hasMoves);
 
     return isMate;
   };

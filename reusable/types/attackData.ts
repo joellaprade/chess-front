@@ -1,7 +1,7 @@
 import { Direction } from "./directions";
 export type AttackData = {
-  direction: Direction;
-  limit: number;
+  direction?: Direction;
+  limit?: number;
   attacker: number;
   attackerColor: string;
   defendant: number | undefined;
