@@ -8,6 +8,7 @@ import useGameWs from "./useGameWs";
 import { useEffect } from "react";
 import { Instruction } from "@/reusable/types/instruction";
 import { useGameContext } from "@/reusable/context/GameContext";
+import GameEnded from "@/reusable/components/game/GameEnded";
 
 const useBoard = () => {
   const { incommingMove, sendMove } = useGameWs();
@@ -18,6 +19,7 @@ const useBoard = () => {
     isWhiteTurn,
     showQueenPopup,
     upgradingPawn,
+    isCheckMate,
     setBoard,
     setSelectedSquare,
   } = useBoardContext();
@@ -110,6 +112,9 @@ const useBoard = () => {
       )
     );
   };
+  const renderGameEnded = () => {
+    return isCheckMate && <GameEnded />;
+  };
 
   useEffect(() => {
     localStorage.setItem("board", JSON.stringify(board));
@@ -127,6 +132,7 @@ const useBoard = () => {
     colorLegalSquares,
     renderQueenPopup,
     handleMove,
+    renderGameEnded,
   };
 };
 

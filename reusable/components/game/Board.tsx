@@ -6,7 +6,8 @@ import Image from "next/image";
 
 const Board = ({ isWhite }: { isWhite: boolean }) => {
   const { board } = useBoardContext();
-  const { getColor, handlePieceClick, colorLegalSquares, renderQueenPopup } = useBoard();
+  const { getColor, handlePieceClick, colorLegalSquares, renderQueenPopup, renderGameEnded } =
+    useBoard();
 
   const renderBoard = () => {
     const finalBoard = isWhite
@@ -38,6 +39,7 @@ const Board = ({ isWhite }: { isWhite: boolean }) => {
     <div className="board">
       {renderBoard()}
       {renderQueenPopup()}
+      {renderGameEnded()}
     </div>
   );
 };

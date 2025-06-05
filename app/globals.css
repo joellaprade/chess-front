@@ -139,6 +139,12 @@ body {
   .piece-container {
     @apply rounded-2xl bg-[#26242140] p-4;
   }
+  .game-ended-bg {
+    @apply absolute top-0 left-0 h-full w-full bg-[#00000060];
+  }
+  .game-ended {
+    @apply h-20 w-20 bg-white;
+  }
 }
 
 @layer utilities {

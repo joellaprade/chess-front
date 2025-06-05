@@ -7,7 +7,8 @@ import { EvalSquareParam } from "@/reusable/types/evalSquareParamType";
 import { AttackData } from "@/reusable/types/attackData";
 
 export const useBoardUtils = () => {
-  const { board, getAttackData, setAttackData, getDefenseData, setDefenseData } = useBoardContext();
+  const { board, getAttackData, setAttackData, getDefenseData, setDefenseData, setIsCheckMate } =
+    useBoardContext();
 
   // GETTERS & UTILS
   const getSquareById = (index: number) => {
@@ -462,7 +463,6 @@ export const useBoardUtils = () => {
     let attackData: AttackData | undefined;
 
     const [knightPossibleMoves] = calculateKnight(origin, piece, false, true, true, false);
-    console.log(knightPossibleMoves);
 
     // Reviso si rey y atacante comparten row, col o diag
     directions.forEach((direction) => {
@@ -546,7 +546,7 @@ export const useBoardUtils = () => {
     let canDefend = false;
 
     for (let i = 0; i < 7; i++) {
-      if (!attack.direction || !attack.limit) return canDefend;
+      if (!attack.direction || (!attack.limit && attack.limit !== 0)) return canDefend;
       const move = getMoveByDirection(attack.attacker, i, attack.direction);
       const square = getSquareById(move);
       if (square.piece.includes("K")) break;
@@ -964,7 +964,9 @@ export const useBoardUtils = () => {
       }
     });
 
-    console.log(!canDefend, hasMoves);
+    if (isMate) {
+      setIsCheckMate(piece.charAt(0));
+    }
 
     return isMate;
   };
