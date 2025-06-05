@@ -1,5 +1,4 @@
 import Navbar from "@/reusable/components/home/Navbar";
-import Notification from "@/reusable/components/home/Notification";
 
 export default function RootLayout({
   children,
@@ -8,7 +7,6 @@ export default function RootLayout({
 }>) {
   return (
     <>
-      <Notification />
       <Navbar />
       <div className="relative flex w-full flex-1 flex-col items-center justify-center gap-6 px-10">
         {children}

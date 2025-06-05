@@ -5,8 +5,8 @@ import { AuthContextProvider } from "@/reusable/context/AuthContext";
 import { getPlayer, getSession } from "@/reusable/lib/auth";
 import { WsContextProvider } from "@/reusable/context/WsContext";
 import { HomePageContextProvider } from "@/reusable/context/HomePageContext";
-import { headers } from "next/headers";
 import { GameContextProvider } from "@/reusable/context/GameContext";
+import Notification from "@/reusable/components/home/Notification";
 
 const raleway = localFont({
   src: "../public/fonts/Raleway-VariableFont_wght.ttf",
@@ -34,6 +34,7 @@ export default async function RootLayout({
           <WsContextProvider>
             <GameContextProvider>
               <HomePageContextProvider homePageData={JSON.stringify(player)}>
+                <Notification />
                 {children}
               </HomePageContextProvider>
             </GameContextProvider>

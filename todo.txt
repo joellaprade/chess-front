@@ -10,3 +10,56 @@ implementar expire inactive ws
 
 KING PUEDE HACER DISCOVERED CHECK
 agregar pawn special moves a engine para calcular defenses
+
+
+
+
+
+
+
+"use client";
+
+import React, { createContext, useContext, useRef, useState } from "react";
+import { Board } from "../types/board";
+import useRefState from "../hooks/useRefState";
+import { AttackData } from "@/reusable/types/attackData";
+
+type BoardContextProviderProps = {
+  children: React.ReactNode;
+};
+
+type BoardContextType = {
+  board: Board;
+  setIsCheckMate: React.Dispatch<React.SetStateAction<string>>;
+ 
+};
+
+export const BoardContext = createContext({} as BoardContextType);
+
+export const useBoardContext = () => {
+  const context = useContext(BoardContext);
+
+  if (!context) {
+    throw new Error("Use useBoardContext within a provider");
+  }
+  return context;
+};
+
+export const BoardContextProvider = ({ children }: BoardContextProviderProps) => {
+  const defaultBoard = [...]
+
+ 
+  const [board, setBoard] = useState<Board>(LSBoard || defaultBoard);
+  const [isCheckMate, setIsCheckMate] = useState("");
+
+  return (
+    <BoardContext.Provider
+      value={{
+        board,
+        setIsCheckMate,
+      }}
+    >
+      {children}
+    </BoardContext.Provider>
+  );
+};
