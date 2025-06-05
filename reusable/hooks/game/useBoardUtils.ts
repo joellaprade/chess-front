@@ -229,12 +229,15 @@ export const useBoardUtils = () => {
 
     switch (destSquare.piece.charAt(1)) {
       case "Q":
-        isAttacked =
+        if (
           oRow == dRow ||
           oCol == dCol ||
           oDiagonal.tl == dDiagonal.tl ||
-          oDiagonal.tr == dDiagonal.tr;
-        isAttacked && defenseData.push(defendedSquare);
+          oDiagonal.tr == dDiagonal.tr
+        ) {
+          isAttacked = true;
+          defenseData.push(defendedSquare);
+        }
         break;
       case "K":
         if (isEvaluatingCheck && isEvaluatingDefense) break;
@@ -248,19 +251,31 @@ export const useBoardUtils = () => {
         isAttacked && defenseData.push(defendedSquare);
         break;
       case "R":
-        isAttacked = oRow == dRow || oCol == dCol;
-        isAttacked && defenseData.push(defendedSquare);
+        if (oRow == dRow || oCol == dCol) {
+          isAttacked = true;
+          defenseData.push(defendedSquare);
+        }
         break;
       case "B":
-        isAttacked = oDiagonal.tl == dDiagonal.tl || oDiagonal.tr == dDiagonal.tr;
-        isAttacked && defenseData.push(defendedSquare);
+        if (oDiagonal.tl == dDiagonal.tl || oDiagonal.tr == dDiagonal.tr) {
+          isAttacked = true;
+          defenseData.push(defendedSquare);
+        }
         break;
       case "P":
-        isAttacked =
+        if (
           (oDiagonal.tl == dDiagonal.tl || oDiagonal.tr == dDiagonal.tr) &&
           Math.abs(oRow - dRow) <= 1 &&
-          Math.abs(oCol - dCol) <= 1;
-        isAttacked && defenseData.push(defendedSquare);
+          Math.abs(oCol - dCol) <= 1
+        ) {
+          if (
+            (piece.charAt(0) == "w" && destSquare.id < origin) ||
+            (piece.charAt(0) == "b" && destSquare.id > origin)
+          ) {
+            isAttacked = true;
+            defenseData.push(defendedSquare);
+          }
+        }
         break;
       case "":
         // PROBLEMA colores son iguales
@@ -435,6 +450,9 @@ export const useBoardUtils = () => {
     const ascendingDirections: Direction[] = ["bottom", "right", "br", "bl"];
     let directions = origin > destSquare.id ? descendingDirections : ascendingDirections;
     let attackData: AttackData | undefined;
+
+    const [knightPossibleMoves] = calculateKnight(origin, piece, false, false, true, false);
+    console.log(knightPossibleMoves);
 
     // Reviso si rey y atacante comparten row, col o diag
     directions.forEach((direction) => {
@@ -671,6 +689,7 @@ export const useBoardUtils = () => {
     // Evalua si el atacante esta viendo al rey
     const destSquare = getSquareById(move);
 
+    console.log(!isEvaluatingDefense);
     if (piece.charAt(1) != "K" && !isEvaluatingDefense) {
       isCalcMoves && cleanPinnedPieces();
       isCalcMoves && checkIsDefendantPinned(isBlocked[direction]);

@@ -101,10 +101,10 @@ body {
 /* Game Components */
 @layer components {
   .game {
-    @apply flex grow flex-col;
+    @apply flex h-full grow flex-col;
   }
   .board {
-    @apply aspect-square;
+    @apply aspect-square grow-0;
   }
   .row {
     @apply flex;

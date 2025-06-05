@@ -5,7 +5,7 @@ import { useBoardContext } from "@/reusable/context/BoardContext";
 import useRefState from "../useRefState";
 
 export const useCheckBishop = () => {
-  const { calculatePossibleMoves, getSquareById } = useBoardUtils();
+  const { calculatePossibleMoves, getSquareById, checkIsCheckMate } = useBoardUtils();
   const { selectedPieceLegalMoves } = useBoardContext();
 
   const [getOrigin, setOrigin] = useRefState(null);
@@ -23,6 +23,7 @@ export const useCheckBishop = () => {
 
     const piece = getSquareById(getOrigin()).piece;
     const [_, isCheck] = calculatePossibleMoves(destination, piece, false, false, true);
+    if (isCheck) checkIsCheckMate(piece);
 
     return true;
   };

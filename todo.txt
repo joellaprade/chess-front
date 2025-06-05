@@ -1,6 +1,6 @@
-aplicar win/loose
-
 implementar tiempo
+
+implementar win/loose
 implementar draw/resign
 
 implementar expire inactive/finished game

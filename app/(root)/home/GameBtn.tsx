@@ -9,7 +9,6 @@ const GameBtn = () => {
   const [isSearching, setIsSearching] = useState(false);
 
   const handleClick = () => {
-    console.log(isSearching);
     isSearchingForGame.current = !isSearching;
     setIsSearching(!isSearching);
     if (!isSearching) {

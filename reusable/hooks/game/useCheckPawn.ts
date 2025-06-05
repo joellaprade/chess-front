@@ -7,8 +7,14 @@ import useRefState from "../useRefState";
 import { EvalSquareParam } from "@/reusable/types/evalSquareParamType";
 
 export const useCheckPawn = () => {
-  const { evaluateSquare, calculatePossibleMoves, getSquareById, getRowCol, getLimits } =
-    useBoardUtils();
+  const {
+    evaluateSquare,
+    calculatePossibleMoves,
+    getSquareById,
+    getRowCol,
+    getLimits,
+    checkIsCheckMate,
+  } = useBoardUtils();
   const { selectedPieceLegalMoves, setBoard, setShowQueenPopup, setUpgradingPawn } =
     useBoardContext();
 
@@ -140,6 +146,7 @@ export const useCheckPawn = () => {
 
     const piece = getSquareById(getOrigin()).piece;
     const [_, isCheck] = calculatePossibleMoves(destination, piece, false, false, true);
+    if (isCheck) checkIsCheckMate(piece);
 
     return true;
   };
