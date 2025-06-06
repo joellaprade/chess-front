@@ -71,7 +71,6 @@ export const BoardContextProvider = ({ children }: BoardContextProviderProps) =>
   const [isCheckMate, setIsCheckMate] = useState("");
 
   // const resetBoard = () => {
-  //   console.log(selectedPieceLegalMoves);
   //   selectedPieceLegalMoves.current = [];
   //   isWhiteTurn.current = true;
   //   setIsCheckMate("");

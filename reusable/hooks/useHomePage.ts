@@ -10,7 +10,7 @@ import useWs from "./useWs";
 import useResetGameBoard from "@/reusable/hooks/resetGameBoard";
 
 const useHomePage = () => {
-  const reset = useResetGameBoard();
+  const { reset } = useResetGameBoard();
   const { sendMsg } = useWs();
   const { playersData, isThisPlayerWhite, gameId, isSearchingForGame } = useGameContext();
   const { handleFunctionsPool } = useWsContext();

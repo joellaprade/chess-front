@@ -5,8 +5,7 @@ import defaultBoard from "../context/DefaultBoard";
 import { AttackData } from "../types/attackData";
 
 const useResetGameBoard = () => {
-  const { playersData, isThisPlayerWhite, gameId, isSearchingForGame, setIsHydrated } =
-    useGameContext();
+  const { playersData, isThisPlayerWhite, gameId, isSearchingForGame } = useGameContext();
   const {
     selectedPieceLegalMoves,
     isWhiteTurn,
@@ -20,9 +19,7 @@ const useResetGameBoard = () => {
     setDefenseData,
   } = useBoardContext();
 
-  const reset = () => {
-    // Board
-    console.log(selectedPieceLegalMoves);
+  const resetBoard = () => {
     selectedPieceLegalMoves.current = [];
     isWhiteTurn.current = true;
     setIsCheckMate("");
@@ -44,23 +41,26 @@ const useResetGameBoard = () => {
     });
     setAttackData([] as unknown as [AttackData]);
     setDefenseData([]);
+  };
 
-    // Game
+  const resetGame = () => {
     playersData.current = [];
     isThisPlayerWhite.current = false;
     gameId.current = null;
     isSearchingForGame.current = false;
-    setIsHydrated(false);
+  };
 
-    // Local Storage
+  const reset = () => {
+    resetGame();
+    resetBoard();
+    localStorage.setItem("board", "");
     localStorage.setItem("playerData", "");
     localStorage.setItem("isThisPlayerWhite", "");
     localStorage.setItem("gameId", "");
-    localStorage.setItem("board", "");
     localStorage.setItem("isWhiteTurn", "");
   };
 
-  return reset;
+  return { resetGame, resetBoard, reset };
 };
 
 export default useResetGameBoard;
