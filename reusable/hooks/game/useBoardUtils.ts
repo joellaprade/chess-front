@@ -5,10 +5,11 @@ import { DiagonalDirection, Direction } from "@/reusable/types/directions";
 import { PerpendicularDirection } from "@/reusable/types/directions";
 import { EvalSquareParam } from "@/reusable/types/evalSquareParamType";
 import { AttackData } from "@/reusable/types/attackData";
+import { useGameContext } from "@/reusable/context/GameContext";
 
 export const useBoardUtils = () => {
-  const { board, getAttackData, setAttackData, getDefenseData, setDefenseData, setIsCheckMate } =
-    useBoardContext();
+  const { board, getAttackData, setAttackData, getDefenseData, setDefenseData } = useBoardContext();
+  const { setIsCheckMate } = useGameContext();
 
   // GETTERS & UTILS
   const getSquareById = (index: number) => {

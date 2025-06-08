@@ -5,11 +5,11 @@ import defaultBoard from "../context/DefaultBoard";
 import { AttackData } from "../types/attackData";
 
 const useResetGameBoard = () => {
-  const { playersData, isThisPlayerWhite, gameId, isSearchingForGame } = useGameContext();
+  const { playersData, isThisPlayerWhite, gameId, isSearchingForGame, setIsCheckMate, setIsDraw } =
+    useGameContext();
   const {
     selectedPieceLegalMoves,
     isWhiteTurn,
-    setIsCheckMate,
     setBoard,
     setSelectedSquare,
     setShowQueenPopup,
@@ -22,7 +22,6 @@ const useResetGameBoard = () => {
   const resetBoard = () => {
     selectedPieceLegalMoves.current = [];
     isWhiteTurn.current = true;
-    setIsCheckMate("");
     setBoard(defaultBoard);
     setSelectedSquare(null);
     setShowQueenPopup(false);
@@ -44,6 +43,8 @@ const useResetGameBoard = () => {
   };
 
   const resetGame = () => {
+    setIsCheckMate("");
+    setIsDraw(false);
     playersData.current = [];
     isThisPlayerWhite.current = false;
     gameId.current = null;

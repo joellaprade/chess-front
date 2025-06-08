@@ -1,14 +1,14 @@
 "use client";
 
+import useGameWs from "@/reusable/hooks/game/useGameWs";
 import PlayerComponent from "./PlayerComponent";
-import useHomePage from "@/reusable/hooks/useHomePage";
 
 type Props = {
   reqs: Record<string, any>[];
 };
 
 const GameReqList = ({ reqs }: Props) => {
-  const { acceptGame, denyGameRequest } = useHomePage();
+  const { acceptGame, denyGameRequest } = useGameWs();
 
   return (
     <div className="friend-list">

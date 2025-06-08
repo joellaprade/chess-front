@@ -1,10 +1,10 @@
 "use client";
 import { useGameContext } from "@/reusable/context/GameContext";
-import useHomePage from "@/reusable/hooks/useHomePage";
+import useGameWs from "@/reusable/hooks/game/useGameWs";
 import { useEffect, useState } from "react";
 
 const GameBtn = () => {
-  const { requestRandomGame, cancelRandomGame } = useHomePage();
+  const { requestRandomGame, cancelRandomGame } = useGameWs();
   const { isSearchingForGame } = useGameContext();
   const [isSearching, setIsSearching] = useState(false);
 

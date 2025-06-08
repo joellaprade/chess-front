@@ -1,13 +1,11 @@
-import { useBoardContext } from "@/reusable/context/BoardContext";
 import { useGameContext } from "@/reusable/context/GameContext";
-import useHomePage from "@/reusable/hooks/useHomePage";
+import useGameWs from "@/reusable/hooks/game/useGameWs";
 import Link from "next/link";
 
 const GameEnded = () => {
-  const { requestGameToFriend } = useHomePage();
-  const { isCheckMate } = useBoardContext();
-  const winner = isCheckMate == "w" ? "White" : "Black";
-  const { playersData, isThisPlayerWhite } = useGameContext();
+  const { requestGameToFriend } = useGameWs();
+  const { playersData, isThisPlayerWhite, isCheckMate, isDraw } = useGameContext();
+  const winner = isCheckMate == "w" ? "Blancas" : "Negras";
 
   const handleRematch = () => {
     const oponent = playersData.current[isThisPlayerWhite.current ? 1 : 0];
@@ -17,7 +15,8 @@ const GameEnded = () => {
   return (
     <div className="game-ended-bg">
       <div className="game-ended">
-        <h2>{winner} wins!</h2>
+        {isCheckMate && <h2 className="text-center">Las Piezas {winner} ganan!</h2>}
+        {isDraw && <h2 className="text-center">Juego terminado por tregua</h2>}
         <div className="flex w-full grow-1 flex-col justify-center gap-10">
           <Link href="/home" className="w-full">
             <button className="big-btn bg-green">Volver a Inicio</button>

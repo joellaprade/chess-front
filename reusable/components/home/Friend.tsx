@@ -1,5 +1,6 @@
 "use client";
 
+import useGameWs from "@/reusable/hooks/game/useGameWs";
 import useHomePage from "@/reusable/hooks/useHomePage";
 import { Player } from "@/reusable/models/Player";
 import { X } from "lucide-react";
@@ -10,7 +11,8 @@ type Props = {
 
 const Friend = ({ player }: Props) => {
   const { username, image, isOnline, _id } = player;
-  const { removeFriend, requestGameToFriend } = useHomePage();
+  const { removeFriend } = useHomePage();
+  const { requestGameToFriend } = useGameWs();
 
   return (
     <div className="flex items-center justify-between">

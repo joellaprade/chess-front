@@ -13,7 +13,6 @@ type BoardContextProviderProps = {
 type BoardContextType = {
   board: Board;
   selectedSquare: number | null;
-  isCheckMate: string;
   showQueenPopup: boolean;
   upgradingPawn: number | null;
 
@@ -28,10 +27,8 @@ type BoardContextType = {
   setHasRookMove: (newValue: any, path?: string) => void;
   setBoard: React.Dispatch<React.SetStateAction<Board>>;
   setSelectedSquare: React.Dispatch<React.SetStateAction<number | null>>;
-  setIsCheckMate: React.Dispatch<React.SetStateAction<string>>;
   setShowQueenPopup: React.Dispatch<React.SetStateAction<boolean>>;
   setUpgradingPawn: React.Dispatch<React.SetStateAction<number | null>>;
-  // resetBoard: () => void;
 };
 
 export const BoardContext = createContext({} as BoardContextType);
@@ -68,31 +65,6 @@ export const BoardContextProvider = ({ children }: BoardContextProviderProps) =>
   const [getDefenseData, setDefenseData] = useRefState([]);
   const selectedPieceLegalMoves = useRef<number[]>([]);
   const isWhiteTurn = useRef(LSIsWhiteTurn === undefined ? true : LSIsWhiteTurn);
-  const [isCheckMate, setIsCheckMate] = useState("");
-
-  // const resetBoard = () => {
-  //   selectedPieceLegalMoves.current = [];
-  //   isWhiteTurn.current = true;
-  //   setIsCheckMate("");
-  //   setBoard(defaultBoard);
-  //   setSelectedSquare(null);
-  //   setShowQueenPopup(false);
-  //   setUpgradingPawn(null);
-  //   setHasRookMove({
-  //     hasWhiteMoved: false,
-  //     hasBlackMoved: false,
-  //     white: {
-  //       left: false,
-  //       right: false,
-  //     },
-  //     black: {
-  //       left: false,
-  //       right: false,
-  //     },
-  //   });
-  //   setAttackData([] as unknown as [AttackData]);
-  //   setDefenseData([]);
-  // };
 
   return (
     <BoardContext.Provider
@@ -103,7 +75,6 @@ export const BoardContextProvider = ({ children }: BoardContextProviderProps) =>
         showQueenPopup,
         isWhiteTurn,
         upgradingPawn,
-        isCheckMate,
         getHasRookMove,
         setHasRookMove,
         setBoard,
@@ -114,8 +85,6 @@ export const BoardContextProvider = ({ children }: BoardContextProviderProps) =>
         setAttackData,
         getDefenseData,
         setDefenseData,
-        setIsCheckMate,
-        // resetBoard,
       }}
     >
       {children}

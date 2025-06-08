@@ -19,13 +19,12 @@ const useBoard = () => {
     isWhiteTurn,
     showQueenPopup,
     upgradingPawn,
-    isCheckMate,
     setBoard,
     setSelectedSquare,
   } = useBoardContext();
   const { calculateLegalMoves, validateMove, handleWrongMove } = useCheckMove();
   const { getSquareById } = useBoardUtils();
-  const { isThisPlayerWhite } = useGameContext();
+  const { isThisPlayerWhite, isCheckMate, isDraw } = useGameContext();
 
   const handleOppMove = (instruction: Instruction | null) => {
     if (!instruction) return;
@@ -113,7 +112,7 @@ const useBoard = () => {
     );
   };
   const renderGameEnded = () => {
-    return isCheckMate && <GameEnded />;
+    return (isCheckMate || isDraw) && <GameEnded />;
   };
 
   useEffect(() => {

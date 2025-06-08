@@ -3,7 +3,7 @@
 import { Check } from "lucide-react";
 import { X } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Instruction } from "@/reusable/types/instruction";
 import useWs from "@/reusable/hooks/useWs";
 import useHomePage from "@/reusable/hooks/useHomePage";
@@ -18,6 +18,7 @@ const Notification = () => {
   const [showNotif, setShowNotif] = useState(false);
   const [showProfilePic, setShowProfilePic] = useState(false);
   const [showReplyActionBtn, setShowReplyActionBtn] = useState(false);
+  const timer = useRef<NodeJS.Timeout | null>(null);
 
   const setInstructionMessage = (instruction: Instruction) => {
     switch (instruction.action) {
@@ -42,17 +43,26 @@ const Notification = () => {
       case "notify-game-request":
         setMessage("Solicitud de juego de:");
         break;
+      case "notify-draw-request":
+        setMessage("Solicitud de tregua de:");
+        break;
+      case "draw-game":
+        setMessage("Tregua Aceptada");
+        break;
     }
   };
 
   const handleNotification = (instruction: Instruction) => {
+    if (timer.current) {
+      clearTimeout(timer.current);
+    }
     if (instruction) {
       setInstructionMessage(instruction);
       setNotification(instruction);
       setShowNotif(instruction.action.includes("notify"));
       setShowProfilePic(!instruction.action.includes("error"));
       setShowReplyActionBtn(!instruction.action.includes("notify-only"));
-      setTimeout(() => setShowNotif(false), 8000);
+      timer.current = setTimeout(() => setShowNotif(false), 8000);
     } else {
       setNotification(null);
       setShowNotif(false);
@@ -63,6 +73,10 @@ const Notification = () => {
 
   useEffect(() => {
     notificationHandler.current = handleNotification;
+
+    return () => {
+      if (timer.current) clearTimeout(timer.current);
+    };
   }, []);
 
   return (

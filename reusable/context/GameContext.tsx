@@ -2,6 +2,7 @@
 
 import { createContext, createRef, useContext, useEffect, useRef, useState } from "react";
 import { PlayerData } from "../types/PlayerData";
+import { Instruction } from "../types/instruction";
 
 type GameContextProviderProps = {
   children: React.ReactNode;
@@ -12,18 +13,16 @@ type GameContextType = {
   isThisPlayerWhite: React.RefObject<boolean>;
   gameId: React.RefObject<string | null>;
   isSearchingForGame: React.RefObject<boolean>;
+  isCheckMate: string;
+  isDraw: boolean;
+  incommingMove: Instruction | null;
+  setIncommingMove: React.Dispatch<React.SetStateAction<Instruction | null>>;
   setIsHydrated: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsCheckMate: React.Dispatch<React.SetStateAction<string>>;
+  setIsDraw: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const defaultGameContext: GameContextType = {
-  playersData: { current: [] as PlayerData[] },
-  isThisPlayerWhite: { current: false },
-  gameId: { current: null },
-  isSearchingForGame: { current: false },
-  setIsHydrated: () => {},
-};
-
-export const GameContext = createContext(defaultGameContext);
+export const GameContext = createContext({} as GameContextType);
 
 export function useGameContext() {
   const context = useContext(GameContext);
@@ -38,6 +37,9 @@ export const GameContextProvider = ({ children }: GameContextProviderProps) => {
   const isThisPlayerWhite = useRef<boolean>(false);
   const gameId = useRef<string | null>(null);
   const isSearchingForGame = useRef<boolean>(false);
+  const [isCheckMate, setIsCheckMate] = useState("");
+  const [isDraw, setIsDraw] = useState(false);
+  const [incommingMove, setIncommingMove] = useState<Instruction | null>(null);
 
   const [isHydrated, setIsHydrated] = useState(false);
 
@@ -56,7 +58,19 @@ export const GameContextProvider = ({ children }: GameContextProviderProps) => {
   if (!isHydrated) return null;
   return (
     <GameContext.Provider
-      value={{ playersData, isThisPlayerWhite, gameId, isSearchingForGame, setIsHydrated }}
+      value={{
+        playersData,
+        isThisPlayerWhite,
+        gameId,
+        isSearchingForGame,
+        isCheckMate,
+        isDraw,
+        incommingMove,
+        setIncommingMove,
+        setIsCheckMate,
+        setIsDraw,
+        setIsHydrated,
+      }}
     >
       {children}
     </GameContext.Provider>
