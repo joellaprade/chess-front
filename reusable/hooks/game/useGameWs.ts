@@ -14,15 +14,8 @@ const useGameWs = () => {
   const { sendMsg } = useWs();
   const { handleFunctionsPool } = useWsContext();
   const { notificationHandler, setGameReqs } = useHomePageContext();
-  const {
-    playersData,
-    isThisPlayerWhite,
-    gameId,
-    isSearchingForGame,
-    setIncommingMove,
-    setIsDraw,
-    setIsWin,
-  } = useGameContext();
+  const { playersData, isThisPlayerWhite, gameId, setIncommingMove, setIsDraw, setIsWin } =
+    useGameContext();
 
   // Handlers
   const handleStartGame = (payload: any[]) => {
@@ -46,9 +39,6 @@ const useGameWs = () => {
         break;
       case "draw-game":
         setIsDraw(true);
-        break;
-      case "notify-player-left":
-        isSearchingForGame.current = false;
         break;
       case "notify-game-request":
         setGameReqs((prevState) => [...prevState, instruction.payload]);

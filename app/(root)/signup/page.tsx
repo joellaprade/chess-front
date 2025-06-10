@@ -4,6 +4,14 @@ import { signup } from "@/reusable/actions/signup";
 import useFetchServerAction from "@/reusable/hooks/fetchAction";
 import { useEffect, useState } from "react";
 
+type dataType = {
+  name: string;
+  email: string;
+  username: string;
+  password: string;
+  confirmPassword: string;
+};
+
 export default function Page() {
   const [isValid, setIsValid] = useState(false);
   const [fData, setFData] = useState({
@@ -16,7 +24,7 @@ export default function Page() {
 
   const { data, loading, error, fetchData } = useFetchServerAction(signup);
 
-  const updateData = (fData: any, field: string) => {
+  const updateData = (fData: dataType, field: string) => {
     setFData((prevState) => ({ ...prevState, [field]: fData }));
   };
 

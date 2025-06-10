@@ -10,7 +10,6 @@ const useResetGameBoard = () => {
     playersData,
     isThisPlayerWhite,
     gameId,
-    isSearchingForGame,
     resetted,
     setIsWin,
     setIsDraw,
@@ -59,7 +58,6 @@ const useResetGameBoard = () => {
     playersData.current = [];
     isThisPlayerWhite.current = false;
     gameId.current = null;
-    isSearchingForGame.current = false;
   };
 
   const reset = () => {

@@ -12,7 +12,6 @@ type GameContextType = {
   playersData: React.RefObject<PlayerData[]>;
   isThisPlayerWhite: React.RefObject<boolean>;
   gameId: React.RefObject<string | null>;
-  isSearchingForGame: React.RefObject<boolean>;
   isWin: string;
   isDraw: boolean;
   incommingMove: Instruction | null;
@@ -38,7 +37,6 @@ export const GameContextProvider = ({ children }: GameContextProviderProps) => {
   const playersData = useRef<any[]>([]);
   const isThisPlayerWhite = useRef<boolean>(false);
   const gameId = useRef<string | null>(null);
-  const isSearchingForGame = useRef<boolean>(false);
   const [isWin, setIsWin] = useState("");
   const [isDraw, setIsDraw] = useState(false);
   const [incommingMove, setIncommingMove] = useState<Instruction | null>(null);
@@ -65,7 +63,6 @@ export const GameContextProvider = ({ children }: GameContextProviderProps) => {
         playersData,
         isThisPlayerWhite,
         gameId,
-        isSearchingForGame,
         isWin,
         isDraw,
         incommingMove,
