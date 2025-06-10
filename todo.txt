@@ -1,7 +1,1 @@
-implementar game lock y close game
-
-implementar resign
-implementar tiempo
-
 implementar expire inactive/finished game
-implementar expire inactive ws

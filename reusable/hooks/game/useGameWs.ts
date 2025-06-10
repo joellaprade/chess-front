@@ -15,14 +15,13 @@ const useGameWs = () => {
   const { handleFunctionsPool } = useWsContext();
   const { notificationHandler, setGameReqs } = useHomePageContext();
   const {
-    incommingMove,
     playersData,
     isThisPlayerWhite,
     gameId,
     isSearchingForGame,
     setIncommingMove,
     setIsDraw,
-    setIsCheckMate,
+    setIsWin,
   } = useGameContext();
 
   // Handlers
@@ -58,7 +57,7 @@ const useGameWs = () => {
         handleStartGame(instruction.payload);
         break;
       case "resign":
-        setIsCheckMate(instruction.payload);
+        setIsWin(instruction.payload);
     }
     notificationHandler.current!(instruction);
   };
@@ -121,13 +120,19 @@ const useGameWs = () => {
       payload: { gameId },
     });
   };
+  const gameEndedMessage = () => {
+    sendMsg({
+      route: "game",
+      action: "game-ended",
+      payload: { e: "e" },
+    });
+  };
 
   useEffect(() => {
     handleFunctionsPool.current.set("game", handleMessage);
   }, []);
 
   return {
-    incommingMove,
     sendMove,
     drawRequest,
     denyGameRequest,
@@ -136,6 +141,7 @@ const useGameWs = () => {
     cancelRandomGame,
     requestGameToFriend,
     acceptGame,
+    gameEndedMessage,
   };
 };
 

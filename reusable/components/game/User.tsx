@@ -1,4 +1,4 @@
-import { Clock } from "lucide-react";
+import Timer from "./Timer";
 import ProfilePlaceholder from "../home/ProfilePlaceholder";
 import { PlayerData } from "@/reusable/types/PlayerData";
 import Image from "next/image";
@@ -21,10 +21,7 @@ const User = ({ user }: { user: PlayerData }) => {
           )}
           <h3>{user.username}</h3>
         </div>
-        <div className="timer">
-          <Clock />
-          <span>4:30</span>
-        </div>
+        <Timer isWhite={user.isWhite} />
       </div>
     )
   );

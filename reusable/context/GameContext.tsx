@@ -13,12 +13,12 @@ type GameContextType = {
   isThisPlayerWhite: React.RefObject<boolean>;
   gameId: React.RefObject<string | null>;
   isSearchingForGame: React.RefObject<boolean>;
-  isCheckMate: string;
+  isWin: string;
   isDraw: boolean;
   incommingMove: Instruction | null;
   setIncommingMove: React.Dispatch<React.SetStateAction<Instruction | null>>;
   setIsHydrated: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsCheckMate: React.Dispatch<React.SetStateAction<string>>;
+  setIsWin: React.Dispatch<React.SetStateAction<string>>;
   setIsDraw: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
@@ -37,7 +37,7 @@ export const GameContextProvider = ({ children }: GameContextProviderProps) => {
   const isThisPlayerWhite = useRef<boolean>(false);
   const gameId = useRef<string | null>(null);
   const isSearchingForGame = useRef<boolean>(false);
-  const [isCheckMate, setIsCheckMate] = useState("");
+  const [isWin, setIsWin] = useState("");
   const [isDraw, setIsDraw] = useState(false);
   const [incommingMove, setIncommingMove] = useState<Instruction | null>(null);
 
@@ -63,11 +63,11 @@ export const GameContextProvider = ({ children }: GameContextProviderProps) => {
         isThisPlayerWhite,
         gameId,
         isSearchingForGame,
-        isCheckMate,
+        isWin,
         isDraw,
         incommingMove,
         setIncommingMove,
-        setIsCheckMate,
+        setIsWin,
         setIsDraw,
         setIsHydrated,
       }}

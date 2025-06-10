@@ -9,7 +9,7 @@ import { useGameContext } from "@/reusable/context/GameContext";
 
 export const useBoardUtils = () => {
   const { board, getAttackData, setAttackData, getDefenseData, setDefenseData } = useBoardContext();
-  const { setIsCheckMate } = useGameContext();
+  const { setIsWin } = useGameContext();
 
   // GETTERS & UTILS
   const getSquareById = (index: number) => {
@@ -966,7 +966,7 @@ export const useBoardUtils = () => {
     });
 
     if (isMate) {
-      setIsCheckMate(piece.charAt(0));
+      setIsWin(piece.charAt(0));
     }
 
     return isMate;

@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 const GameOptions = () => {
   const [selectValue, setSelectValue] = useState("");
   const { drawRequest, resign } = useGameWs();
-  const { isThisPlayerWhite, setIsCheckMate } = useGameContext();
+  const { isThisPlayerWhite, setIsWin } = useGameContext();
 
   useEffect(() => {
     switch (selectValue) {
@@ -16,7 +16,7 @@ const GameOptions = () => {
         break;
       case "resign":
         resign();
-        setIsCheckMate(isThisPlayerWhite.current ? "b" : "w");
+        setIsWin(isThisPlayerWhite.current ? "b" : "w");
         break;
     }
     setSelectValue("");

@@ -5,11 +5,18 @@ import defaultBoard from "../context/DefaultBoard";
 import { AttackData } from "../types/attackData";
 
 const useResetGameBoard = () => {
-  const { playersData, isThisPlayerWhite, gameId, isSearchingForGame, setIsCheckMate, setIsDraw } =
-    useGameContext();
+  const {
+    playersData,
+    isThisPlayerWhite,
+    gameId,
+    isSearchingForGame,
+    setIsWin,
+    setIsDraw,
+    setIncommingMove,
+  } = useGameContext();
   const {
     selectedPieceLegalMoves,
-    isWhiteTurn,
+    setIsWhiteTurn,
     setBoard,
     setSelectedSquare,
     setShowQueenPopup,
@@ -21,7 +28,7 @@ const useResetGameBoard = () => {
 
   const resetBoard = () => {
     selectedPieceLegalMoves.current = [];
-    isWhiteTurn.current = true;
+    setIsWhiteTurn(true);
     setBoard(defaultBoard);
     setSelectedSquare(null);
     setShowQueenPopup(false);
@@ -43,8 +50,9 @@ const useResetGameBoard = () => {
   };
 
   const resetGame = () => {
-    setIsCheckMate("");
+    setIsWin("");
     setIsDraw(false);
+    setIncommingMove(null);
     playersData.current = [];
     isThisPlayerWhite.current = false;
     gameId.current = null;
@@ -52,13 +60,15 @@ const useResetGameBoard = () => {
   };
 
   const reset = () => {
-    resetGame();
-    resetBoard();
     localStorage.setItem("board", "");
     localStorage.setItem("playerData", "");
     localStorage.setItem("isThisPlayerWhite", "");
     localStorage.setItem("gameId", "");
     localStorage.setItem("isWhiteTurn", "");
+    localStorage.setItem("w-time", "");
+    localStorage.setItem("b-time", "");
+    resetGame();
+    resetBoard();
   };
 
   return { resetGame, resetBoard, reset };

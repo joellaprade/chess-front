@@ -11,7 +11,7 @@ import { useGameContext } from "@/reusable/context/GameContext";
 import GameEnded from "@/reusable/components/game/GameEnded";
 
 const useBoard = () => {
-  const { incommingMove, sendMove } = useGameWs();
+  const { sendMove } = useGameWs();
   const {
     board,
     selectedSquare,
@@ -19,26 +19,25 @@ const useBoard = () => {
     isWhiteTurn,
     showQueenPopup,
     upgradingPawn,
+    setIsWhiteTurn,
     setBoard,
     setSelectedSquare,
   } = useBoardContext();
   const { calculateLegalMoves, validateMove, handleWrongMove } = useCheckMove();
   const { getSquareById } = useBoardUtils();
-  const { isThisPlayerWhite, isCheckMate, isDraw } = useGameContext();
+  const { isThisPlayerWhite, isWin, isDraw, incommingMove } = useGameContext();
 
-  const handleOppMove = (instruction: Instruction | null) => {
-    if (!instruction) return;
+  const handleOppMove = (instruction: Instruction) => {
     const { origin, destination } = instruction.payload;
     const movingPiece = getSquareById(origin).piece;
     selectedPieceLegalMoves.current = calculateLegalMoves(origin);
 
     const isValid = validateMove(origin, destination);
     if (isValid) {
-      isWhiteTurn.current = !isWhiteTurn.current;
+      setIsWhiteTurn(!isWhiteTurn);
       handleMove(movingPiece, destination, origin);
     }
   };
-
   const colorLegalSquares = (id: number) => {
     if (selectedSquare != 0 && !selectedSquare) return "";
     if (selectedPieceLegalMoves.current.includes(id)) return "valid-square-indicator";
@@ -68,7 +67,7 @@ const useBoard = () => {
     const isMoveValid = validateMove(selectedSquare!, destination);
     if (!isMoveValid) return handleWrongMove();
 
-    isWhiteTurn.current = !isWhiteTurn.current;
+    setIsWhiteTurn(!isWhiteTurn);
     handleMove(movingPiece, destination);
     sendMove(selectedSquare!, destination);
   };
@@ -82,7 +81,7 @@ const useBoard = () => {
     return color;
   };
   const handlePieceClick = ({ id: index, piece }: { id: number; code: string; piece: string }) => {
-    const isThisPlayersTurn = isThisPlayerWhite.current === isWhiteTurn.current;
+    const isThisPlayersTurn = isThisPlayerWhite.current === isWhiteTurn;
     const originSquareColor = getSquareById(selectedSquare || index).piece.charAt(0);
     const thisPlayerColor = isThisPlayerWhite.current ? "w" : "b";
     const isThisPlayersPiece = originSquareColor == thisPlayerColor;
@@ -106,20 +105,19 @@ const useBoard = () => {
   };
   const renderQueenPopup = () => {
     return (
-      showQueenPopup && (
-        <QueenPopup color={isWhiteTurn.current ? "w" : "b"} destination={upgradingPawn!} />
-      )
+      showQueenPopup && <QueenPopup color={isWhiteTurn ? "w" : "b"} destination={upgradingPawn!} />
     );
   };
   const renderGameEnded = () => {
-    return (isCheckMate || isDraw) && <GameEnded />;
+    return (isWin || isDraw) && <GameEnded />;
   };
 
   useEffect(() => {
     localStorage.setItem("board", JSON.stringify(board));
-    localStorage.setItem("isWhiteTurn", JSON.stringify(isWhiteTurn.current));
+    localStorage.setItem("isWhiteTurn", JSON.stringify(isWhiteTurn));
   }, [board]);
   useEffect(() => {
+    if (!incommingMove) return;
     handleOppMove(incommingMove);
   }, [incommingMove]);
 

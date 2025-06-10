@@ -17,7 +17,8 @@ type BoardContextType = {
   upgradingPawn: number | null;
 
   selectedPieceLegalMoves: React.RefObject<number[]>;
-  isWhiteTurn: React.RefObject<boolean>;
+  isWhiteTurn: boolean;
+  setIsWhiteTurn: React.Dispatch<React.SetStateAction<boolean>>;
 
   getAttackData: () => [AttackData];
   setAttackData: (newValue: [AttackData], path?: string) => void;
@@ -49,6 +50,7 @@ export const BoardContextProvider = ({ children }: BoardContextProviderProps) =>
   const [selectedSquare, setSelectedSquare] = useState<number | null>(null);
   const [showQueenPopup, setShowQueenPopup] = useState(false);
   const [upgradingPawn, setUpgradingPawn] = useState<number | null>(null);
+  const [isWhiteTurn, setIsWhiteTurn] = useState(LSIsWhiteTurn === null ? true : LSIsWhiteTurn);
   const [getHasRookMove, setHasRookMove] = useRefState({
     hasWhiteMoved: false,
     hasBlackMoved: false,
@@ -64,7 +66,6 @@ export const BoardContextProvider = ({ children }: BoardContextProviderProps) =>
   const [getAttackData, setAttackData] = useRefState([]);
   const [getDefenseData, setDefenseData] = useRefState([]);
   const selectedPieceLegalMoves = useRef<number[]>([]);
-  const isWhiteTurn = useRef(LSIsWhiteTurn === undefined ? true : LSIsWhiteTurn);
 
   return (
     <BoardContext.Provider
@@ -73,8 +74,9 @@ export const BoardContextProvider = ({ children }: BoardContextProviderProps) =>
         selectedSquare,
         selectedPieceLegalMoves,
         showQueenPopup,
-        isWhiteTurn,
         upgradingPawn,
+        isWhiteTurn,
+        setIsWhiteTurn,
         getHasRookMove,
         setHasRookMove,
         setBoard,
