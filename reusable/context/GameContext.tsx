@@ -16,6 +16,8 @@ type GameContextType = {
   isWin: string;
   isDraw: boolean;
   incommingMove: Instruction | null;
+  resetted: boolean;
+  setResetted: React.Dispatch<React.SetStateAction<boolean>>;
   setIncommingMove: React.Dispatch<React.SetStateAction<Instruction | null>>;
   setIsHydrated: React.Dispatch<React.SetStateAction<boolean>>;
   setIsWin: React.Dispatch<React.SetStateAction<string>>;
@@ -40,6 +42,7 @@ export const GameContextProvider = ({ children }: GameContextProviderProps) => {
   const [isWin, setIsWin] = useState("");
   const [isDraw, setIsDraw] = useState(false);
   const [incommingMove, setIncommingMove] = useState<Instruction | null>(null);
+  const [resetted, setResetted] = useState(false);
 
   const [isHydrated, setIsHydrated] = useState(false);
 
@@ -66,6 +69,8 @@ export const GameContextProvider = ({ children }: GameContextProviderProps) => {
         isWin,
         isDraw,
         incommingMove,
+        resetted,
+        setResetted,
         setIncommingMove,
         setIsWin,
         setIsDraw,

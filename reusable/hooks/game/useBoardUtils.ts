@@ -330,7 +330,7 @@ export const useBoardUtils = () => {
     let reachedLimit = false;
     let i = 0;
     while (!reachedLimit) {
-      const destination = getMoveByDirection(origin, i, attackData.direction);
+      const destination = getMoveByDirection(origin, i, attackData.direction!);
       if (destination < 0 || destination > 63) {
         reachedLimit = true;
         continue;
@@ -651,7 +651,7 @@ export const useBoardUtils = () => {
 
       // Revisar que moves puede hacer un defensor pinned
       if (!pd.isPinBlocked && pd.defendant == origin) {
-        if (!validateMoveUnderPin(pd.direction, direction)) {
+        if (!validateMoveUnderPin(pd.direction!, direction)) {
           return false;
         }
       }

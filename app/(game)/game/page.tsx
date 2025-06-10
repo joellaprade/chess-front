@@ -14,7 +14,7 @@ const Game = () => {
   const thisPlayer = playersData.current[isThisPlayerWhite.current ? 0 : 1];
   const oponent = playersData.current[isThisPlayerWhite.current ? 1 : 0];
 
-  useEffect(() => resetBoard, []);
+  useEffect(resetBoard, []);
 
   return (
     <div className="game">

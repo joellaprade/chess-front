@@ -124,13 +124,21 @@ export const useCheckPawn = () => {
       bl: false,
     };
     const isLimit = getLimits(origin, piece);
-    let evalParam = {
+    let evalParam: EvalSquareParam = {
       isBlocked,
       origin,
       isLimit,
       piece,
       isCheck: false,
       possibleMoves,
+      direction: "top",
+      i: 0,
+      isAttacked: false,
+      isPin: false,
+      isCalcMoves: false,
+      isEvaluatingDefense: false,
+      isEvaluatingCheck: false,
+      recursionLayer: 0,
     };
     checkSpecialMoves(evalParam, possibleMoves);
 

@@ -1,5 +1,6 @@
 import { useBoardContext } from "@/reusable/context/BoardContext";
 import { useGameContext } from "@/reusable/context/GameContext";
+import useGameWs from "@/reusable/hooks/game/useGameWs";
 import { Clock } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -7,7 +8,8 @@ const Timer = ({ isWhite }: { isWhite: boolean }) => {
   const [time, setTime] = useState(600);
   const timer = useRef<NodeJS.Timeout | undefined>(undefined);
   const { isWhiteTurn } = useBoardContext();
-  const { incommingMove } = useGameContext();
+  const { incommingMove, isThisPlayerWhite, resetted, setIsWin } = useGameContext();
+  const { resign } = useGameWs();
 
   const turnSecondsIntoMinutes = (totalTime: number) => {
     const minutes = Math.floor(totalTime / 60);
@@ -33,9 +35,22 @@ const Timer = ({ isWhite }: { isWhite: boolean }) => {
 
     setTime(updatedTime);
   };
+  const handleTimeExpired = () => {
+    if (time <= 0) {
+      clearInterval(timer.current);
+      if (isWhite == isThisPlayerWhite.current) {
+        resign();
+        setIsWin(isThisPlayerWhite.current ? "b" : "w");
+      }
+    }
+  };
 
   useEffect(handleTimeSync, [incommingMove]);
   useEffect(handleSwitchTimes, [isWhiteTurn]);
+  useEffect(handleTimeExpired, [time]);
+  useEffect(() => {
+    if (resetted) setTime(600);
+  }, [resetted]);
 
   return (
     <div

@@ -12,11 +12,8 @@ export default function Page() {
       </Link>
 
       <Link href={"/about"}>
-        <span className="link absolute right-7 bottom-5">
-          Información del Programa
-        </span>
+        <span className="link absolute right-7 bottom-5">Información del Programa</span>
       </Link>
     </>
   );
 }
-6;

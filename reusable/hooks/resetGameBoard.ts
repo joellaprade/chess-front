@@ -3,6 +3,7 @@ import { useGameContext } from "../context/GameContext";
 import { useBoardContext } from "../context/BoardContext";
 import defaultBoard from "../context/DefaultBoard";
 import { AttackData } from "../types/attackData";
+import { useEffect } from "react";
 
 const useResetGameBoard = () => {
   const {
@@ -10,9 +11,11 @@ const useResetGameBoard = () => {
     isThisPlayerWhite,
     gameId,
     isSearchingForGame,
+    resetted,
     setIsWin,
     setIsDraw,
     setIncommingMove,
+    setResetted,
   } = useGameContext();
   const {
     selectedPieceLegalMoves,
@@ -69,7 +72,12 @@ const useResetGameBoard = () => {
     localStorage.setItem("b-time", "");
     resetGame();
     resetBoard();
+    setResetted(true);
   };
+
+  useEffect(() => {
+    if (resetted) setResetted(false);
+  }, [resetted]);
 
   return { resetGame, resetBoard, reset };
 };
