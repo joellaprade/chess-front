@@ -13,7 +13,7 @@ type formData = {
   password: string;
 };
 
-export async function signup(formData: FormData): Promise<boolean> {
+export default async function signup(formData: FormData): Promise<boolean> {
   try {
     await db();
     const { username, password, name, email } = getFormValues<formData>(formData);
