@@ -1,6 +1,6 @@
 "use client";
 
-import signup from "@/reusable/actions/signup";
+import signUp from "@/reusable/actions/signUp";
 import useFetchServerAction from "@/reusable/hooks/fetchAction";
 import { useEffect, useState } from "react";
 
@@ -14,7 +14,7 @@ export default function Page() {
     confirmPassword: "",
   });
 
-  const { data, loading, error, fetchData } = useFetchServerAction(signup);
+  const { data, loading, error, fetchData } = useFetchServerAction(signUp);
 
   const updateData = (fData: string, field: string) => {
     setFData((prevState) => ({ ...prevState, [field]: fData }));
