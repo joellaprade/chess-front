@@ -5,7 +5,8 @@ import useFetchServerAction from "@/reusable/hooks/fetchAction";
 import { useEffect, useState } from "react";
 
 const signup = async function signup(formData: FormData): Promise<boolean> {
-  return await new Promise((resolve, reject) => {
+  return await new Promise((resolve) => {
+    console.log(formData);
     setTimeout(resolve, 1);
   });
 };
