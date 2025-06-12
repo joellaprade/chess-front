@@ -46,6 +46,7 @@ export const useBoardContext = () => {
 export const BoardContextProvider = ({ children }: BoardContextProviderProps) => {
   const LSBoard = JSON.parse(localStorage.getItem("board") || "null");
   const LSIsWhiteTurn = JSON.parse(localStorage.getItem("isWhiteTurn") || "null");
+
   const [board, setBoard] = useState<Board>(LSBoard || defaultBoard);
   const [selectedSquare, setSelectedSquare] = useState<number | null>(null);
   const [showQueenPopup, setShowQueenPopup] = useState(false);

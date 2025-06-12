@@ -25,7 +25,6 @@ const Board = ({ isWhite }: { isWhite: boolean }) => {
             onClick={() => handlePieceClick(square)}
             key={cI}
           >
-            <span className="absolute">{square.id}</span>
             {square.piece && (
               <Image src={`/assets/pieces/${square.piece}.png`} width={80} height={80} alt="" />
             )}
