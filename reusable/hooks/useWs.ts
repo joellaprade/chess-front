@@ -20,7 +20,7 @@ const useWs = () => {
     connected.current = true;
 
     try {
-      const wsRes = new WebSocket(wssUrl);
+      const wsRes = new WebSocket(`${wssUrl}?userId=${userId}`);
       ws.current = wsRes;
       initWs(ws.current, isReconnect);
     } catch (e) {

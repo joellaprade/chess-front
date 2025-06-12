@@ -1,1 +1,4 @@
 about
+no sirve wrong password message
+no sirve online friend indicator
+hacer ws heartbeat
