@@ -11,7 +11,7 @@ type formValues = {
   password: string;
 };
 
-export default async function login(formData: FormData): Promise<boolean> {
+export default async function login(formData: FormData): Promise<boolean | string> {
   try {
     await db();
 
@@ -26,6 +26,6 @@ export default async function login(formData: FormData): Promise<boolean> {
       throw new Error("El usuario o contraseña son incorrectos.");
     }
   } catch (e) {
-    throw e;
+    return "El usuario o contraseña son incorrectos.";
   }
 }

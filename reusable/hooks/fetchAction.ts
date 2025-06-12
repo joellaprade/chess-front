@@ -21,5 +21,5 @@ export default function useFetchServerAction<T>(
     }
   };
 
-  return { data, loading, error, fetchData };
+  return { data, loading, error, fetchData, setError };
 }

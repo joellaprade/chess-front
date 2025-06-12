@@ -10,7 +10,7 @@ export default function Page() {
   const [password, setPassword] = useState("");
   const [isValid, setIsValid] = useState(false);
 
-  const { data, loading, error, fetchData } = useFetchServerAction(login);
+  const { data, loading, error, fetchData, setError } = useFetchServerAction(login);
 
   const checkIsValid = () => {
     if (!username || !password) {
@@ -23,6 +23,10 @@ export default function Page() {
 
   useEffect(checkIsValid, [username, password]);
   useEffect(() => {
+    if (typeof data === "string") {
+      setError(data);
+      return;
+    }
     if (data) window.location.href = "/";
   }, [data]);
 
