@@ -21,6 +21,14 @@ export default function Page() {
     setIsValid(true);
   };
 
+  const handleGuest = () => {
+    const formData = new FormData();
+    formData.append("username", "user");
+    formData.append("password", "user");
+
+    fetchData(formData);
+  };
+
   useEffect(checkIsValid, [username, password]);
   useEffect(() => {
     if (typeof data === "string") {
@@ -62,6 +70,9 @@ export default function Page() {
         >
           {loading ? "Enviando..." : "Ingresar"}
         </button>
+        <span className="link absolute right-7 bottom-5" onClick={handleGuest}>
+          Ingresar como Invitado
+        </span>
       </form>
     </>
   );

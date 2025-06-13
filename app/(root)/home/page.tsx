@@ -13,6 +13,10 @@ export default function Page() {
       <Link className="w-full" href={"/settings"}>
         <button className="big-btn secondary-btn">Ajustes</button>
       </Link>
+
+      <Link href={"/about"}>
+        <span className="link absolute right-7 bottom-5">Información del Programa</span>
+      </Link>
     </>
   );
 }

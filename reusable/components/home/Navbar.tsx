@@ -40,6 +40,15 @@ const Navbar = () => {
     case "/friends/add":
       message = "Agregar Amigo";
       break;
+    case "/settings":
+      message = "Ajustes";
+      break;
+    case "/settings/change-profile-picture":
+      message = "Cambiar Foto de Perfil";
+      break;
+    case "/about":
+      message = "Acerca del App";
+      break;
     default:
       message = "Bienvenido";
       break;

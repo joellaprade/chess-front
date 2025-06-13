@@ -28,6 +28,9 @@ body {
   h3 {
     @apply text-light text-xl font-black;
   }
+  p {
+    @apply text-gray-300;
+  }
 
   button {
     @apply cursor-pointer rounded-[10px] text-white;

@@ -1,3 +1,0 @@
-about
-hacer ws heartbeat
-no sirve game restart
