@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 
-export async function middleware(req: NextRequest) {
-  const result = await fetch(`${req.nextUrl.origin}/api/validate-session`, {
+export async function proxy(req: NextRequest) {
+  const result = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/validate-session`, {
     headers: {
       cookie: req.headers.get("cookie") || "",
     },
